@@ -8,21 +8,20 @@ import ClubStrip from '@/components/sections/ClubStrip.astro';
 import Picture from '@/components/ui/Picture.astro';
 import CareersForm from '@/components/forms/CareersForm.astro';
 import ContactForm from '@/components/forms/ContactForm.astro';
-import { getContent, findGallery, sortedLocations } from '@/lib/cms';
+import { getContent, sortedLocations } from '@/lib/cms';
 import { breadcrumbSchema } from '@/utils/schema';
 
 const content = await getContent();
 const { aboutPage, joinPage, contactPage, settings } = content;
 const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
 
-// Framed photos: explicit list → "about-frames" gallery → location photos.
+// Framed photos: the About page's own list, else the location photos from the home page.
 const frames =
   aboutPage.frames.length > 0
     ? aboutPage.frames
-    : (findGallery(content.galleries, 'about-frames')?.images.map((g) => g.image) ??
-      sortedLocations(content.locations)
+    : sortedLocations(content.locations)
         .map((l) => l.image)
-        .filter((i): i is NonNullable<typeof i> => Boolean(i)));
+        .filter((i): i is NonNullable<typeof i> => Boolean(i));
 const teamImage = aboutPage.teamImage ?? joinPage.image;
 
 const schema = [

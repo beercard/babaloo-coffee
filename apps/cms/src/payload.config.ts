@@ -11,9 +11,6 @@ import { Users } from './collections/Users';
 import { Media } from './collections/Media';
 import { MenuCategories } from './collections/MenuCategories';
 import { MenuItems } from './collections/MenuItems';
-import { Locations } from './collections/Locations';
-import { Galleries } from './collections/Galleries';
-import { Testimonials } from './collections/Testimonials';
 import { FormSubmissions } from './collections/FormSubmissions';
 import { globals } from './globals';
 import { formsSubmit, formsSubmitOptions } from './endpoints/formsSubmit';
@@ -46,9 +43,11 @@ export default buildConfig({
     },
     // Sidebar order: groups are listed in the order collections/globals appear.
   },
-  // Order here = order of the groups in the admin sidebar: Home · Menu · Media · Settings (· Pages from globals).
-  collections: [Locations, Testimonials, MenuItems, MenuCategories, Media, Galleries, FormSubmissions, Users],
+  // Sidebar: Pages (globals) · Menu · Media · Messages · Settings.
+  collections: [MenuItems, MenuCategories, Media, FormSubmissions, Users],
   globals,
+  // Image library folders (one per page/section); the folder collection is created by Payload.
+  folders: { slug: 'folders', browseByFolder: true, collectionSpecific: false },
   i18n: {
     supportedLanguages: { en, es },
     fallbackLanguage: 'en',

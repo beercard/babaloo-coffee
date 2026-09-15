@@ -4,7 +4,7 @@
  * Adding a new block type = one entry here + one block in apps/cms.
  */
 import type { HomeSection, SiteContent } from '@/lib/cms/types';
-import { featuredItems, findGallery, sortedLocations } from '@/lib/cms';
+import { featuredItems, findGallery } from '@/lib/cms';
 import Hero from './Hero.astro';
 import IconStrip from './IconStrip.astro';
 import NavRow from './NavRow.astro';
@@ -37,7 +37,7 @@ const enabled = sections.filter((s) => s.enabled);
       case 'intro':
         return <Intro text={section.text} title={section.title} cta={section.cta} id={section.anchor} />;
       case 'locations':
-        return <Locations locations={sortedLocations(content.locations)} id={section.anchor ?? 'locations'} title={section.title} text={section.text} />;
+        return <Locations locations={section.items.filter((l) => l.status !== 'closed')} id={section.anchor ?? 'locations'} title={section.title} text={section.text} />;
       case 'clubStrip':
         return <ClubStrip />;
       case 'featuredMenu':
@@ -45,11 +45,11 @@ const enabled = sections.filter((s) => s.enabled);
           <FeaturedMenu items={featuredItems(content.menu.items, section.limit)} title={section.title} text={section.text} cta={section.cta} currency={content.menu.currency} id={section.anchor ?? 'featured'} />
         );
       case 'gallery': {
-        const gallery = findGallery(content.galleries, section.gallery);
+        const gallery = findGallery(content.galleries, 'main');
         return gallery ? <GalleryGrid gallery={gallery} title={section.title} limit={section.limit} cta={section.cta} id={section.anchor ?? 'gallery'} /> : null;
       }
       case 'testimonials':
-        return <Testimonials items={content.testimonials} title={section.title} id={section.anchor ?? 'testimonials'} />;
+        return <Testimonials items={section.items} title={section.title} id={section.anchor ?? 'testimonials'} />;
       case 'cta':
         return <CtaBlock section={section} />;
       case 'richText':

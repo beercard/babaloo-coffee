@@ -217,6 +217,8 @@ export interface LocationsSection extends SectionBase {
   type: 'locations';
   title?: string;
   text?: string;
+  /** The locations themselves live inside the section (edited in place on the Home page). */
+  items: Location[];
 }
 export interface FeaturedMenuSection extends SectionBase {
   type: 'featuredMenu';
@@ -228,13 +230,14 @@ export interface FeaturedMenuSection extends SectionBase {
 export interface GallerySection extends SectionBase {
   type: 'gallery';
   title?: string;
-  gallery: string;
+  /** Shows the first `limit` photos of the Gallery page. */
   limit: number;
   cta?: Link;
 }
 export interface TestimonialsSection extends SectionBase {
   type: 'testimonials';
   title?: string;
+  items: Testimonial[];
 }
 export interface CtaSection extends SectionBase {
   type: 'cta';
@@ -310,7 +313,7 @@ export interface JoinPage {
 export interface GalleryPage {
   title: string;
   text?: string;
-  gallery: string;
+  images: GalleryImage[];
   seo: SEOMeta;
 }
 
@@ -324,7 +327,10 @@ export interface SiteContent {
   joinPage: JoinPage;
   galleryPage: GalleryPage;
   menu: MenuData;
+  /** Derived from the Home page "Locations" section (used by JSON-LD, contact page…). */
   locations: Location[];
+  /** Derived: the Gallery page photos as gallery "main". */
   galleries: Gallery[];
+  /** Derived from the Home page "Testimonials" section. */
   testimonials: Testimonial[];
 }

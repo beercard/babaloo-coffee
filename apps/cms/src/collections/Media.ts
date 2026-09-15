@@ -11,9 +11,14 @@ export const Media: CollectionConfig = {
   labels: { singular: t('Image', 'Imagen'), plural: t('Images', 'Imágenes') },
   admin: {
     group: t('Media', 'Fotos'),
-    description: 'Upload photos here, then pick them from any page or product. Always fill in the description (ALT) — it is read by screen readers and Google.',
-    defaultColumns: ['filename', 'alt', 'updatedAt'],
+    description: t(
+      'Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product.',
+      'Biblioteca de fotos, organizada en carpetas por página (Home · Menu · About · Gallery…). Sube en la carpeta correcta, añade una descripción y luego elige la foto desde la página o el producto.',
+    ),
+    defaultColumns: ['filename', 'alt', 'folder', 'updatedAt'],
   },
+  // Enables the folder browser for this collection (folders are created in the Images list).
+  folders: true,
   access: editorContentDeletable,
   upload: {
     staticDir: mediaDir,
@@ -31,7 +36,7 @@ export const Media: CollectionConfig = {
       type: 'text',
       label: t('Description (ALT text)', 'Descripción (texto ALT)'),
       required: true,
-      admin: { description: 'Describe the photo in one sentence, e.g. "Iced latte in a Babaloo cup on a stone table".' },
+      admin: { description: t('Describe the photo in one sentence, e.g. "Iced latte in a Babaloo cup on a stone table".', 'Describe la foto en una frase, p. ej. "Iced latte in a Babaloo cup on a stone table".') },
     },
     { name: 'caption', type: 'text', label: t('Caption (optional)', 'Pie de foto (opcional)') },
   ],

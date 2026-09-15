@@ -40,6 +40,23 @@ collect(tree);
 /** First image to show: the first top-level category image, else the first item image. */
 const firstVisual = tree[0]?.category.image ? tree[0].category.id : [...visuals.keys()][0];
 
+/** Sub-section kind (drives the icon and tint): hot · iced · salty · sweet · other. */
+type SubKind = 'hot' | 'iced' | 'salty' | 'sweet' | 'other';
+function subKind(slug: string): SubKind {
+  if (/hot/.test(slug)) return 'hot';
+  if (/ice|cold/.test(slug)) return 'iced';
+  if (/salt|savory|savoury|bite/.test(slug)) return 'salty';
+  if (/sweet|dessert/.test(slug)) return 'sweet';
+  return 'other';
+}
+const SUB_ICONS: Record<SubKind, string> = {
+  hot: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M17 12h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3c0 1.5-1.5 2-1.5 3.5S8 8 8 8M12 3c0 1.5-1.5 2-1.5 3.5S12 8 12 8"/></svg>',
+  iced: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5.5 6.5l13 11M18.5 6.5l-13 11M12 3l-2 2M12 3l2 2M12 21l-2-2M12 21l2-2M5.5 6.5l2.7.2M5.5 6.5l.2 2.7M18.5 6.5l-2.7.2M18.5 6.5l-.2 2.7M5.5 17.5l2.7-.2M5.5 17.5l.2-2.7M18.5 17.5l-2.7-.2M18.5 17.5l-.2-2.7"/></svg>',
+  salty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3.6-7 8-7s8 3 8 7H4z"/><path d="M3 13h18l-1.5 4h-15z"/><path d="M9 9.5h.01M12 8.5h.01M15 9.5h.01"/></svg>',
+  sweet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l2-8h12l2 8z"/><path d="M6 12c1-3 2.5-4 6-4s5 1 6 4"/><path d="M12 8V5"/><path d="M12 5a1.5 1.5 0 1 0 0-3"/></svg>',
+  other: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>',
+};
+
 /** Which id should the panel show for a given item (its own image or its category's). */
 function visualFor(itemId: string, image: unknown, categoryId: string, topId: string): string | undefined {
   if (image) return itemId;
@@ -66,7 +83,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   <div class="board__list">
     {
       tree.map((top, ti) => (
-        <details class="board__cat" data-board-cat data-tone={ti % 2} data-visual={visuals.has(top.category.id) ? top.category.id : undefined} id={top.category.slug} open={ti === 0 ? true : undefined}>
+        <details class="board__cat" data-board-cat data-tone={ti % 2} data-visual={visuals.has(top.category.id) ? top.category.id : undefined} id={top.category.slug}>
           <summary class="board__row board__row--cat">
             <h2 class="board__cat-name">{top.category.name}</h2>
             <span class="board__toggle" aria-hidden="true" />
@@ -107,9 +124,13 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
           )}
 
           {top.children.map((sub, si) => (
-            <details class="board__sub" data-board-sub data-visual={visuals.has(sub.category.id) ? sub.category.id : undefined} id={`${top.category.slug}-${sub.category.slug}`} open={ti === 0 && si === 0 ? true : undefined}>
-              <summary class="board__row board__row--sub">
-                <h3 class="board__sub-name">{sub.category.name}</h3>
+            <details class="board__sub" data-board-sub data-visual={visuals.has(sub.category.id) ? sub.category.id : undefined} id={`${top.category.slug}-${sub.category.slug}`}>
+              <summary class:list={['board__row', 'board__row--sub', `board__row--${subKind(sub.category.slug)}`]}>
+                <h3 class="board__sub-name">
+                  <span class="board__sub-icon" aria-hidden="true" set:html={SUB_ICONS[subKind(sub.category.slug)]} />
+                  <span class="board__sub-label">{sub.category.name}</span>
+                  <span class="board__sub-count">{sub.items.length}</span>
+                </h3>
                 <span class="board__toggle" aria-hidden="true" />
               </summary>
               <div class="board__panel" data-board-panel>
@@ -181,7 +202,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     background-size: 480px auto;
     transition: background-color 600ms ease;
     /* Panel height as a variable so the photo can be sized against it reliably. */
-    --panel-h: min(46vh, 26rem);
+    --panel-h: min(36vh, 22rem);
     height: var(--panel-h);
     overflow: hidden;
   }
@@ -259,8 +280,71 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     padding-top: clamp(1.4rem, 3vw, 3.25rem);
     padding-bottom: 0.6em;
   }
+  /* sub-sections (Hot · Iced · Salty · Sweet): tinted band + icon, unmistakably different from items */
   .board__row--sub {
-    padding: 0.7em 0;
+    margin-top: 0.75em;
+    padding: 0.55em 0.9em;
+    border-top: 0;
+    border-radius: var(--radius-field);
+    background: var(--sub-tint, rgba(60, 26, 30, 0.06));
+    color: var(--sub-ink, var(--ink));
+  }
+  .board__row--hot {
+    --sub-tint: rgba(163, 90, 60, 0.14);
+    --sub-ink: #7a3a22;
+  }
+  .board__row--iced {
+    --sub-tint: rgba(78, 118, 140, 0.16);
+    --sub-ink: #2f5468;
+  }
+  .board__row--salty {
+    --sub-tint: rgba(150, 120, 60, 0.16);
+    --sub-ink: #6b5320;
+  }
+  .board__row--sweet {
+    --sub-tint: rgba(170, 90, 120, 0.15);
+    --sub-ink: #7a3555;
+  }
+  .board__sub-name {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-style: normal;
+    font-size: calc(var(--text-menu-title) * 0.62);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .board__sub-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: 50%;
+    background: var(--cream);
+    box-shadow: inset 0 0 0 1.5px currentColor;
+  }
+  .board__sub-icon :global(svg) {
+    width: 62%;
+    height: 62%;
+  }
+  .board__sub-count {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 0.85em;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 0.7;
+  }
+  .board__row--sub .board__toggle {
+    font-size: calc(var(--text-menu-title) * 0.85);
+  }
+  /* items inside a sub-section are indented under its band */
+  .board__sub > .board__panel > .board__items {
+    padding-left: 0.9em;
+    padding-right: 0.9em;
   }
   .board__cat:first-of-type > .board__row--cat {
     border-top: 0;
@@ -273,9 +357,6 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     font-size: var(--text-menu-title);
     text-transform: uppercase;
     line-height: 1.2;
-  }
-  .board__sub-name {
-    text-transform: none;
   }
   .board__toggle {
     font-family: var(--font-body);

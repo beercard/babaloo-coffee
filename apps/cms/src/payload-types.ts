@@ -67,30 +67,30 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    locations: Location;
-    testimonials: Testimonial;
     'menu-items': MenuItem;
     'menu-categories': MenuCategory;
     media: Media;
-    galleries: Gallery;
     'form-submissions': FormSubmission;
     users: User;
     'payload-kv': PayloadKv;
+    folders: FolderInterface;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    folders: {
+      documentsAndFolders: 'folders' | 'media';
+    };
+  };
   collectionsSelect: {
-    locations: LocationsSelect<false> | LocationsSelect<true>;
-    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'menu-items': MenuItemsSelect<false> | MenuItemsSelect<true>;
     'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    folders: FoldersSelect<false> | FoldersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -103,9 +103,9 @@ export interface Config {
     homepage: Homepage;
     'menu-page': MenuPage;
     'about-page': AboutPage;
+    'gallery-page': GalleryPage;
     'contact-page': ContactPage;
     'join-page': JoinPage;
-    'gallery-page': GalleryPage;
     'site-settings': SiteSetting;
     'seo-defaults': SeoDefault;
   };
@@ -113,9 +113,9 @@ export interface Config {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     'menu-page': MenuPageSelect<false> | MenuPageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
+    'gallery-page': GalleryPageSelect<false> | GalleryPageSelect<true>;
     'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
     'join-page': JoinPageSelect<false> | JoinPageSelect<true>;
-    'gallery-page': GalleryPageSelect<false> | GalleryPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'seo-defaults': SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
   };
@@ -146,125 +146,6 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
-}
-/**
- * The framed photos on the home page. Add a new location here and it appears automatically.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "locations".
- */
-export interface Location {
-  id: number;
-  name: string;
-  /**
-   * e.g. "rea farms". Leave empty for none.
-   */
-  scriptName?: string | null;
-  status: 'open' | 'coming-soon' | 'closed';
-  image?: (number | null) | Media;
-  address?: {
-    street?: string | null;
-    suite?: string | null;
-    city?: string | null;
-    region?: string | null;
-    postalCode?: string | null;
-    country?: string | null;
-  };
-  phone?: string | null;
-  email?: string | null;
-  hoursDisplay?:
-    | {
-        days: string;
-        hours: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Same information in a format search engines understand. 24h times, e.g. 07:00 and 16:00.
-   */
-  hoursSpec?:
-    | {
-        dayOfWeek: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday')[];
-        opens: string;
-        closes: string;
-        id?: string | null;
-      }[]
-    | null;
-  mapUrl?: string | null;
-  geo?: {
-    lat?: number | null;
-    lng?: number | null;
-  };
-  orderUrl?: string | null;
-  /**
-   * e.g. "Coming soon" or "Opening spring 2027".
-   */
-  note?: string | null;
-  /**
-   * Lower numbers show first.
-   */
-  order?: number | null;
-  /**
-   * Auto-generated from the name. Used for links like /menu#latte.
-   */
-  slug?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Upload photos here, then pick them from any page or product. Always fill in the description (ALT) — it is read by screen readers and Google.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Describe the photo in one sentence, e.g. "Iced latte in a Babaloo cup on a stone table".
-   */
-  alt: string;
-  caption?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * Guest quotes. Shown on the home page when the "Testimonials" section is enabled.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials".
- */
-export interface Testimonial {
-  id: number;
-  quote: string;
-  author: string;
-  role?: string | null;
-  rating?: number | null;
-  active?: boolean | null;
-  /**
-   * Lower numbers show first.
-   */
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * Every drink and dish. Change the price here and the website updates on the next publish.
@@ -341,30 +222,63 @@ export interface MenuCategory {
   createdAt: string;
 }
 /**
- * Photo sets used on the website. "Gallery" is the /gallery page; "About — framed photos" fills the three gold frames on the About page. Drag rows to reorder.
+ * Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "galleries".
+ * via the `definition` "media".
  */
-export interface Gallery {
+export interface Media {
+  id: number;
+  /**
+   * Describe the photo in one sentence, e.g. "Iced latte in a Babaloo cup on a stone table".
+   */
+  alt: string;
+  caption?: string | null;
+  folder?: (number | null) | FolderInterface;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "folders".
+ */
+export interface FolderInterface {
   id: number;
   name: string;
-  description?: string | null;
-  images?:
-    | {
-        image: number | Media;
-        /**
-         * Uses the photo's own description when empty.
-         */
-        alt?: string | null;
-        caption?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Auto-generated from the name. Used for links like /menu#latte.
-   */
-  slug?: string | null;
+  folder?: (number | null) | FolderInterface;
+  documentsAndFolders?: {
+    docs?: (
+      | {
+          relationTo?: 'folders';
+          value: number | FolderInterface;
+        }
+      | {
+          relationTo?: 'media';
+          value: number | Media;
+        }
+    )[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -454,14 +368,6 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'locations';
-        value: number | Location;
-      } | null)
-    | ({
-        relationTo: 'testimonials';
-        value: number | Testimonial;
-      } | null)
-    | ({
         relationTo: 'menu-items';
         value: number | MenuItem;
       } | null)
@@ -474,16 +380,16 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'galleries';
-        value: number | Gallery;
-      } | null)
-    | ({
         relationTo: 'form-submissions';
         value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'folders';
+        value: number | FolderInterface;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -526,70 +432,6 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "locations_select".
- */
-export interface LocationsSelect<T extends boolean = true> {
-  name?: T;
-  scriptName?: T;
-  status?: T;
-  image?: T;
-  address?:
-    | T
-    | {
-        street?: T;
-        suite?: T;
-        city?: T;
-        region?: T;
-        postalCode?: T;
-        country?: T;
-      };
-  phone?: T;
-  email?: T;
-  hoursDisplay?:
-    | T
-    | {
-        days?: T;
-        hours?: T;
-        id?: T;
-      };
-  hoursSpec?:
-    | T
-    | {
-        dayOfWeek?: T;
-        opens?: T;
-        closes?: T;
-        id?: T;
-      };
-  mapUrl?: T;
-  geo?:
-    | T
-    | {
-        lat?: T;
-        lng?: T;
-      };
-  orderUrl?: T;
-  note?: T;
-  order?: T;
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials_select".
- */
-export interface TestimonialsSelect<T extends boolean = true> {
-  quote?: T;
-  author?: T;
-  role?: T;
-  rating?: T;
-  active?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -639,6 +481,7 @@ export interface MenuCategoriesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  folder?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -664,25 +507,6 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "galleries_select".
- */
-export interface GalleriesSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  images?:
-    | T
-    | {
-        image?: T;
-        alt?: T;
-        caption?: T;
-        id?: T;
-      };
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -741,6 +565,17 @@ export interface PayloadKvSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "folders_select".
+ */
+export interface FoldersSelect<T extends boolean = true> {
+  name?: T;
+  folder?: T;
+  documentsAndFolders?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -772,7 +607,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Drag sections to reorder them; untick "Show this section" to hide one without deleting it.
+ * Every section of the home page, in order. Drag to reorder; untick "Show this section" to hide one without deleting it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
@@ -813,7 +648,7 @@ export interface Homepage {
         | {
             enabled?: boolean | null;
             /**
-             * Links are managed in Settings → Site settings → Navigation.
+             * The links themselves are managed by the super admin (Site settings → Navigation).
              */
             note?: string | null;
             id?: string | null;
@@ -844,6 +679,55 @@ export interface Homepage {
             enabled?: boolean | null;
             title?: string | null;
             text?: string | null;
+            /**
+             * The first one is used for Google (address, hours). Set "Coming soon" for future locations.
+             */
+            items?:
+              | {
+                  name: string;
+                  scriptName?: string | null;
+                  status: 'open' | 'coming-soon' | 'closed';
+                  image?: (number | null) | Media;
+                  address?: {
+                    street?: string | null;
+                    suite?: string | null;
+                    city?: string | null;
+                    region?: string | null;
+                    postalCode?: string | null;
+                    country?: string | null;
+                  };
+                  phone?: string | null;
+                  email?: string | null;
+                  hoursDisplay?:
+                    | {
+                        days: string;
+                        hours: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  hoursSpec?:
+                    | {
+                        dayOfWeek: (
+                          'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+                        )[];
+                        opens: string;
+                        closes: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  mapUrl?: string | null;
+                  geo?: {
+                    lat?: number | null;
+                    lng?: number | null;
+                  };
+                  orderUrl?: string | null;
+                  /**
+                   * e.g. "Coming soon".
+                   */
+                  note?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
             /**
              * Lets links jump to this section, e.g. "locations" → /#locations.
              */
@@ -879,7 +763,6 @@ export interface Homepage {
         | {
             enabled?: boolean | null;
             title?: string | null;
-            gallery: number | Gallery;
             limit?: number | null;
             cta?: {
               label?: string | null;
@@ -897,6 +780,14 @@ export interface Homepage {
         | {
             enabled?: boolean | null;
             title?: string | null;
+            items?:
+              | {
+                  quote: string;
+                  author: string;
+                  role?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
             /**
              * Lets links jump to this section, e.g. "locations" → /#locations.
              */
@@ -963,7 +854,7 @@ export interface Homepage {
   createdAt?: string | null;
 }
 /**
- * Intro text of the /menu page. Products and categories are managed in Menu → Products / Categories.
+ * Intro text of the /menu page. The products and categories themselves are in the Menu group.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "menu-page".
@@ -995,24 +886,30 @@ export interface MenuPage {
   createdAt?: string | null;
 }
 /**
+ * Sections of /about, top to bottom.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about-page".
  */
 export interface AboutPage {
   id: number;
   title?: string | null;
-  /**
-   * Leave empty to use the "About — framed photos" gallery, then the location photos.
-   */
   frames?:
     | {
         image: number | Media;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Line breaks are kept.
+   */
   text: string;
   showTeamSection?: boolean | null;
   teamImage?: (number | null) | Media;
+  /**
+   * The form texts, positions and experience options are edited in the "Join our team page".
+   */
+  note?: string | null;
   showContactSection?: boolean | null;
   /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
@@ -1034,6 +931,44 @@ export interface AboutPage {
   createdAt?: string | null;
 }
 /**
+ * The photos of /gallery (the home page preview uses the first ones). Drag to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-page".
+ */
+export interface GalleryPage {
+  id: number;
+  title?: string | null;
+  text?: string | null;
+  images?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Leave a field empty to use the site-wide default (Settings → SEO).
+   */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Only if this page should point to another URL.
+     */
+    canonical?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    twitterCard?: ('summary_large_image' | 'summary') | null;
+    robots?: ('index, follow' | 'noindex, follow') | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Texts of /contact. Email, phone, address and hours come from the first location (Home page) and Site settings.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact-page".
  */
@@ -1061,6 +996,8 @@ export interface ContactPage {
   createdAt?: string | null;
 }
 /**
+ * Used on /join-our-team and in the "Join our team" section of About.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "join-page".
  */
@@ -1081,34 +1018,6 @@ export interface JoinPage {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Leave a field empty to use the site-wide default (Settings → SEO).
-   */
-  seo?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Only if this page should point to another URL.
-     */
-    canonical?: string | null;
-    ogTitle?: string | null;
-    ogDescription?: string | null;
-    ogImage?: (number | null) | Media;
-    twitterCard?: ('summary_large_image' | 'summary') | null;
-    robots?: ('index, follow' | 'noindex, follow') | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery-page".
- */
-export interface GalleryPage {
-  id: number;
-  title?: string | null;
-  text?: string | null;
-  gallery: number | Gallery;
   /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
    */
@@ -1195,7 +1104,7 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * Site-wide defaults. Each page can override them in its own SEO box.
+ * Site-wide defaults. Each page can override them in its own SEO box (super admin only).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seo-defaults".
@@ -1287,6 +1196,51 @@ export interface HomepageSelect<T extends boolean = true> {
               enabled?: T;
               title?: T;
               text?: T;
+              items?:
+                | T
+                | {
+                    name?: T;
+                    scriptName?: T;
+                    status?: T;
+                    image?: T;
+                    address?:
+                      | T
+                      | {
+                          street?: T;
+                          suite?: T;
+                          city?: T;
+                          region?: T;
+                          postalCode?: T;
+                          country?: T;
+                        };
+                    phone?: T;
+                    email?: T;
+                    hoursDisplay?:
+                      | T
+                      | {
+                          days?: T;
+                          hours?: T;
+                          id?: T;
+                        };
+                    hoursSpec?:
+                      | T
+                      | {
+                          dayOfWeek?: T;
+                          opens?: T;
+                          closes?: T;
+                          id?: T;
+                        };
+                    mapUrl?: T;
+                    geo?:
+                      | T
+                      | {
+                          lat?: T;
+                          lng?: T;
+                        };
+                    orderUrl?: T;
+                    note?: T;
+                    id?: T;
+                  };
               anchor?: T;
               id?: T;
               blockName?: T;
@@ -1321,7 +1275,6 @@ export interface HomepageSelect<T extends boolean = true> {
           | {
               enabled?: T;
               title?: T;
-              gallery?: T;
               limit?: T;
               cta?:
                 | T
@@ -1339,6 +1292,14 @@ export interface HomepageSelect<T extends boolean = true> {
           | {
               enabled?: T;
               title?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    id?: T;
+                  };
               anchor?: T;
               id?: T;
               blockName?: T;
@@ -1437,7 +1398,38 @@ export interface AboutPageSelect<T extends boolean = true> {
   text?: T;
   showTeamSection?: T;
   teamImage?: T;
+  note?: T;
   showContactSection?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterCard?: T;
+        robots?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-page_select".
+ */
+export interface GalleryPageSelect<T extends boolean = true> {
+  title?: T;
+  text?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -1497,30 +1489,6 @@ export interface JoinPageSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        ogImage?: T;
-        twitterCard?: T;
-        robots?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery-page_select".
- */
-export interface GalleryPageSelect<T extends boolean = true> {
-  title?: T;
-  text?: T;
-  gallery?: T;
   seo?:
     | T
     | {

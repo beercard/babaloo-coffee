@@ -11,35 +11,27 @@ type Group = { title: [string, string]; cards: Card[] }
 
 const groups: Group[] = [
   {
+    title: ['Pages — edit each section in place', 'Páginas — edita cada sección en su sitio'],
+    cards: [
+      { title: ['Home page', 'Página de inicio'], text: ['Hero photos · icons band · welcome text · locations & hours · optional sections.', 'Fotos del hero · franja de iconos · texto de bienvenida · locales y horarios · secciones opcionales.'], href: '/admin/globals/homepage', icon: '🏠' },
+      { title: ['Menu page', 'Página Menú'], text: ['Intro text of the menu page (products are below).', 'Texto de intro de la página del menú (los productos están abajo).'], href: '/admin/globals/menu-page', icon: '✏️' },
+      { title: ['About page', 'Página About'], text: ['Title · 3 framed photos · text · team photo · contact form.', 'Título · 3 fotos enmarcadas · texto · foto del equipo · formulario.'], href: '/admin/globals/about-page', icon: '🐶' },
+      { title: ['Gallery page', 'Página Galería'], text: ['All the gallery photos, in order.', 'Todas las fotos de la galería, en orden.'], href: '/admin/globals/gallery-page', icon: '🖼️' },
+      { title: ['Contact page', 'Página Contacto'], text: ['Title and intro text.', 'Título y texto de intro.'], href: '/admin/globals/contact-page', icon: '✉️' },
+      { title: ['Join our team page', 'Página Únete al equipo'], text: ['Careers text, photo, positions and experience options.', 'Texto, foto, puestos y niveles de experiencia.'], href: '/admin/globals/join-page', icon: '🤝' },
+    ],
+  },
+  {
     title: ['Menu', 'Menú'],
     cards: [
       { title: ['Products', 'Productos'], text: ['Prices, descriptions, photos, labels. Hide a product with one checkbox.', 'Precios, descripciones, fotos, etiquetas. Oculta un producto con una casilla.'], href: '/admin/collections/menu-items', icon: '☕' },
       { title: ['Categories', 'Categorías'], text: ['Coffee, Matcha & non-coffee, Bites… and their Hot / Iced sections.', 'Coffee, Matcha & non-coffee, Bites… y sus secciones Hot / Iced.'], href: '/admin/collections/menu-categories', icon: '📋' },
-      { title: ['Menu page text', 'Texto de la página Menú'], text: ['The intro at the top of the menu page.', 'El texto de arriba de la página del menú.'], href: '/admin/globals/menu-page', icon: '✏️' },
-    ],
-  },
-  {
-    title: ['Home', 'Portada'],
-    cards: [
-      { title: ['Home page', 'Página de inicio'], text: ['Hero photos, welcome text, order and visibility of every section.', 'Fotos del hero, texto de bienvenida, orden y visibilidad de cada sección.'], href: '/admin/globals/homepage', icon: '🏠' },
-      { title: ['Locations & hours', 'Locales y horarios'], text: ['Address, opening hours, map link and "coming soon" locations.', 'Dirección, horarios, enlace al mapa y locales "coming soon".'], href: '/admin/collections/locations', icon: '📍' },
-      { title: ['Testimonials', 'Testimonios'], text: ['Guest quotes (optional section).', 'Frases de clientes (sección opcional).'], href: '/admin/collections/testimonials', icon: '💬' },
-    ],
-  },
-  {
-    title: ['Pages', 'Páginas'],
-    cards: [
-      { title: ['About', 'About'], text: ['Framed photos, text, team photo and section toggles.', 'Fotos enmarcadas, texto, foto del equipo y secciones.'], href: '/admin/globals/about-page', icon: '🐶' },
-      { title: ['Contact', 'Contacto'], text: ['Title and intro of the contact page.', 'Título e intro de la página de contacto.'], href: '/admin/globals/contact-page', icon: '✉️' },
-      { title: ['Join our team', 'Únete al equipo'], text: ['Careers text, photo, positions and experience options.', 'Texto, foto, puestos y niveles de experiencia.'], href: '/admin/globals/join-page', icon: '🤝' },
-      { title: ['Gallery page', 'Página Galería'], text: ['Which gallery the /gallery page shows.', 'Qué galería muestra la página /gallery.'], href: '/admin/globals/gallery-page', icon: '🖼️' },
     ],
   },
   {
     title: ['Photos & messages', 'Fotos y mensajes'],
     cards: [
-      { title: ['Images', 'Imágenes'], text: ['Upload photos once, reuse them anywhere. Always add a short description.', 'Sube las fotos una vez y úsalas donde quieras. Añade siempre una descripción.'], href: '/admin/collections/media', icon: '📷' },
-      { title: ['Galleries', 'Galerías'], text: ['The gallery page and the three framed photos on About. Drag to reorder.', 'La galería de la web y las tres fotos enmarcadas de About. Arrastra para ordenar.'], href: '/admin/collections/galleries', icon: '🗂️' },
+      { title: ['Images', 'Imágenes'], text: ['Photo library in folders by page (Home · Menu · About · Gallery). Upload here, then pick from the page.', 'Biblioteca en carpetas por página (Home · Menu · About · Gallery). Sube aquí y luego elige desde la página.'], href: '/admin/collections/media', icon: '📷' },
       { title: ['Inbox', 'Mensajes'], text: ['Messages from the Contact and Join our team forms.', 'Mensajes de los formularios de contacto y empleo.'], href: '/admin/collections/form-submissions', icon: '📥' },
     ],
   },
@@ -47,7 +39,7 @@ const groups: Group[] = [
     title: ['Settings (super admin)', 'Ajustes (super admin)'],
     cards: [
       { title: ['Site settings', 'Ajustes del sitio'], text: ['Business name, contact details, social links, navigation.', 'Nombre, datos de contacto, redes, navegación.'], href: '/admin/globals/site-settings', icon: '⚙️', admin: true },
-      { title: ['SEO defaults', 'SEO por defecto'], text: ['Default title, description and share image for Google.', 'Título, descripción e imagen por defecto para Google.'], href: '/admin/globals/seo-defaults', icon: '🔍', admin: true },
+      { title: ['SEO defaults', 'SEO por defecto'], text: ['Default title, description and share image for Google. Page SEO boxes are also super-admin only.', 'Título, descripción e imagen por defecto para Google. Los SEO de cada página también son solo para super admin.'], href: '/admin/globals/seo-defaults', icon: '🔍', admin: true },
       { title: ['Users', 'Usuarios'], text: ['Who can log in. Super admins manage everything; editors edit content.', 'Quién puede entrar. Super admins gestionan todo; editores editan contenido.'], href: '/admin/collections/users', icon: '👤', admin: true },
     ],
   },
@@ -56,8 +48,9 @@ const groups: Group[] = [
 const howto: [string, string][] = [
   ['<b>Change a price</b> → Products → open the item → <em>Price (USD)</em> → Save.', '<b>Cambiar un precio</b> → Productos → abre el producto → <em>Price (USD)</em> → Guardar.'],
   ['<b>Change a product photo</b> → Products → open the item → <em>Product photo</em> → Choose or Upload → Save.', '<b>Cambiar la foto de un producto</b> → Productos → abre el producto → <em>Product photo</em> → Elegir o Subir → Guardar.'],
-  ['<b>Change opening hours</b> → Locations & hours → open the location → <em>Opening hours</em> → Save.', '<b>Cambiar el horario</b> → Locales y horarios → abre el local → <em>Opening hours</em> → Guardar.'],
-  ['<b>Change the welcome text</b> → Home page → <em>Intro text</em> → Save.', '<b>Cambiar el texto de bienvenida</b> → Página de inicio → <em>Intro text</em> → Guardar.'],
+  ['<b>Change opening hours</b> → Home page → section <em>Locations</em> → the location → <em>Opening hours</em> → Save.', '<b>Cambiar el horario</b> → Página de inicio → sección <em>Locales</em> → el local → <em>Horario</em> → Guardar.'],
+  ['<b>Change the welcome text</b> → Home page → section <em>Welcome text</em> → Save.', '<b>Cambiar el texto de bienvenida</b> → Página de inicio → sección <em>Texto de bienvenida</em> → Guardar.'],
+  ['<b>Add gallery photos</b> → Gallery page → <em>Photos</em> → Add → upload into the Gallery folder → Save.', '<b>Añadir fotos a la galería</b> → Página Galería → <em>Fotos</em> → Añadir → subir en la carpeta Gallery → Guardar.'],
   ['<b>Hide something temporarily</b> → untick <em>Available</em> (products) or <em>Show this section</em> (home) instead of deleting.', '<b>Ocultar algo temporalmente</b> → desmarca <em>Available</em> (productos) o <em>Show this section</em> (portada) en vez de borrar.'],
 ]
 

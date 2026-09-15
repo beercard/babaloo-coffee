@@ -6,10 +6,10 @@
  * the mapping is thin: it mostly resolves media relations into `ImageRef`
  * objects with absolute URLs and drops inactive documents.
  */
+import { deriveFromPages } from './derive';
 import type {
   AboutPage,
   ContactPage,
-  Gallery,
   GalleryPage,
   HomeSection,
   Homepage,
@@ -208,7 +208,13 @@ function section(block: Json, index: number): HomeSection | undefined {
     case 'intro':
       return { ...base, type: 'intro', title: str(block.title), text: str(block.text) ?? '', cta: link(block.cta) };
     case 'locations':
-      return { ...base, type: 'locations', title: str(block.title), text: str(block.text) };
+      return {
+        ...base,
+        type: 'locations',
+        title: str(block.title),
+        text: str(block.text),
+        items: Array.isArray(block.items) ? (block.items as Json[]).map((l, i) => location({ ...l, id: str(l.id) ?? `location-${i + 1}`, order: i + 1 })) : [],
+      };
     case 'featuredMenu':
       return {
         ...base,
@@ -219,16 +225,14 @@ function section(block: Json, index: number): HomeSection | undefined {
         limit: num(block.limit) ?? 4,
       };
     case 'gallery':
+      return { ...base, type: 'gallery', title: str(block.title), limit: num(block.limit) ?? 6, cta: link(block.cta) };
+    case 'testimonials':
       return {
         ...base,
-        type: 'gallery',
+        type: 'testimonials',
         title: str(block.title),
-        gallery: (typeof block.gallery === 'object' && block.gallery ? str((block.gallery as Json).slug) : str(block.gallery)) ?? 'main',
-        limit: num(block.limit) ?? 6,
-        cta: link(block.cta),
+        items: Array.isArray(block.items) ? (block.items as Json[]).map((x, i) => testimonial({ ...x, id: str(x.id) ?? `t-${i}`, order: i + 1 })) : [],
       };
-    case 'testimonials':
-      return { ...base, type: 'testimonials', title: str(block.title) };
     case 'cta': {
       const cta = link(block.cta);
       if (!cta) return undefined;
@@ -270,7 +274,7 @@ function homepage(doc: Json): Homepage {
 function location(doc: Json): Location {
   return {
     id: String(doc.id),
-    slug: str(doc.slug) ?? String(doc.id),
+    slug: str(doc.slug) ?? (str(doc.name) ?? String(doc.id)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
     name: str(doc.name) ?? '',
     scriptName: str(doc.scriptName),
     status: (str(doc.status) as Location['status']) ?? 'open',
@@ -332,21 +336,15 @@ function menu(categories: Json[], items: Json[]): MenuData {
   };
 }
 
-function gallery(doc: Json): Gallery {
-  return {
-    id: String(doc.id),
-    name: str(doc.name) ?? '',
-    slug: str(doc.slug) ?? String(doc.id),
-    description: str(doc.description),
-    images: Array.isArray(doc.images)
-      ? (doc.images as Json[])
-          .map((g, i) => {
-            const img = image(g.image, str(g.alt));
-            return img ? { image: img, caption: str(g.caption), order: num(g.order) ?? i + 1 } : undefined;
-          })
-          .filter((g): g is NonNullable<typeof g> => Boolean(g))
-      : [],
-  };
+function galleryImages(v: unknown): GalleryPage['images'] {
+  return Array.isArray(v)
+    ? (v as Json[])
+        .map((g, i) => {
+          const img = image(g.image, str(g.alt));
+          return img ? { image: img, caption: str(g.caption), order: i + 1 } : undefined;
+        })
+        .filter((g): g is NonNullable<typeof g> => Boolean(g))
+    : [];
 }
 
 function testimonial(doc: Json): Testimonial {
@@ -374,9 +372,6 @@ export async function loadPayload(): Promise<SiteContent> {
     galleryDoc,
     categories,
     items,
-    locations,
-    galleries,
-    testimonials,
   ] = await Promise.all([
     get('globals/site-settings?depth=2'),
     get('globals/seo-defaults?depth=2'),
@@ -388,9 +383,6 @@ export async function loadPayload(): Promise<SiteContent> {
     get('globals/gallery-page?depth=2'),
     getAll('menu-categories', 'where[active][equals]=true'),
     getAll('menu-items', 'where[available][equals]=true'),
-    getAll('locations', 'where[status][not_equals]=closed'),
-    getAll('galleries'),
-    getAll('testimonials', 'where[active][equals]=true'),
   ]);
 
   const menuPage: MenuPage = {
@@ -426,22 +418,21 @@ export async function loadPayload(): Promise<SiteContent> {
   const galleryPage: GalleryPage = {
     title: str(galleryDoc.title) ?? 'Gallery',
     text: str(galleryDoc.text),
-    gallery: (typeof galleryDoc.gallery === 'object' && galleryDoc.gallery ? str((galleryDoc.gallery as Json).slug) : str(galleryDoc.gallery)) ?? 'main',
+    images: galleryImages(galleryDoc.images),
     seo: seo(galleryDoc.seo),
   };
+  const home = homepage(homeDoc);
 
   return {
     settings: settings(settingsDoc),
     seoDefaults: seoDefaults(seoDoc),
-    homepage: homepage(homeDoc),
+    homepage: home,
     menuPage,
     aboutPage,
     contactPage,
     joinPage,
     galleryPage,
     menu: menu(categories, items),
-    locations: locations.map(location),
-    galleries: galleries.map(gallery),
-    testimonials: testimonials.map(testimonial),
+    ...deriveFromPages(home, galleryPage),
   };
 }

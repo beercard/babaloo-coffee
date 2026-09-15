@@ -1,11 +1,12 @@
 /**
  * Seeds Payload with the same content the frontend ships in
- * apps/web/src/content/seed (WordPress migration + PDF copy), uploading the
- * photos from apps/web/src/assets.
+ * apps/web/src/content/seed (WordPress/Toast migration + PDF copy), uploading
+ * the photos from apps/web/src/assets into folders named after the page they
+ * belong to.
  *
- *   npm run seed --workspace apps/cms            # only fills empty collections/globals
- *   SEED_FORCE=1 npm run seed --workspace apps/cms   # wipes and re-seeds content
- *   SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD        # first admin user (created if no users exist)
+ *   npm run seed --workspace apps/cms                 # only adds what is missing
+ *   SEED_FORCE=1 npm run seed --workspace apps/cms    # re-seeds menu + pages, re-uploads photos
+ *   SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD            # first admin user (created if no users exist)
  */
 import 'dotenv/config';
 import path from 'path';
@@ -24,6 +25,18 @@ type ImageRef = { src: string; alt: string; caption?: string };
 
 const readJson = <T = Json>(file: string): T => JSON.parse(fs.readFileSync(path.join(SEED, file), 'utf8')) as T;
 
+/** Folder for a seed image, from its file name. */
+function folderNameFor(src: string): string {
+  const name = path.basename(src);
+  if (name.startsWith('hero-')) return 'Home · Hero';
+  if (name.startsWith('location-')) return 'Home · Locations';
+  if (name.startsWith('product-')) return 'Menu · Products';
+  if (name.startsWith('gallery-')) return 'Gallery';
+  if (name.startsWith('team-')) return 'About · Team';
+  if (name.startsWith('logo')) return 'Brand';
+  return 'Other';
+}
+
 async function main() {
   const payload = await getPayload({ config });
   const force = process.env.SEED_FORCE === '1';
@@ -37,14 +50,18 @@ async function main() {
     payload.logger.info(`[seed] admin user created: ${email} — change the password after first login`);
   }
 
-  if (force) {
-    // Galleries and media are referenced by globals (FK), so they are upserted instead of deleted.
-    for (const collection of ['menu-items', 'menu-categories', 'locations', 'testimonials'] as const) {
-      const { docs } = await payload.find({ collection, limit: 1000, depth: 0, pagination: false });
-      for (const doc of docs) await payload.delete({ collection, id: doc.id });
-      payload.logger.info(`[seed] cleared ${collection} (${docs.length})`);
-    }
-  }
+  // ---------- folders (one per page / section) ----------
+  const folderIds = new Map<string, number>();
+  const folder = async (name: string): Promise<number> => {
+    if (folderIds.has(name)) return folderIds.get(name)!;
+    const existing = await payload.find({ collection: 'folders', where: { name: { equals: name } }, limit: 1, depth: 0 });
+    const id = existing.docs[0]
+      ? (existing.docs[0].id as number)
+      : ((await payload.create({ collection: 'folders', data: { name } as never })).id as number);
+    folderIds.set(name, id);
+    return id;
+  };
+  for (const name of ['Home · Hero', 'Home · Locations', 'Menu · Products', 'About · Team', 'Gallery', 'Brand', 'Other']) await folder(name);
 
   // ---------- media ----------
   const mediaCache = new Map<string, number>();
@@ -56,31 +73,36 @@ async function main() {
       payload.logger.warn(`[seed] missing image ${file}`);
       return undefined;
     }
+    const folderId = await folder(folderNameFor(ref.src));
     const existing = await payload.find({ collection: 'media', where: { filename: { equals: path.basename(file) } }, limit: 1 });
     if (existing.docs[0]) {
       const id = existing.docs[0].id as number;
       const onDisk = path.join(process.env.MEDIA_DIR ?? path.resolve(process.cwd(), 'media'), existing.docs[0].filename ?? '');
       if (!fs.existsSync(onDisk) || force) {
         // Re-upload the file (keeps the same id, so every reference stays valid).
-        await payload.update({ collection: 'media', id, data: { alt: ref.alt, caption: ref.caption }, filePath: file, overwriteExistingFiles: true });
+        await payload.update({ collection: 'media', id, data: { alt: ref.alt, caption: ref.caption, folder: folderId } as never, filePath: file, overwriteExistingFiles: true });
+      } else if (!existing.docs[0].folder) {
+        await payload.update({ collection: 'media', id, data: { folder: folderId } as never });
       }
       mediaCache.set(ref.src, id);
       return id;
     }
-    const doc = await payload.create({
-      collection: 'media',
-      data: { alt: ref.alt, caption: ref.caption },
-      filePath: file,
-    });
+    const doc = await payload.create({ collection: 'media', data: { alt: ref.alt, caption: ref.caption, folder: folderId } as never, filePath: file });
     mediaCache.set(ref.src, doc.id as number);
     return doc.id as number;
   };
 
-  type Slugged = 'menu-items' | 'menu-categories' | 'locations' | 'galleries';
-  /** Returns the id of an existing document with this slug (so re-running the seed only adds what is missing). */
+  if (force) {
+    for (const collection of ['menu-items', 'menu-categories'] as const) {
+      const { docs } = await payload.find({ collection, limit: 1000, depth: 0, pagination: false });
+      for (const doc of docs) await payload.delete({ collection, id: doc.id });
+      payload.logger.info(`[seed] cleared ${collection} (${docs.length})`);
+    }
+  }
+
+  type Slugged = 'menu-items' | 'menu-categories';
   const findBySlug = async (collection: Slugged, slug: string): Promise<number | undefined> =>
     (await payload.find({ collection, where: { slug: { equals: slug } }, limit: 1, depth: 0 })).docs[0]?.id as number | undefined;
-  const isEmpty = async (collection: Slugged | 'testimonials') => (await payload.count({ collection })).totalDocs === 0;
 
   // ---------- menu ----------
   {
@@ -137,66 +159,7 @@ async function main() {
     payload.logger.info(`[seed] menu: ${created} documents created (${menu.categories.length} categories, ${menu.items.length} items in seed)`);
   }
 
-  // ---------- locations ----------
-  {
-    for (const l of readJson<Json[]>('locations.json')) {
-      if (await findBySlug('locations', l.slug as string)) continue;
-      await payload.create({
-        collection: 'locations',
-        data: {
-          name: l.name as string,
-          slug: l.slug as string,
-          scriptName: (l.scriptName as string) || undefined,
-          status: l.status as 'open' | 'coming-soon' | 'closed',
-          address: l.address as never,
-          geo: undefined,
-          email: l.email as string | undefined,
-          phone: l.phone as string | undefined,
-          hoursDisplay: ((l.hoursDisplay as Json[]) ?? []) as never,
-          hoursSpec: ((l.hoursSpec as Json[]) ?? []) as never,
-          mapUrl: l.mapUrl as string | undefined,
-          ...(l.geo ? { geo: l.geo as never } : {}),
-          orderUrl: l.orderUrl as string | undefined,
-          note: l.note as string | undefined,
-          order: l.order as number,
-          image: await upload(l.image as ImageRef),
-        },
-      });
-    }
-    payload.logger.info('[seed] locations done');
-  }
-
-  // ---------- galleries ----------
-  const galleryIds = new Map<string, number>();
-  {
-    for (const g of readJson<Json[]>('galleries.json')) {
-      const existing = await findBySlug('galleries', g.slug as string);
-      if (existing && !force) {
-        galleryIds.set(g.slug as string, existing);
-        continue;
-      }
-      const images: { image: number; caption?: string }[] = [];
-      for (const img of g.images as { image: ImageRef; caption?: string }[]) {
-        const id = await upload(img.image);
-        if (id) images.push({ image: id, caption: img.caption });
-      }
-      const data = { name: g.name as string, slug: g.slug as string, images };
-      const doc = existing
-        ? await payload.update({ collection: 'galleries', id: existing, data })
-        : await payload.create({ collection: 'galleries', data });
-      galleryIds.set(g.slug as string, doc.id as number);
-    }
-    payload.logger.info('[seed] galleries done');
-  }
-
-  // ---------- testimonials ----------
-  if (await isEmpty('testimonials')) {
-    for (const t of readJson<Json[]>('testimonials.json')) {
-      await payload.create({ collection: 'testimonials', data: { quote: t.quote as string, author: t.author as string, role: t.role as string | undefined, rating: t.rating as number | undefined, order: (t.order as number) ?? 0, active: true } });
-    }
-  }
-
-  // ---------- globals ----------
+  // ---------- pages (globals) ----------
   const site = readJson('site.json');
   const seo = readJson('seo.json');
   const home = readJson<{ sections: Json[]; seo: Json }>('home.json');
@@ -206,7 +169,7 @@ async function main() {
   const link = (l: unknown) => (l && typeof l === 'object' ? (l as Json) : undefined);
 
   const currentHome = await payload.findGlobal({ slug: 'homepage' });
-  if (force || !(currentHome.sections?.length)) {
+  if (force || !currentHome.sections?.length) {
     await payload.updateGlobal({
       slug: 'site-settings',
       data: {
@@ -220,17 +183,38 @@ async function main() {
     });
     await payload.updateGlobal({ slug: 'seo-defaults', data: { ...seo, ogImage: await upload(seo.ogImage as ImageRef) } as never });
 
-    const sections = [];
+    const sections: Json[] = [];
     for (const s of home.sections) {
       const { type, ...rest } = s;
       const block: Json = { blockType: type, ...rest };
       if (type === 'hero') {
-        block.slides = [];
+        const slides: Json[] = [];
         for (const sl of s.slides as { image: ImageRef; imageMobile?: ImageRef; title?: string; subtitle?: string; text?: string; cta?: Json }[]) {
-          block.slides = [...(block.slides as Json[]), { image: await upload(sl.image), imageMobile: await upload(sl.imageMobile), title: sl.title, subtitle: sl.subtitle, text: sl.text, cta: sl.cta }];
+          slides.push({ image: await upload(sl.image), imageMobile: await upload(sl.imageMobile), title: sl.title, subtitle: sl.subtitle, text: sl.text, cta: sl.cta });
         }
+        block.slides = slides;
       }
-      if (type === 'gallery') block.gallery = galleryIds.get(s.gallery as string);
+      if (type === 'locations') {
+        const items: Json[] = [];
+        for (const l of ((s.items as Json[] | undefined) ?? [])) {
+          items.push({
+            name: l.name,
+            scriptName: (l.scriptName as string) || undefined,
+            status: l.status,
+            image: await upload(l.image as ImageRef),
+            address: l.address,
+            phone: l.phone,
+            email: l.email,
+            hoursDisplay: l.hoursDisplay ?? [],
+            hoursSpec: l.hoursSpec ?? [],
+            mapUrl: l.mapUrl,
+            geo: l.geo,
+            orderUrl: l.orderUrl,
+            note: l.note,
+          });
+        }
+        block.items = items;
+      }
       sections.push(block);
     }
     await payload.updateGlobal({ slug: 'homepage', data: { sections, seo: await seoData(home.seo) } as never });
@@ -239,12 +223,14 @@ async function main() {
     await payload.updateGlobal({ slug: 'menu-page', data: { intro: menuPage.intro, showPrices: menuPage.showPrices ?? true, seo: await seoData(menuPage.seo as Json) } as never });
 
     const about = pages.aboutPage as Json;
+    const frames: Json[] = [];
+    for (const f of ((about.frames as ImageRef[] | undefined) ?? [])) frames.push({ image: await upload(f) });
     await payload.updateGlobal({
       slug: 'about-page',
       data: {
         title: about.title,
         text: about.text,
-        frames: [],
+        frames,
         showTeamSection: about.showTeamSection ?? true,
         teamImage: await upload(about.teamImage as ImageRef),
         showContactSection: about.showContactSection ?? true,
@@ -269,8 +255,13 @@ async function main() {
     });
 
     const gallery = pages.galleryPage as Json;
-    await payload.updateGlobal({ slug: 'gallery-page', data: { title: gallery.title, text: gallery.text, gallery: galleryIds.get(gallery.gallery as string), seo: await seoData(gallery.seo as Json) } as never });
-    payload.logger.info('[seed] globals done');
+    const images: Json[] = [];
+    for (const g of ((gallery.images as { image: ImageRef; caption?: string }[] | undefined) ?? [])) {
+      const id = await upload(g.image);
+      if (id) images.push({ image: id, caption: g.caption });
+    }
+    await payload.updateGlobal({ slug: 'gallery-page', data: { title: gallery.title, text: gallery.text, images, seo: await seoData(gallery.seo as Json) } as never });
+    payload.logger.info('[seed] pages done');
   }
 
   payload.logger.info('[seed] complete');

@@ -61,18 +61,23 @@ export const linkFields = (): Field[] => [
   },
 ];
 
-export const linkGroup = (name: string, label: string): GroupField => ({
+export const linkGroup = (name: string, label: string | Record<string, string>): GroupField => ({
   name,
   type: 'group',
   label,
   fields: linkFields(),
 });
 
+/** SEO box — super admins only (editors never see it; the API still returns it for the build). */
 export const seoGroup = (): GroupField => ({
   name: 'seo',
   type: 'group',
-  label: 'SEO',
-  admin: { description: t('Leave a field empty to use the site-wide default (Settings → SEO).', 'Deja un campo vacío para usar el valor por defecto del sitio (Ajustes → SEO).') },
+  label: 'SEO (super admin)',
+  access: { update: ({ req }) => (req.user as { role?: string } | null)?.role === 'admin' },
+  admin: {
+    condition: (_data, _siblingData, { user }) => (user as { role?: string } | null)?.role === 'admin',
+    description: t('Leave a field empty to use the site-wide default (Settings → SEO).', 'Deja un campo vacío para usar el valor por defecto del sitio (Ajustes → SEO).'),
+  },
   fields: [
     { name: 'title', type: 'text', label: 'SEO title', maxLength: 70 },
     { name: 'description', type: 'textarea', label: 'Meta description', maxLength: 170 },

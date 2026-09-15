@@ -1,3 +1,8 @@
+/**
+ * One global per page. Editors open a page and find every section of that
+ * page inside it; nothing about a page lives anywhere else. SEO boxes are
+ * only visible to super admins.
+ */
 import type { GlobalConfig } from 'payload';
 import { isAdmin, isEditorOrAdmin, publicRead } from '../access/roles';
 import { addressGroup, imageField, linkFields, linkGroup, seoGroup } from '../fields';
@@ -9,6 +14,140 @@ const globalAccess = { read: publicRead, update: isEditorOrAdmin };
 const adminOnlyAccess = { read: publicRead, update: isAdmin };
 const adminOnly = ({ user }: { user?: { role?: string } | null }) => user?.role !== 'admin';
 const hooks = { afterChange: [triggerDeployGlobal] };
+const PAGES = t('Pages', 'Páginas');
+
+export const Homepage: GlobalConfig = {
+  slug: 'homepage',
+  label: t('Home page', 'Página de inicio'),
+  admin: { group: PAGES, description: t('Every section of the home page, in order. Drag to reorder; untick "Show this section" to hide one without deleting it.', 'Todas las secciones de la portada, en orden. Arrastra para reordenar; desmarca "Mostrar esta sección" para ocultarla sin borrarla.') },
+  access: globalAccess,
+  hooks,
+  fields: [
+    { name: 'sections', type: 'blocks', label: t('Sections', 'Secciones'), blocks: homeBlocks },
+    seoGroup(),
+  ],
+};
+
+export const MenuPage: GlobalConfig = {
+  slug: 'menu-page',
+  label: t('Menu page', 'Página Menú'),
+  admin: { group: PAGES, description: t('Intro text of the /menu page. The products and categories themselves are in the Menu group.', 'Texto de la página /menu. Los productos y categorías están en el grupo Menú.') },
+  access: globalAccess,
+  hooks,
+  fields: [
+    {
+      name: 'intro',
+      type: 'group',
+      label: t('Intro', 'Intro'),
+      fields: [
+        { name: 'title', type: 'text', label: t('Title (hand-written style)', 'Título (estilo manuscrito)'), defaultValue: 'homemade creations' },
+        { name: 'text', type: 'textarea', label: t('Text (blank line = new paragraph; the first paragraph is hand-written style)', 'Texto (línea en blanco = párrafo nuevo; el primero va en estilo manuscrito)') },
+      ],
+    },
+    { name: 'showPrices', type: 'checkbox', label: t('Show prices', 'Mostrar precios'), defaultValue: true },
+    seoGroup(),
+  ],
+};
+
+export const AboutPage: GlobalConfig = {
+  slug: 'about-page',
+  label: t('About page', 'Página About'),
+  admin: { group: PAGES, description: t('Sections of /about, top to bottom.', 'Secciones de /about, de arriba abajo.') },
+  access: globalAccess,
+  hooks,
+  fields: [
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: t('1 · Title & framed photos', '1 · Título y fotos enmarcadas'),
+          fields: [
+            { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'About' },
+            {
+              name: 'frames',
+              type: 'array',
+              label: t('Framed photos (3 gold frames)', 'Fotos enmarcadas (3 marcos dorados)'),
+              labels: { singular: t('Photo', 'Foto'), plural: t('Photos', 'Fotos') },
+              maxRows: 3,
+              fields: [imageField('image', t('Photo', 'Foto'), true)],
+            },
+          ],
+        },
+        {
+          label: t('2 · Text', '2 · Texto'),
+          fields: [{ name: 'text', type: 'textarea', label: t('Text', 'Texto'), required: true, admin: { description: t('Line breaks are kept.', 'Los saltos de línea se respetan.') } }],
+        },
+        {
+          label: t('3 · Join our team', '3 · Únete al equipo'),
+          fields: [
+            { name: 'showTeamSection', type: 'checkbox', label: t('Show this section', 'Mostrar esta sección'), defaultValue: true },
+            imageField('teamImage', t('Team photo (next to the form)', 'Foto del equipo (junto al formulario)')),
+            { name: 'note', type: 'text', admin: { readOnly: true, description: t('The form texts, positions and experience options are edited in the "Join our team page".', 'Los textos del formulario, puestos y experiencia se editan en la "Página Únete al equipo".') } },
+          ],
+        },
+        {
+          label: t('4 · Contact', '4 · Contacto'),
+          fields: [
+            { name: 'showContactSection', type: 'checkbox', label: t('Show the contact form at the bottom', 'Mostrar el formulario de contacto al final'), defaultValue: true },
+          ],
+        },
+      ],
+    },
+    seoGroup(),
+  ],
+};
+
+export const ContactPage: GlobalConfig = {
+  slug: 'contact-page',
+  label: t('Contact page', 'Página Contacto'),
+  admin: { group: PAGES, description: t('Texts of /contact. Email, phone, address and hours come from the first location (Home page) and Site settings.', 'Textos de /contact. Email, teléfono, dirección y horario vienen del primer local (Página de inicio) y de Ajustes del sitio.') },
+  access: globalAccess,
+  hooks,
+  fields: [
+    { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Contact us' },
+    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
+    seoGroup(),
+  ],
+};
+
+export const JoinPage: GlobalConfig = {
+  slug: 'join-page',
+  label: t('Join our team page', 'Página Únete al equipo'),
+  admin: { group: PAGES, description: t('Used on /join-our-team and in the "Join our team" section of About.', 'Se usa en /join-our-team y en la sección "Join our team" de About.') },
+  access: globalAccess,
+  hooks,
+  fields: [
+    { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Join our team' },
+    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
+    imageField('image', t('Photo', 'Foto')),
+    { name: 'positions', type: 'array', label: t('Positions (dropdown)', 'Puestos (desplegable)'), labels: { singular: t('Position', 'Puesto'), plural: t('Positions', 'Puestos') }, fields: [{ name: 'label', type: 'text', required: true, label: t('Position', 'Puesto') }] },
+    { name: 'experienceLevels', type: 'array', label: t('Experience levels (dropdown)', 'Niveles de experiencia (desplegable)'), labels: { singular: t('Level', 'Nivel'), plural: t('Levels', 'Niveles') }, fields: [{ name: 'label', type: 'text', required: true, label: t('Level', 'Nivel') }] },
+    seoGroup(),
+  ],
+};
+
+export const GalleryPage: GlobalConfig = {
+  slug: 'gallery-page',
+  label: t('Gallery page', 'Página Galería'),
+  admin: { group: PAGES, description: t('The photos of /gallery (the home page preview uses the first ones). Drag to reorder.', 'Las fotos de /gallery (la vista previa de la portada usa las primeras). Arrastra para ordenar.') },
+  access: globalAccess,
+  hooks,
+  fields: [
+    { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Gallery' },
+    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
+    {
+      name: 'images',
+      type: 'array',
+      label: t('Photos', 'Fotos'),
+      labels: { singular: t('Photo', 'Foto'), plural: t('Photos', 'Fotos') },
+      fields: [
+        imageField('image', t('Photo', 'Foto'), true),
+        { name: 'caption', type: 'text', label: t('Caption (optional)', 'Pie de foto (opcional)') },
+      ],
+    },
+    seoGroup(),
+  ],
+};
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -82,7 +221,7 @@ export const SiteSettings: GlobalConfig = {
 export const SEODefaults: GlobalConfig = {
   slug: 'seo-defaults',
   label: t('SEO defaults', 'SEO por defecto'),
-  admin: { group: t('Settings', 'Ajustes'), hidden: adminOnly, description: 'Site-wide defaults. Each page can override them in its own SEO box.' },
+  admin: { group: t('Settings', 'Ajustes'), hidden: adminOnly, description: 'Site-wide defaults. Each page can override them in its own SEO box (super admin only).' },
   access: adminOnlyAccess,
   hooks,
   fields: [
@@ -96,104 +235,5 @@ export const SEODefaults: GlobalConfig = {
   ],
 };
 
-export const Homepage: GlobalConfig = {
-  slug: 'homepage',
-  label: t('Home page', 'Página de inicio'),
-  admin: { group: t('Home', 'Portada'), description: 'Drag sections to reorder them; untick "Show this section" to hide one without deleting it.' },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'sections', type: 'blocks', label: t('Sections', 'Secciones'), blocks: homeBlocks },
-    seoGroup(),
-  ],
-};
-
-export const MenuPage: GlobalConfig = {
-  slug: 'menu-page',
-  label: t('Menu page', 'Página Menú'),
-  admin: { group: t('Menu', 'Menú'), description: 'Intro text of the /menu page. Products and categories are managed in Menu → Products / Categories.' },
-  access: globalAccess,
-  hooks,
-  fields: [
-    {
-      name: 'intro',
-      type: 'group',
-      label: 'Intro (hand-written style)',
-      fields: [
-        { name: 'title', type: 'text', label: 'Title', defaultValue: 'homemade creations' },
-        { name: 'text', type: 'textarea', label: 'Text' },
-      ],
-    },
-    { name: 'showPrices', type: 'checkbox', label: 'Show prices', defaultValue: true },
-    seoGroup(),
-  ],
-};
-
-export const AboutPage: GlobalConfig = {
-  slug: 'about-page',
-  label: t('About page', 'Página About'),
-  admin: { group: t('Pages', 'Páginas') },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'title', type: 'text', label: 'Title', defaultValue: 'About' },
-    {
-      name: 'frames',
-      type: 'array',
-      label: 'Framed photos (3)',
-      maxRows: 3,
-      admin: { description: 'Leave empty to use the "About — framed photos" gallery, then the location photos.' },
-      fields: [imageField('image', 'Photo', true)],
-    },
-    { name: 'text', type: 'textarea', label: t('Text', 'Texto'), required: true },
-    { name: 'showTeamSection', type: 'checkbox', label: 'Show "Join our team" section', defaultValue: true },
-    imageField('teamImage', 'Team photo (next to the form)'),
-    { name: 'showContactSection', type: 'checkbox', label: 'Show "Contact us" section', defaultValue: true },
-    seoGroup(),
-  ],
-};
-
-export const ContactPage: GlobalConfig = {
-  slug: 'contact-page',
-  label: t('Contact page', 'Página Contacto'),
-  admin: { group: t('Pages', 'Páginas') },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'title', type: 'text', label: 'Title', defaultValue: 'Contact us' },
-    { name: 'text', type: 'textarea', label: 'Intro text (optional)' },
-    seoGroup(),
-  ],
-};
-
-export const JoinPage: GlobalConfig = {
-  slug: 'join-page',
-  label: t('Join our team page', 'Página Únete al equipo'),
-  admin: { group: t('Pages', 'Páginas') },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'title', type: 'text', label: 'Title', defaultValue: 'Join our team' },
-    { name: 'text', type: 'textarea', label: 'Intro text (optional)' },
-    imageField('image', 'Photo'),
-    { name: 'positions', type: 'array', label: 'Positions (dropdown)', fields: [{ name: 'label', type: 'text', required: true }] },
-    { name: 'experienceLevels', type: 'array', label: 'Experience levels (dropdown)', fields: [{ name: 'label', type: 'text', required: true }] },
-    seoGroup(),
-  ],
-};
-
-export const GalleryPage: GlobalConfig = {
-  slug: 'gallery-page',
-  label: t('Gallery page', 'Página Galería'),
-  admin: { group: t('Pages', 'Páginas') },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'title', type: 'text', label: 'Title', defaultValue: 'Gallery' },
-    { name: 'text', type: 'textarea', label: 'Intro text (optional)' },
-    { name: 'gallery', type: 'relationship', relationTo: 'galleries', label: 'Gallery to show', required: true },
-    seoGroup(),
-  ],
-};
-
-export const globals: GlobalConfig[] = [Homepage, MenuPage, AboutPage, ContactPage, JoinPage, GalleryPage, SiteSettings, SEODefaults];
+/** Order = order in the sidebar: pages in site order, then settings. */
+export const globals: GlobalConfig[] = [Homepage, MenuPage, AboutPage, GalleryPage, ContactPage, JoinPage, SiteSettings, SEODefaults];
