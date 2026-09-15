@@ -53,7 +53,7 @@ const smtp = process.env.SMTP_HOST
 const dbPush = process.env.DB_PUSH ? process.env.DB_PUSH === '1' : process.env.NODE_ENV !== 'production';
 
 export default buildConfig({
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || undefined,
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL?.trim().replace(/\/$/, '') || undefined,
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
