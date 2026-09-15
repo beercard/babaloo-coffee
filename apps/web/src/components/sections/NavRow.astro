@@ -44,10 +44,18 @@ const { links, label = 'Sections', class: className } = Astro.props;
     column-gap: clamp(1.25rem, 3vw, 3rem);
     row-gap: 0.75rem;
   }
+  /* Phones: every link on one line (smaller type, tighter gaps, no wrapping). */
   @media (max-width: 767px) {
     .nav-row__list {
-      justify-content: center;
-      column-gap: 1.25rem;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      column-gap: clamp(0.4rem, 2vw, 1rem);
+      padding-inline: clamp(0.5rem, 3vw, 1.5rem);
+    }
+    .nav-row__link {
+      font-size: clamp(0.58rem, 2.75vw, var(--text-nav));
+      white-space: nowrap;
+      letter-spacing: 0;
     }
   }
   .nav-row__link {

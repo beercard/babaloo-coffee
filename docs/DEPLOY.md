@@ -93,6 +93,7 @@ Vercel no tiene disco persistente, así que la base de datos va a **Turso** (SQL
    | `SITE_URL` | `https://<sitio>.vercel.app,https://babaloocoffeeclub.com` |
    | `DEPLOY_HOOK_URL` | Deploy Hook del proyecto **web** (Settings → Git → Deploy Hooks); sin token |
    | `SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD` | cuenta editor del cliente (solo la usa el seed) |
+   | `FORM_NOTIFY_EMAIL` + `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` | buzón `info@babaloocoffeeclub.com` y el SMTP de Hostinger (`smtp.hostinger.com`, 465) para recibir los formularios por email |
 
    `apps/cms/vercel.json` ya fija el `installCommand`/`buildCommand` del monorepo.
 4. **Carga inicial desde tu máquina** (crea las tablas en Turso, sube las fotos a Blob y carga menú, páginas y usuarios):

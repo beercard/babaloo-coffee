@@ -21,6 +21,8 @@ const address = settings.address;
 ---
 
 <Section as="footer" background="concrete" padded="y" class="footer" ariaLabelledby="footer-heading">
+  {/* Optional block rendered on the same concrete as the footer (About page: Contact us). */}
+  <slot name="before" />
   <h2 id="footer-heading" class="visually-hidden">{settings.name}</h2>
   <div class="container footer__inner">
     <a href="/" class="footer__lockup reveal reveal--zoom" aria-label={`${settings.name} — home`}>

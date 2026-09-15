@@ -75,6 +75,16 @@ export function initForms(): void {
       payload.form = form.dataset.form ?? 'contact';
       payload.elapsed = String(Date.now() - startedAt);
       payload.page = location.pathname;
+      const relay = endpoint.includes('formsubmit.co/');
+      if (relay) {
+        // Email relay: honeypot + subject in the relay's own vocabulary, no bookkeeping fields.
+        if (payload.website) return; // bot
+        delete payload.website;
+        delete payload.elapsed;
+        payload._honey = '';
+        payload._subject = form.dataset.subject ?? '[Babaloo] Website contact';
+        payload._template = 'table';
+      }
 
       setState(form, 'loading');
       try {
@@ -83,8 +93,8 @@ export function initForms(): void {
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(payload),
         });
-        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; message?: string; errors?: Record<string, string> };
-        if (!res.ok || body.ok === false) {
+        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; success?: string | boolean; message?: string; errors?: Record<string, string> };
+        if (!res.ok || body.ok === false || body.success === false || body.success === 'false') {
           if (body.errors) {
             Object.entries(body.errors).forEach(([name, msg]) => {
               const field = form.querySelector<HTMLElement>(`[name="${name}"]`);
@@ -99,7 +109,7 @@ export function initForms(): void {
           throw new Error(body.message || 'Something went wrong. Please try again or email us.');
         }
         form.reset();
-        setState(form, 'success', body.message || form.dataset.successMessage || 'Thank you! We received your message.');
+        setState(form, 'success', (relay ? form.dataset.successMessage : body.message) || form.dataset.successMessage || body.message || 'Thank you! We received your message.');
       } catch (err) {
         setState(form, 'error', (err as Error).message);
       }

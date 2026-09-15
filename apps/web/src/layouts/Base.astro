@@ -91,7 +91,9 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer settings={settings} />
+    <Footer settings={settings}>
+      <slot name="footer" slot="before" />
+    </Footer>
     <script>
       import { initReveal } from '@/scripts/reveal';
       document.addEventListener('astro:page-load', initReveal);

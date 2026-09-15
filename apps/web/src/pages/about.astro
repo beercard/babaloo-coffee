@@ -1,7 +1,6 @@
 ---
 /** About — PDF page 3: ABOUT · frames · text · club strip · team + Join form · Contact form. */
 import Base from '@/layouts/Base.astro';
-import Section from '@/components/ui/Section.astro';
 import Frame from '@/components/ui/Frame.astro';
 import Intro from '@/components/sections/Intro.astro';
 import ClubStrip from '@/components/sections/ClubStrip.astro';
@@ -73,14 +72,13 @@ const schema = [
 
   {
     aboutPage.showContactSection && (
-      <Section background="concrete" padded="y" id="contact" ariaLabelledby="contact-title">
-        <div class="container contact reveal">
-          <h2 id="contact-title" class="contact__title ui">
-            {contactPage.title}
-          </h2>
-          <ContactForm email={settings.email} ariaLabelledby="contact-title" />
-        </div>
-      </Section>
+      <div slot="footer" id="contact" class="container contact reveal">
+        <h2 id="contact-title" class="contact__title ui">
+          {contactPage.title}
+        </h2>
+        {contactPage.text && <p class="contact__text italic">{contactPage.text}</p>}
+        <ContactForm email={settings.email} ariaLabelledby="contact-title" />
+      </div>
     )
   }
 </Base>
@@ -155,10 +153,16 @@ const schema = [
     text-align: center;
     font-size: var(--text-body-sm);
   }
+  /* Rendered inside the footer (same concrete, no seam); the footer lockup follows below. */
   .contact {
     display: flex;
     flex-direction: column;
     gap: clamp(1rem, 2vw, 2rem);
     max-width: 62rem;
+    margin-bottom: clamp(3rem, 7vw, 7rem);
+  }
+  .contact__text {
+    text-align: center;
+    font-size: var(--text-body-sm);
   }
 </style>

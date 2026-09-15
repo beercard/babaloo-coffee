@@ -196,7 +196,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   /* ---------- photo panel ---------- */
   .board__visual {
     position: sticky;
-    top: 0;
+    top: var(--header-h);
     z-index: 2;
     background-color: var(--concrete-light);
     background-image: var(--texture);
@@ -209,7 +209,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   }
   @media (min-width: 900px) {
     .board__visual {
-      --panel-h: min(100vh, 60rem);
+      --panel-h: min(calc(100vh - var(--header-h)), 60rem);
     }
   }
   .board__visual[data-tone='1'] {

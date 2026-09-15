@@ -1,7 +1,7 @@
 ---
 /**
  * Full-bleed photo carousel (PDF page 1, "fotos que cambien").
- * Autoplays with a crossfade; arrows and dots let visitors change the photo.
+ * Autoplays with a crossfade (no arrows or dots, by client request).
  * Only the first photo loads with the page — the rest sit in <template>
  * elements and are inserted after load (or on first interaction).
  */
@@ -14,7 +14,6 @@ interface Props {
 }
 const { section } = Astro.props;
 const slides = section.slides;
-const multiple = slides.length > 1;
 ---
 
 {
@@ -53,25 +52,6 @@ const multiple = slides.length > 1;
         ))}
       </div>
 
-      {multiple && (
-        <div class="hero__controls" data-hero-controls hidden>
-          <button type="button" class="hero__arrow hero__arrow--prev" data-hero-prev aria-label="Previous photo">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-          <button type="button" class="hero__arrow hero__arrow--next" data-hero-next aria-label="Next photo">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-          <div class="hero__dots" role="tablist" aria-label="Choose photo">
-            {slides.map((_, i) => (
-              <button type="button" class:list={['hero__dot', i === 0 && 'is-active']} data-hero-dot={i} role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={`Photo ${i + 1}`} />
-            ))}
-          </div>
-        </div>
-      )}
     </section>
   )
 }
@@ -85,18 +65,11 @@ const multiple = slides.length > 1;
   .hero {
     position: relative;
     width: 100%;
-    /* PDF: 1920 × 1590 */
-    aspect-ratio: 1920 / 1590;
-    max-height: 92vh;
+    /* Fixed 900px band; on shorter screens (phones, small laptops) it never exceeds one viewport. */
+    height: min(900px, 100svh);
     min-height: 20rem;
     overflow: hidden;
     background: var(--wood);
-  }
-  @media (max-width: 767px) {
-    .hero {
-      aspect-ratio: 4 / 5;
-      max-height: none;
-    }
   }
   .hero__slides {
     position: absolute;
@@ -149,84 +122,4 @@ const multiple = slides.length > 1;
     font-size: var(--text-body-sm);
   }
 
-  /* ---------- controls (shown once the script runs) ---------- */
-  .hero__controls[hidden] {
-    display: none;
-  }
-  .hero__arrow {
-    position: absolute;
-    top: 50%;
-    z-index: 3;
-    width: clamp(2.5rem, 4vw, 3.5rem);
-    height: clamp(2.5rem, 4vw, 3.5rem);
-    transform: translateY(-50%);
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    color: var(--cream-bright);
-    background: rgba(60, 26, 30, 0.35);
-    backdrop-filter: blur(4px);
-    transition:
-      background-color var(--dur),
-      transform var(--dur) var(--ease-out),
-      opacity var(--dur);
-  }
-  .hero__arrow svg {
-    width: 55%;
-    height: 55%;
-  }
-  .hero__arrow--prev {
-    left: clamp(0.75rem, 2.5vw, 2.5rem);
-  }
-  .hero__arrow--next {
-    right: clamp(0.75rem, 2.5vw, 2.5rem);
-  }
-  .hero__arrow:hover,
-  .hero__arrow:focus-visible {
-    background: rgba(60, 26, 30, 0.7);
-  }
-  .hero__arrow:hover {
-    transform: translateY(-50%) scale(1.06);
-  }
-  .hero__arrow:focus-visible {
-    outline-color: var(--cream-bright);
-  }
-  .hero__dots {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: clamp(0.75rem, 2.2vw, 1.75rem);
-    z-index: 3;
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-  .hero__dot {
-    width: 2rem;
-    height: 2rem;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-  }
-  .hero__dot::before {
-    content: '';
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
-    background: rgba(242, 238, 231, 0.55);
-    box-shadow: 0 0 0 1px rgba(60, 26, 30, 0.35);
-    transition:
-      transform var(--dur) var(--ease-out),
-      background-color var(--dur);
-  }
-  .hero__dot.is-active::before {
-    background: var(--cream-bright);
-    transform: scale(1.5);
-  }
-  .hero__dot:hover::before {
-    background: var(--cream-bright);
-  }
-  .hero__dot:focus-visible {
-    outline-color: var(--cream-bright);
-  }
 </style>

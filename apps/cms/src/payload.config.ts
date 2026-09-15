@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { buildConfig } from 'payload';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob';
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import sharp from 'sharp';
 import { en } from '@payloadcms/translations/languages/en';
@@ -31,6 +32,20 @@ const siteUrls = (process.env.SITE_URL ?? 'http://localhost:4321')
  * creates the tables; in production the schema is expected to exist already.
  */
 const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+/** Outgoing email (form notifications) over SMTP, e.g. Hostinger: smtp.hostinger.com:465 with the info@ mailbox. */
+const smtp = process.env.SMTP_HOST
+  ? nodemailerAdapter({
+      defaultFromAddress: process.env.EMAIL_FROM ?? process.env.SMTP_USER ?? 'no-reply@babaloocoffeeclub.com',
+      defaultFromName: process.env.EMAIL_FROM_NAME ?? 'Babaloo Coffee Club',
+      transportOptions: {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT ?? 465),
+        secure: (process.env.SMTP_SECURE ?? 'true') === 'true',
+        auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+      },
+    })
+  : undefined;
 const dbPush = process.env.DB_PUSH ? process.env.DB_PUSH === '1' : process.env.NODE_ENV !== 'production';
 
 export default buildConfig({
@@ -86,6 +101,7 @@ export default buildConfig({
     }),
   ],
   sharp,
+  email: smtp,
   cors: siteUrls,
   csrf: siteUrls,
   upload: {

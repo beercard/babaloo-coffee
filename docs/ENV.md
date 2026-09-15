@@ -11,6 +11,7 @@ Ningún secreto se incluye en el repositorio. Los archivos `.env` están ignorad
 | `PAYLOAD_API_KEY` | no | Reservada; las API keys están desactivadas en el CMS (la lectura pública basta para el build). |
 | `PUBLIC_CMS_URL` | no | URL pública del CMS que usa el navegador para enviar formularios (normalmente igual a `PAYLOAD_URL`). |
 | `PUBLIC_FORM_ENDPOINT` | no | Sustituye el endpoint de formularios por otro servicio (Formspree, n8n, Zapier…). |
+| `PUBLIC_FORM_RELAY` | no | Sin CMS ni endpoint propio, los formularios se envían por email al contacto del sitio mediante FormSubmit (la primera vez llega un email de activación a ese buzón). `off` lo desactiva. |
 | `PUBLIC_GTM_ID` | no | Google Tag Manager `GTM-XXXX`. Si está vacío no se carga nada. |
 | `PUBLIC_GA4_ID` | no | Google Analytics 4 `G-XXXX`. |
 | `PUBLIC_GADS_ID` | no | Google Ads `AW-XXXX` (conversiones). |
@@ -33,7 +34,9 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `DEPLOY_HOOK_TOKEN` | con GitHub | Fine-grained PAT con permiso *Contents: write* sobre el repo. |
 | `DEPLOY_HOOK_BODY` | con GitHub | `{"event_type":"cms-publish"}` |
 | `DEPLOY_DEBOUNCE_MS` | no | Espera antes de disparar (agrupa ediciones). Default 60000. |
-| `FORM_NOTIFY_EMAIL` | no | Email que recibe los formularios (requiere adaptador de email en `payload.config.ts`). |
+| `FORM_NOTIFY_EMAIL` | recomendado | Buzón que recibe los formularios (`info@babaloocoffeeclub.com`). |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` | con notificaciones | SMTP para enviar los avisos (Hostinger: `smtp.hostinger.com`, 465, usuario y clave del buzón). Sin `SMTP_HOST` no se envía email; el mensaje queda solo en el CMS. |
+| `EMAIL_FROM` / `EMAIL_FROM_NAME` | no | Remitente de los avisos. |
 | `FORM_WEBHOOK_URL` | no | Webhook para CRM / WhatsApp / newsletter con cada envío. |
 | `FORM_RATE_LIMIT` | no | Envíos por IP cada 10 min. Default 5. |
 | `LOGIN_RATE_LIMIT` / `LOGIN_RATE_WINDOW_MS` | no | Intentos de login por IP y ventana (default 10 / 15 min). Payload además bloquea la cuenta 15 min tras 5 fallos. |
