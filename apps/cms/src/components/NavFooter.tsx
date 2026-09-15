@@ -19,6 +19,7 @@ export const NavFooter: React.FC<Props> = ({ i18n, user }) => {
           .nav a[href$="/browse-by-folder"], .nav a[href*="/browse-by-folder"] { display: none !important; }
           .doc-tab[href$="/api"], .doc-tabs a[href$="/api"], .doc-tabs__tab[href$="/api"] { display: none !important; }
           .api-url { display: none !important; }
+          #force-unlock { display: none !important; }
         `}</style>
       )}
       <a href="/admin/account" className="bb-navfooter__link">
