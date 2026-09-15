@@ -12,6 +12,8 @@ export interface ImageRef {
   width: number;
   height: number;
   caption?: string;
+  /** Focal point in percent (0–100) used as object-position when the image is cropped. */
+  focal?: { x: number; y: number };
 }
 
 export interface Link {

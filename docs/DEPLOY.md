@@ -43,7 +43,7 @@ El deploy Git de hPanel sólo clona, no ejecuta `npm run build`. Si quieres usar
 
 ### Otros hosts
 
-- **Vercel**: importar el repo, *Root Directory* = `apps/web`, framework Astro. `vercel.json` ya trae redirects y caché.
+- **Vercel**: importar el repo con *Root Directory* en la raíz (por defecto). El `vercel.json` de la raíz define `buildCommand`, `outputDirectory: apps/web/dist`, redirects y caché; no hace falta configurar nada más. (Si prefieres *Root Directory* = `apps/web`, usa el `apps/web/vercel.json`.)
 - **Netlify / Cloudflare Pages**: build `npm run build`, publish `dist`, base `apps/web`. `public/_redirects` ya trae los 301.
 
 ---

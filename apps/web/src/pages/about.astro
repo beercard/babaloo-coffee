@@ -123,7 +123,7 @@ const schema = [
     min-height: 18rem;
   }
   .team__photo :global(picture),
-  .team__img {
+  :global(.team__img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -132,7 +132,7 @@ const schema = [
     .team__photo :global(picture) {
       height: 100%;
     }
-    .team__img {
+    :global(.team__img) {
       max-height: 60rem;
     }
   }

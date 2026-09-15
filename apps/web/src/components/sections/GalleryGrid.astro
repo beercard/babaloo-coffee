@@ -72,14 +72,14 @@ const images = [...gallery.images].sort((a, b) => a.order - b.order).slice(0, li
     margin-bottom: clamp(0.75rem, 2vw, 1.5rem);
     transition-delay: calc(var(--i) * 70ms);
   }
-  .gallery__img {
+  :global(.gallery__img) {
     width: 100%;
     height: auto;
     border-radius: 4px;
     box-shadow: var(--shadow-frame);
     transition: transform var(--dur) var(--ease-out);
   }
-  .gallery__item:hover .gallery__img {
+  .gallery__item:hover :global(.gallery__img) {
     transform: translateY(-3px);
   }
   .gallery__caption {

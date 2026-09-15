@@ -81,6 +81,7 @@ export function image(v: unknown, altOverride?: string): ImageRef | undefined {
     width,
     height,
     caption: str(doc.caption),
+    ...(num(doc.focalX) !== undefined && num(doc.focalY) !== undefined ? { focal: { x: num(doc.focalX) as number, y: num(doc.focalY) as number } } : {}),
   };
 }
 

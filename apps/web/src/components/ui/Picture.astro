@@ -71,6 +71,8 @@ const narrow = mobile ? await variants(mobile) : undefined;
 const mediaNarrow = `(max-width: ${mobileMaxWidth}px)`;
 const mediaWide = `(min-width: ${mobileMaxWidth + 1}px)`;
 const fallbackAttrs = desktop.fallback.attributes as Record<string, string | number | undefined>;
+const focal = image.focal ? `object-position:${image.focal.x}% ${image.focal.y}%;` : '';
+const imgStyle = [focal, style].filter(Boolean).join('') || undefined;
 ---
 
 <picture class={pictureClass}>
@@ -90,6 +92,6 @@ const fallbackAttrs = desktop.fallback.attributes as Record<string, string | num
     decoding={decoding}
     fetchpriority={fetchpriority}
     class={className}
-    style={style}
+    style={imgStyle}
   />
 </picture>

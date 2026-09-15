@@ -78,13 +78,13 @@ const { items, title = 'homemade creations', text, cta, currency = 'USD', id = '
     display: block;
     text-decoration: none;
   }
-  .featured__img {
+  :global(.featured__img) {
     width: 100%;
     border-radius: 4px;
     box-shadow: var(--shadow-frame);
     transition: transform var(--dur) var(--ease-out);
   }
-  .featured__link:hover .featured__img {
+  .featured__link:hover :global(.featured__img) {
     transform: translateY(-4px);
   }
   .featured__row {

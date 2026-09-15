@@ -1,13 +1,13 @@
 {
   "menuPage": {
     "intro": {
-      "title": "homemade creations",
-      "text": "specialty coffee, ceremonial matcha and homemade sweets,\nmade in house every morning."
+      "title": "The classics are always here.",
+      "text": "We just happen to like a little chaos in the kitchen.\n\nOur creations are inspired by desserts we love, flavors we discover, places we visit, and things happening around the world that make us want to try something new. Some drinks become favorites and earn a permanent spot, others change with the seasons. The kitchen chaos? Is year-round.\n\nBut it all starts with a few things we care about and never compromise on: First Harvest matcha sourced directly from our farm partner in Yame, Fukuoka, Japan. Double-shot espresso, because one felt unnecessary… decaf options are available as well for all drinks. House-made creams, and some syrups. Freshly made plant milk with real ingredients, no added sugar and no preservatives. No extra charge for your milk of choice, always on us."
     },
     "showPrices": true,
     "seo": {
       "title": "Menu — Coffee, Matcha, Food & Sweets",
-      "description": "Babaloo Coffee Club menu: espresso drinks, cold brew, ceremonial matcha, smoothies, sandwiches, pan de bono and homemade sweets. Order online in Charlotte, NC.",
+      "description": "Babaloo Coffee Club menu: double-shot espresso drinks, cold brew, First Harvest matcha from Yame, Japan, seasonal creations, pan de bonos and sweets. Charlotte, NC.",
       "twitterCard": "summary_large_image"
     }
   },

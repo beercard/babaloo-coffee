@@ -22,29 +22,29 @@
   --font-script: 'Mrs Saint Delafield', 'Jimmy Script', 'Brush Script MT', cursive;
 
   /* PDF 46px @1920 = 2.4vw */
-  --text-body: clamp(1.0625rem, 0.75rem + 1.3vw, 1.9rem);
-  --text-body-sm: clamp(0.9375rem, 0.8rem + 0.55vw, 1.25rem);
+  --text-body: clamp(1.0625rem, 0.85rem + 0.7vw, 1.45rem);
+  --text-body-sm: clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem);
   /* PDF 26px @1920 */
-  --text-small: clamp(0.875rem, 0.78rem + 0.4vw, 1.15rem);
+  --text-small: clamp(0.875rem, 0.8rem + 0.25vw, 1rem);
   /* PDF nav 46px */
-  --text-nav: clamp(1rem, 0.65rem + 1.25vw, 2.1rem);
+  --text-nav: clamp(1rem, 0.8rem + 0.6vw, 1.45rem);
   /* PDF menu titles 60px */
-  --text-menu-title: clamp(1.25rem, 0.8rem + 1.5vw, 2.6rem);
+  --text-menu-title: clamp(1.2rem, 0.95rem + 0.85vw, 1.85rem);
   /* PDF menu description 46px */
-  --text-menu-desc: clamp(0.95rem, 0.75rem + 0.8vw, 1.5rem);
+  --text-menu-desc: clamp(0.95rem, 0.85rem + 0.35vw, 1.15rem);
   /* PDF script 80–88px */
-  --text-script: clamp(2rem, 1.2rem + 3.4vw, 5.25rem);
-  --text-script-sm: clamp(1.5rem, 1rem + 2vw, 3.2rem);
+  --text-script: clamp(2rem, 1.4rem + 2vw, 3.75rem);
+  --text-script-sm: clamp(1.5rem, 1.1rem + 1.3vw, 2.5rem);
   /* PDF form titles 46px Poppins Bold */
-  --text-title: clamp(1.25rem, 0.9rem + 1.3vw, 2.4rem);
+  --text-title: clamp(1.2rem, 1rem + 0.7vw, 1.75rem);
 
   --leading-tight: 1.15;
   --leading-body: 1.4;
 
   /* Spacing (PDF gutters: 87px @1920 ≈ 4.5vw) */
-  --gutter: clamp(1rem, 4.5vw, 5.5rem);
-  --section-y: clamp(3rem, 7vw, 8.5rem);
-  --section-y-sm: clamp(2rem, 4vw, 5rem);
+  --gutter: clamp(1rem, 4.5vw, 5rem);
+  --section-y: clamp(3rem, 6vw, 6.5rem);
+  --section-y-sm: clamp(2rem, 3.5vw, 4rem);
   --max-w: 1920px;
   --content-w: 1200px;
 
@@ -56,10 +56,10 @@
   --dur: 400ms;
   --dur-slow: 1200ms;
 
-  /* Header proportions (PDF: 300px header on 1920) */
-  --header-h: clamp(5rem, 13.5vw, 16.5rem);
-  --curtain-h: clamp(2.25rem, 8.8vw, 10.6rem);
-  --strip-h: clamp(3.75rem, 8.9vw, 10.6rem);
+  /* Header proportions (PDF: 300px header on 1920, reduced ~30% for screens) */
+  --header-h: clamp(4.5rem, 9.5vw, 11.5rem);
+  --curtain-h: clamp(2rem, 7vw, 8.5rem);
+  --strip-h: clamp(3.5rem, 6.5vw, 7.5rem);
 
   color-scheme: light;
 }

@@ -4,6 +4,7 @@ import Base from '@/layouts/Base.astro';
 import MenuBoard from '@/components/menu/MenuBoard.astro';
 import { getContent, buildMenuTree } from '@/lib/cms';
 import { breadcrumbSchema, menuSchema } from '@/utils/schema';
+import { paragraphs } from '@/utils/format';
 
 const content = await getContent();
 const { menuPage, menu } = content;
@@ -28,16 +29,17 @@ const schema = [
     <div class="container container--narrow text-center">
       <h1 id="menu-title" class="menu-intro__title script">{menuPage.intro.title}</h1>
       {
-        menuPage.intro.text && (
-          <p class="menu-intro__text script">
-            {menuPage.intro.text.split('\n').map((line, i, arr) => (
-              <Fragment>
-                {line}
-                {i < arr.length - 1 && <br />}
-              </Fragment>
-            ))}
-          </p>
-        )
+        menuPage.intro.text &&
+          paragraphs(menuPage.intro.text).map((lines, pi) => (
+            <p class:list={['menu-intro__text', pi === 0 && 'menu-intro__text--lead']}>
+              {lines.map((line, i) => (
+                <Fragment>
+                  {line}
+                  {i < lines.length - 1 && <br />}
+                </Fragment>
+              ))}
+            </p>
+          ))
       }
     </div>
   </section>
@@ -54,14 +56,20 @@ const schema = [
     font-size: var(--text-script);
   }
   .menu-intro__text {
-    font-size: var(--text-script);
-    line-height: 1.05;
-    margin-top: 0.1em;
-    text-wrap: balance;
+    font-style: italic;
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    max-width: 60ch;
+    margin-inline: auto;
+    margin-top: 1em;
+    text-wrap: pretty;
   }
-  @media (max-width: 640px) {
-    .menu-intro__text {
-      font-size: var(--text-script-sm);
-    }
+  .menu-intro__text--lead {
+    font-family: var(--font-script);
+    font-style: normal;
+    font-size: var(--text-script-sm);
+    line-height: 1.1;
+    max-width: none;
+    margin-top: 0.1em;
   }
 </style>
