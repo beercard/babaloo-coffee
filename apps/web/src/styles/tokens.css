@@ -19,7 +19,8 @@
   /* Type */
   --font-body: 'Lato', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-ui: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-script: 'Mrs Saint Delafield', 'Jimmy Script', 'Brush Script MT', cursive;
+  /* Jimmy Script (licensed, see docs/MIGRATION.md) when apps/web/public/fonts/jimmy-script.woff2 exists; else the free look-alike. */
+  --font-script: 'Jimmy Script', 'Mrs Saint Delafield', 'Brush Script MT', cursive;
 
   /* PDF 46px @1920 = 2.4vw */
   --text-body: clamp(1.0625rem, 0.85rem + 0.7vw, 1.45rem);
@@ -51,6 +52,8 @@
   /* Shape & motion */
   --radius-pill: 999px;
   --radius-field: 0.625rem;
+  /* Scalloped form-field outline from the PDF (border-image tile; source: src/assets/brand/field-frame.svg) */
+  --field-frame: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cpath d='M8,8 A4,4 0 0 1 16,8 A4,4 0 0 1 24,8 A4,4 0 0 1 32,8 A4,4 0 0 1 40,8 A4,4 0 0 1 48,8 A4,4 0 0 1 56,8 A4,4 0 0 1 64,8 A4,4 0 0 1 64,16 A4,4 0 0 1 64,24 A4,4 0 0 1 64,32 A4,4 0 0 1 64,40 A4,4 0 0 1 64,48 A4,4 0 0 1 64,56 A4,4 0 0 1 64,64 A4,4 0 0 1 56,64 A4,4 0 0 1 48,64 A4,4 0 0 1 40,64 A4,4 0 0 1 32,64 A4,4 0 0 1 24,64 A4,4 0 0 1 16,64 A4,4 0 0 1 8,64 A4,4 0 0 1 8,56 A4,4 0 0 1 8,48 A4,4 0 0 1 8,40 A4,4 0 0 1 8,32 A4,4 0 0 1 8,24 A4,4 0 0 1 8,16 A4,4 0 0 1 8,8 Z' fill='none' stroke='%233c1a1e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
   --shadow-frame: 0 18px 40px -18px rgba(60, 26, 30, 0.45);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --dur: 400ms;

@@ -28,6 +28,7 @@ const subject = form === 'careers' ? 'Job application' : 'Website contact';
       data-form={form}
       data-endpoint={endpoint}
       data-subject={`[Babaloo] ${subject}`}
+      enctype={form === 'careers' ? 'multipart/form-data' : undefined}
       data-success-message={successMessage}
       aria-labelledby={ariaLabelledby}
       novalidate
@@ -41,7 +42,9 @@ const subject = form === 'careers' ? 'Job application' : 'Website contact';
       <input type="hidden" name="form" value={form} />
       <p class="form__status" data-form-status role="status" aria-live="polite" hidden />
       <div class="form__actions">
-        <Button type="submit" size="lg" data-label-idle={submitLabel} data-label-loading="sending…" data-label-success="sent ✓">
+        {/* Extra controls above the submit button (careers: upload résumé). */}
+        <slot name="actions" />
+        <Button type="submit" variant="script" size="lg" data-label-idle={submitLabel} data-label-loading="sending…" data-label-success="sent ✓">
           {submitLabel}
         </Button>
       </div>
@@ -108,8 +111,10 @@ const subject = form === 'careers' ? 'Job application' : 'Website contact';
   }
   .form__actions {
     display: flex;
-    justify-content: center;
-    padding-top: clamp(0.5rem, 2vw, 2rem);
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1rem, 2.2vw, 1.75rem);
+    padding-top: clamp(1rem, 3vw, 3rem);
   }
   .form__fallback-text {
     text-align: center;

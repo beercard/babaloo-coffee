@@ -136,6 +136,20 @@ const address = settings.address;
     column-gap: clamp(1.25rem, 5vw, 6rem);
     row-gap: 0.75rem;
   }
+  /* Phones: every link on one line. */
+  @media (max-width: 767px) {
+    .footer__nav {
+      flex-wrap: nowrap;
+      width: 100%;
+      justify-content: space-between;
+      column-gap: clamp(0.4rem, 2vw, 1rem);
+    }
+    .footer__nav a {
+      font-size: clamp(0.58rem, 2.75vw, var(--text-nav));
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+  }
   .footer__social {
     display: flex;
     gap: 1.25rem;

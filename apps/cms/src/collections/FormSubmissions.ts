@@ -42,6 +42,7 @@ export const FormSubmissions: CollectionConfig = {
     { name: 'summary', type: 'text', label: 'From', admin: { readOnly: true } },
     { name: 'email', type: 'email', admin: { readOnly: true } },
     { name: 'data', type: 'json', label: 'Submitted fields', admin: { readOnly: true } },
+    { name: 'resume', type: 'upload', relationTo: 'resumes', label: t('Résumé', 'Currículum'), admin: { readOnly: true } },
     {
       name: 'meta',
       type: 'group',

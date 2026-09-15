@@ -41,6 +41,7 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `FORM_RATE_LIMIT` | no | Envíos por IP cada 10 min. Default 5. |
 | `LOGIN_RATE_LIMIT` / `LOGIN_RATE_WINDOW_MS` | no | Intentos de login por IP y ventana (default 10 / 15 min). Payload además bloquea la cuenta 15 min tras 5 fallos. |
 | `ADMIN_ALLOWED_IPS` | no | Lista de IPs (coma) que pueden abrir `/admin`; vacío = todas. |
+| `RESUMES_DIR` | no | Carpeta de los currículums (default `media/resumes`, dentro del volumen de media). |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | sólo seed | Primer usuario admin. |
 | `SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD` / `SEED_EDITOR_NAME` | sólo seed | Cuenta editor del cliente: se crea o se le actualiza la contraseña en cada seed. `SEED_EDITOR_REPLACES=<email viejo>` renombra una cuenta existente. |
 

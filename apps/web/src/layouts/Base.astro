@@ -21,6 +21,7 @@ import type { SEOMeta, SiteContent } from '@/lib/cms/types';
 import { getContent } from '@/lib/cms';
 import { imageOptions, absoluteUrl } from '@/lib/images';
 import { getImage } from 'astro:assets';
+import concreteTexture from '@/assets/textures/concrete.jpg';
 import { organizationSchema, websiteSchema, cafeSchema, graph } from '@/utils/schema';
 import SEO from '@/components/seo/SEO.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
@@ -28,6 +29,19 @@ import Analytics from '@/components/seo/Analytics.astro';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import { ClientRouter } from 'astro:transitions';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+/**
+ * Optional licensed script font: drop `jimmy-script.woff2` (or .woff/.otf/.ttf) into
+ * apps/web/public/fonts and it is served with @font-face + preload; otherwise the
+ * free look-alike (Mrs Saint Delafield) is used.
+ */
+const FONT_FORMATS: Record<string, string> = { woff2: 'woff2', woff: 'woff', otf: 'opentype', ttf: 'truetype' };
+const jimmyFile = Object.keys(FONT_FORMATS)
+  .map((ext) => `jimmy-script.${ext}`)
+  .find((f) => fs.existsSync(fileURLToPath(new URL(`../../public/fonts/${f}`, import.meta.url))));
+const jimmyFormat = jimmyFile ? FONT_FORMATS[jimmyFile.split('.').pop() as string] : undefined;
 
 interface Props {
   seo: SEOMeta;
@@ -37,9 +51,12 @@ interface Props {
   /** Extra JSON-LD nodes for this page (breadcrumbs, menu…). */
   schema?: Record<string, unknown>[];
   bodyClass?: string;
+  /** `concrete` paints the texture on <body> so bands and footer show one continuous surface. */
+  background?: 'cream' | 'concrete';
 }
 
-const { seo, title, isHome = false, schema = [], bodyClass } = Astro.props;
+const { seo, title, isHome = false, schema = [], bodyClass, background = 'cream' } = Astro.props;
+const pageTexture = background === 'concrete' ? await getImage({ src: concreteTexture, width: 480, format: 'webp', quality: 55 }) : undefined;
 const content: SiteContent = await getContent();
 const { settings, seoDefaults, locations } = content;
 const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
@@ -73,12 +90,20 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
     <link rel="preload" as="font" type="font/woff2" href={latoItalic} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={poppinsItalic} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={scriptFont} crossorigin />
+    {
+      jimmyFile && (
+        <Fragment>
+          <link rel="preload" as="font" type={`font/${jimmyFile.split('.').pop()}`} href={`/fonts/${jimmyFile}`} crossorigin />
+          <style is:inline set:html={`@font-face{font-family:'Jimmy Script';src:url('/fonts/${jimmyFile}') format('${jimmyFormat}');font-weight:300 400;font-style:normal;font-display:swap}`} />
+        </Fragment>
+      )
+    }
     <meta name="generator" content={Astro.generator} />
     <JsonLd data={ld} />
     <Analytics />
     <ClientRouter fallback="none" />
   </head>
-  <body class={bodyClass}>
+  <body class:list={[bodyClass, pageTexture && 'page--concrete']} style={pageTexture ? `--texture:url(${pageTexture.src})` : undefined}>
     <a href="#main" class="skip-link">Skip to content</a>
     {
       import.meta.env.PUBLIC_GTM_ID && (

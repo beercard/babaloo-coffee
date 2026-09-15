@@ -71,6 +71,7 @@ export interface Config {
     'menu-categories': MenuCategory;
     media: Media;
     'form-submissions': FormSubmission;
+    resumes: Resume;
     users: User;
     'payload-kv': PayloadKv;
     folders: FolderInterface;
@@ -88,6 +89,7 @@ export interface Config {
     'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
+    resumes: ResumesSelect<false> | ResumesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     folders: FoldersSelect<false> | FoldersSelect<true>;
@@ -176,7 +178,7 @@ export interface MenuItem {
       }[]
     | null;
   image?: (number | null) | Media;
-  tags?: ('New' | 'Popular' | 'Seasonal' | 'Vegan' | 'Gluten free' | 'Signature')[] | null;
+  tags?: ('New' | 'Popular' | 'Seasonal' | 'Vegan' | 'Gluten free' | 'Signature' | 'All locations')[] | null;
   featured?: boolean | null;
   available?: boolean | null;
   /**
@@ -299,6 +301,7 @@ export interface FormSubmission {
     | number
     | boolean
     | null;
+  resume?: (number | null) | Resume;
   meta?: {
     page?: string | null;
     userAgent?: string | null;
@@ -306,6 +309,27 @@ export interface FormSubmission {
   };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Files attached to job applications. Open the message to see the applicant.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes".
+ */
+export interface Resume {
+  id: number;
+  applicant?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * Super admins manage everything (including users). Editors edit content only.
@@ -375,6 +399,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'form-submissions';
         value: number | FormSubmission;
+      } | null)
+    | ({
+        relationTo: 'resumes';
+        value: number | Resume;
       } | null)
     | ({
         relationTo: 'users';
@@ -511,6 +539,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   summary?: T;
   email?: T;
   data?: T;
+  resume?: T;
   meta?:
     | T
     | {
@@ -520,6 +549,24 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes_select".
+ */
+export interface ResumesSelect<T extends boolean = true> {
+  applicant?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

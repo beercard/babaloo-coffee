@@ -14,6 +14,7 @@ import { Media } from './collections/Media';
 import { MenuCategories } from './collections/MenuCategories';
 import { MenuItems } from './collections/MenuItems';
 import { FormSubmissions } from './collections/FormSubmissions';
+import { Resumes } from './collections/Resumes';
 import { globals } from './globals';
 import { formsSubmit, formsSubmitOptions } from './endpoints/formsSubmit';
 
@@ -71,7 +72,7 @@ export default buildConfig({
     // Sidebar order: groups are listed in the order collections/globals appear.
   },
   // Sidebar: Pages (globals) · Menu · Media · Messages · Settings.
-  collections: [MenuItems, MenuCategories, Media, FormSubmissions, Users],
+  collections: [MenuItems, MenuCategories, Media, FormSubmissions, Resumes, Users],
   globals,
   // Image library folders (one per page/section); the folder collection is created by Payload.
   folders: { slug: 'folders', browseByFolder: true, collectionSpecific: false },
@@ -98,6 +99,14 @@ export default buildConfig({
       collections: { media: true },
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 365,
+    }),
+    // Résumés: unguessable blob paths (the store itself is public).
+    vercelBlobStorage({
+      enabled: Boolean(blobToken),
+      token: blobToken,
+      collections: { resumes: { prefix: 'resumes' } },
+      addRandomSuffix: true,
+      cacheControlMaxAge: 0,
     }),
   ],
   sharp,

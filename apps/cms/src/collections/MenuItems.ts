@@ -79,6 +79,7 @@ export const MenuItems: CollectionConfig = {
         { label: 'Vegan', value: 'Vegan' },
         { label: 'Gluten free', value: 'Gluten free' },
         { label: 'Signature', value: 'Signature' },
+        { label: 'All locations', value: 'All locations' },
       ],
       admin: { position: 'sidebar' },
     },

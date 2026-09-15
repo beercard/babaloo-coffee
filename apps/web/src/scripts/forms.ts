@@ -1,8 +1,33 @@
 /**
  * Progressive enhancement for the forms: client-side validation messages,
- * loading / success / error states, JSON POST to the configured endpoint.
- * Without JS the form still submits as a regular POST.
+ * loading / success / error states, JSON POST to the configured endpoint
+ * (multipart when a résumé is attached). Without JS the form still submits
+ * as a regular POST.
  */
+const RESUME_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+/** Validates the optional file picker and mirrors the chosen file name next to the button. */
+function checkFile(input: HTMLInputElement): boolean {
+  const wrapper = input.closest<HTMLElement>('[data-upload]');
+  const name = wrapper?.querySelector<HTMLElement>('[data-file-name]');
+  const error = wrapper?.querySelector<HTMLElement>('[data-error]');
+  const file = input.files?.[0];
+  const max = Number(input.dataset.maxBytes) || 5 * 1024 * 1024;
+  let message = '';
+  if (file && !RESUME_TYPES.includes(file.type)) message = 'Please attach a PDF or Word document.';
+  else if (file && file.size > max) message = `The file is too large (${Math.round(max / 1024 / 1024)} MB max).`;
+  if (name) {
+    name.textContent = file && !message ? `${file.name} · ${(file.size / 1024).toFixed(0)} KB` : name.dataset.idle || 'PDF or Word · up to 5 MB';
+    name.toggleAttribute('data-has-file', Boolean(file && !message));
+  }
+  if (error) {
+    error.textContent = message;
+    error.hidden = !message;
+  }
+  input.setAttribute('aria-invalid', String(Boolean(message)));
+  if (message) input.value = '';
+  return !message;
+}
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
 function setState(form: HTMLFormElement, state: FormState, message?: string) {
@@ -24,7 +49,7 @@ function setState(form: HTMLFormElement, state: FormState, message?: string) {
 
 function validate(form: HTMLFormElement): boolean {
   let ok = true;
-  form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[name]').forEach((field) => {
+  form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[name]:not([type="file"])').forEach((field) => {
     const wrapper = field.closest<HTMLElement>('[data-field]');
     const error = wrapper?.querySelector<HTMLElement>('[data-error]');
     field.setCustomValidity('');
@@ -48,7 +73,14 @@ export function initForms(): void {
     const startedAt = Date.now();
     form.setAttribute('novalidate', '');
 
-    form.querySelectorAll<HTMLInputElement>('[name]').forEach((field) => {
+    const fileInput = form.querySelector<HTMLInputElement>('input[type="file"][data-file]');
+    if (fileInput) {
+      const name = form.querySelector<HTMLElement>('[data-file-name]');
+      if (name) name.dataset.idle = name.textContent ?? '';
+      fileInput.addEventListener('change', () => checkFile(fileInput));
+    }
+
+    form.querySelectorAll<HTMLInputElement>('[name]:not([type="file"])').forEach((field) => {
       field.addEventListener('blur', () => {
         if (field.value) {
           const valid = field.checkValidity();
@@ -66,6 +98,8 @@ export function initForms(): void {
       if (!endpoint) return; // let the mailto/native action happen
       event.preventDefault();
       if (!validate(form)) return;
+      if (fileInput && !checkFile(fileInput)) return;
+      const file = fileInput?.files?.[0];
 
       const data = new FormData(form);
       const payload: Record<string, string> = {};
@@ -86,13 +120,21 @@ export function initForms(): void {
         payload._template = 'table';
       }
 
+      // With a file: multipart (CMS stores it; the email relay attaches it). Otherwise JSON.
+      let reqBody: BodyInit = JSON.stringify(payload);
+      const headers: Record<string, string> = { Accept: 'application/json' };
+      if (file) {
+        const fd = new FormData();
+        Object.entries(payload).forEach(([k, v]) => fd.append(k, v));
+        fd.append(relay ? 'attachment' : 'resume', file, file.name);
+        reqBody = fd;
+      } else {
+        headers['Content-Type'] = 'application/json';
+      }
+
       setState(form, 'loading');
       try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        const res = await fetch(endpoint, { method: 'POST', headers, body: reqBody });
         const body = (await res.json().catch(() => ({}))) as { ok?: boolean; success?: string | boolean; message?: string; errors?: Record<string, string> };
         if (!res.ok || body.ok === false || body.success === false || body.success === 'false') {
           if (body.errors) {
@@ -109,6 +151,7 @@ export function initForms(): void {
           throw new Error(body.message || 'Something went wrong. Please try again or email us.');
         }
         form.reset();
+        if (fileInput) checkFile(fileInput);
         setState(form, 'success', (relay ? form.dataset.successMessage : body.message) || form.dataset.successMessage || body.message || 'Thank you! We received your message.');
       } catch (err) {
         setState(form, 'error', (err as Error).message);

@@ -48,7 +48,7 @@ Las cajas **SEO** de cada página y todo el grupo *Ajustes* solo las ve el super
 ### Añadir un producto nuevo
 **Menú → Productos → Crear**. Rellena nombre, categoría/sección (por ejemplo *Coffee → Iced*), precio, foto y guarda.
 - **Orden**: número para ordenar dentro de su sección (1 sale primero).
-- **Etiquetas**: *New*, *Popular*, *Seasonal*, *Signature*… se ven junto al nombre.
+- **Etiquetas**: *New*, *Popular*, *Seasonal*, *Signature*, *All locations*… se ven junto al nombre.
 - **Destacado**: lo muestra en la portada si esa sección está activa.
 - Desmarca **Disponible** para ocultarlo temporalmente sin borrarlo.
 
@@ -75,7 +75,7 @@ Cada salto de línea se respeta tal cual.
 **Página de inicio** → sección **Galería de fotos**: marca *Mostrar esta sección*, añade fotos (carpeta *Gallery*), quita o arrastra para reordenar. Si la sección está oculta, la web no muestra galería.
 
 ### Leer los mensajes de los formularios
-**Mensajes**. Cada mensaje tiene un estado (New / Replied / Archived).
+**Mensajes**. Cada mensaje tiene un estado (New / Replied / Archived). Las solicitudes de *Join our team* traen el currículum adjunto (campo **Currículum**, también en **Mensajes → Currículums**); además llegan por email al buzón configurado.
 
 ### Ocultar o reordenar secciones de la portada
 **Página de inicio**: arrastra las secciones para cambiar su orden; desmarca **Mostrar esta sección** para ocultar una sin borrarla. Puedes añadir secciones nuevas (galería, productos destacados, testimonios, texto, llamada a la acción) con **Añadir sección**.

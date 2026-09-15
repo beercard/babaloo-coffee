@@ -1,13 +1,16 @@
 ---
 /**
  * Pill button as drawn in the PDF ("sent"): bark background, cream Poppins Bold.
- * Renders an <a> when `href` is given, otherwise a <button>.
+ * Renders an <a> when `href` is given, a <label> when `for` is given (file
+ * pickers), otherwise a <button>.
  */
 import { isExternal } from '@/utils/format';
 
 interface Props {
   href?: string;
   external?: boolean;
+  /** Render as a <label for=…> (styled trigger for a hidden file input). */
+  for?: string;
   type?: 'button' | 'submit';
   variant?: 'solid' | 'outline' | 'script';
   size?: 'md' | 'lg';
@@ -15,7 +18,7 @@ interface Props {
   [key: string]: unknown;
 }
 
-const { href, external, type = 'button', variant = 'solid', size = 'md', class: className, ...rest } = Astro.props;
+const { href, external, for: htmlFor, type = 'button', variant = 'solid', size = 'md', class: className, ...rest } = Astro.props;
 const ext = external ?? (href ? isExternal(href) && !href.startsWith('mailto:') && !href.startsWith('tel:') : false);
 const classes = ['btn', `btn--${variant}`, `btn--${size}`, className];
 ---
@@ -25,6 +28,10 @@ const classes = ['btn', `btn--${variant}`, `btn--${size}`, className];
     <a href={href} class:list={classes} {...(ext ? { target: '_blank', rel: 'noopener' } : {})} {...rest}>
       <slot />
     </a>
+  ) : htmlFor ? (
+    <label for={htmlFor} class:list={classes} {...rest}>
+      <slot />
+    </label>
   ) : (
     <button type={type} class:list={classes} {...rest}>
       <slot />
@@ -34,6 +41,7 @@ const classes = ['btn', `btn--${variant}`, `btn--${size}`, className];
 
 <style>
   .btn {
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -82,8 +90,14 @@ const classes = ['btn', `btn--${variant}`, `btn--${size}`, className];
     color: var(--cream-bright);
     font-family: var(--font-script);
     font-weight: 400;
-    font-size: calc(var(--text-body) * 1.15);
-    padding: 0.25em 1.6em 0.35em;
+    /* PDF "send" / "upload résumé": 310×95 pill with the script at ~44px */
+    font-size: calc(var(--text-body) * 1.45);
+    min-width: 9.5em;
+    padding: 0.55em 1.8em 0.6em;
+  }
+  .btn--script:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px -12px rgba(60, 26, 30, 0.7);
   }
   .btn--script:hover,
   .btn--script:focus-visible {

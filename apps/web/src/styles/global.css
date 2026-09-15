@@ -133,6 +133,18 @@ textarea {
   letter-spacing: 0.01em;
 }
 
+/* ---------- Page-wide concrete (contact page): one texture under every band and the footer ---------- */
+.page--concrete {
+  background-color: var(--concrete);
+  background-image: var(--texture);
+  background-size: 480px auto;
+  background-repeat: repeat;
+  background-position: center top;
+}
+body.page--concrete .band--concrete {
+  background: transparent;
+}
+
 /* ---------- Scroll reveal ---------- */
 .reveal {
   --reveal-y: 22px;
