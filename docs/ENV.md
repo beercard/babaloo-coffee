@@ -8,7 +8,7 @@ Ningún secreto se incluye en el repositorio. Los archivos `.env` están ignorad
 |---|---|---|
 | `SITE_URL` | sí (prod) | URL canónica, p. ej. `https://babaloocoffeeclub.com`. Sitemap, canonical, JSON-LD. |
 | `PAYLOAD_URL` | no | URL del CMS. **Vacía = build con el contenido de `src/content/seed`.** |
-| `PAYLOAD_API_KEY` | no | Sólo si el API REST del CMS se hace privado (usuario con API key). |
+| `PAYLOAD_API_KEY` | no | Reservada; las API keys están desactivadas en el CMS (la lectura pública basta para el build). |
 | `PUBLIC_CMS_URL` | no | URL pública del CMS que usa el navegador para enviar formularios (normalmente igual a `PAYLOAD_URL`). |
 | `PUBLIC_FORM_ENDPOINT` | no | Sustituye el endpoint de formularios por otro servicio (Formspree, n8n, Zapier…). |
 | `PUBLIC_GTM_ID` | no | Google Tag Manager `GTM-XXXX`. Si está vacío no se carga nada. |
@@ -33,6 +33,8 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `FORM_NOTIFY_EMAIL` | no | Email que recibe los formularios (requiere adaptador de email en `payload.config.ts`). |
 | `FORM_WEBHOOK_URL` | no | Webhook para CRM / WhatsApp / newsletter con cada envío. |
 | `FORM_RATE_LIMIT` | no | Envíos por IP cada 10 min. Default 5. |
+| `LOGIN_RATE_LIMIT` / `LOGIN_RATE_WINDOW_MS` | no | Intentos de login por IP y ventana (default 10 / 15 min). Payload además bloquea la cuenta 15 min tras 5 fallos. |
+| `ADMIN_ALLOWED_IPS` | no | Lista de IPs (coma) que pueden abrir `/admin`; vacío = todas. |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | sólo seed | Primer usuario admin. |
 
 ## GitHub Actions (Settings → Secrets and variables → Actions)

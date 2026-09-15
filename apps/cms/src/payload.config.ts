@@ -52,6 +52,10 @@ export default buildConfig({
   i18n: {
     supportedLanguages: { en, es },
     fallbackLanguage: 'en',
+    translations: {
+      en: { general: { payloadSettings: 'Preferences' } },
+      es: { general: { payloadSettings: 'Preferencias' } },
+    },
   },
   endpoints: [formsSubmit, formsSubmitOptions],
   editor: lexicalEditor(),
