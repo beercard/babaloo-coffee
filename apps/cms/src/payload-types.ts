@@ -178,7 +178,19 @@ export interface MenuItem {
       }[]
     | null;
   image?: (number | null) | Media;
-  tags?: ('New' | 'Popular' | 'Seasonal' | 'Vegan' | 'Gluten free' | 'Signature' | 'All locations')[] | null;
+  tags?:
+    | (
+        | 'New'
+        | 'Popular'
+        | 'Seasonal'
+        | 'Vegan'
+        | 'Gluten free'
+        | 'Signature'
+        | 'Rea Farms'
+        | 'South End'
+        | 'Lake Norman'
+      )[]
+    | null;
   featured?: boolean | null;
   available?: boolean | null;
   /**
@@ -319,6 +331,7 @@ export interface FormSubmission {
 export interface Resume {
   id: number;
   applicant?: string | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -556,6 +569,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
  */
 export interface ResumesSelect<T extends boolean = true> {
   applicant?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

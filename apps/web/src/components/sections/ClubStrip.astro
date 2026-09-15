@@ -19,9 +19,9 @@ const repeats = [0, 1, 2, 3, 4, 5];
         <ul role="list" class="club__set">
           {repeats.map(() => (
             <li class="club__unit">
-              <Icon name="dog-poodle" class="club__dog" />
-              <Icon name="wordmark-club" class="club__word" />
-              <Icon name="dog-basenji" class="club__dog" />
+              <span class="club__dog club__dog--poodle"><Icon name="dog-poodle" class="club__svg" /></span>
+              <span class="club__word"><Icon name="wordmark-club" class="club__svg" /></span>
+              <span class="club__dog club__dog--basenji"><Icon name="dog-basenji" class="club__svg" /></span>
             </li>
           ))}
         </ul>
@@ -54,16 +54,29 @@ const repeats = [0, 1, 2, 3, 4, 5];
     gap: clamp(0.5rem, 1vw, 1rem);
     padding-inline: clamp(0.5rem, 1.2vw, 1.5rem);
   }
-  /* Explicit widths: an SVG with width:auto inside a max-content flex track collapses to 0 in Chromium. */
+  /* Sizes live on plain spans (Safari/WebKit sizes <svg><use> inconsistently inside a
+     max-content flex track); the SVG simply fills its box. */
+  .club__dog,
+  .club__word {
+    display: block;
+    flex: none;
+  }
   .club__dog {
     height: calc(var(--strip-h) * 0.72);
-    width: calc(var(--strip-h) * 0.72 * 0.65);
-    flex: none;
+    aspect-ratio: 197 / 305;
+  }
+  .club__dog--basenji {
+    aspect-ratio: 188 / 287;
   }
   .club__word {
     height: calc(var(--strip-h) * 0.22);
-    width: calc(var(--strip-h) * 0.22 * 5.08);
-    flex: none;
+    aspect-ratio: 183 / 36;
+  }
+  .club__svg,
+  :global(.club__svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   /* Phones: the fluid strip gets too short and the units crowd each other — give them air. */
   @media (max-width: 767px) {
@@ -76,11 +89,9 @@ const repeats = [0, 1, 2, 3, 4, 5];
     }
     .club__dog {
       height: 3.1rem;
-      width: calc(3.1rem * 0.65);
     }
     .club__word {
       height: 1.15rem;
-      width: calc(1.15rem * 5.08);
     }
   }
   @keyframes club-marquee {

@@ -126,6 +126,7 @@ const social = settings.social;
   }
   .header__band {
     position: relative;
+    z-index: 2; /* above the curtain, which starts underneath the wood */
     height: var(--header-h);
     background-color: var(--wood);
     background-image: var(--wood);
@@ -183,12 +184,13 @@ const social = settings.social;
     position: absolute;
     left: 0;
     right: 0;
-    top: 100%;
+    /* Starts under the wood band so no hairline can show between them (sub-pixel rounding). */
+    top: calc(100% - 0.5rem);
     width: 100%;
-    height: var(--curtain-h);
+    height: calc(var(--curtain-h) + 0.5rem);
     object-fit: cover;
     object-position: center bottom; /* keeps the ruffled edge, crops the top */
-    z-index: 3;
+    z-index: 1;
     pointer-events: none;
     filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
     transform-origin: top center;
@@ -200,6 +202,9 @@ const social = settings.social;
     position: fixed;
     inset: 0;
     z-index: 50;
+    /* Paint under the phone's status bar / home indicator too. */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
     background-color: var(--wood);
     background-image: var(--wood);
     background-size: 464px auto;
