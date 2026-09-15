@@ -1,0 +1,51 @@
+---
+/** JOIN OUR TEAM (PDF about page): Name · Last · Email · Phone · Position · Experience · send. */
+import FormShell from './FormShell.astro';
+import FormField from './FormField.astro';
+
+interface Props {
+  email?: string;
+  positions: string[];
+  experienceLevels: string[];
+  ariaLabelledby?: string;
+}
+const { email, positions, experienceLevels, ariaLabelledby } = Astro.props;
+---
+
+<FormShell form="careers" email={email} submitLabel="send" successMessage="Thank you! We'll be in touch soon." ariaLabelledby={ariaLabelledby} class="careers-form">
+  <div class="careers-form__grid">
+    <FormField name="firstName" label="Name" required autocomplete="given-name" minlength={2} maxlength={80} />
+    <FormField name="lastName" label="Last" required autocomplete="family-name" minlength={2} maxlength={80} />
+    <FormField name="email" label="Email" type="email" required autocomplete="email" maxlength={200} />
+    <FormField name="phone" label="Phone" type="tel" required autocomplete="tel" minlength={7} maxlength={30} />
+    {
+      positions.length > 0 ? (
+        <FormField name="position" label="Position" type="select" required options={positions} />
+      ) : (
+        <FormField name="position" label="Position" required maxlength={120} />
+      )
+    }
+    {
+      experienceLevels.length > 0 ? (
+        <FormField name="experience" label="Experience" type="select" required options={experienceLevels} />
+      ) : (
+        <FormField name="experience" label="Experience" required maxlength={200} />
+      )
+    }
+  </div>
+  <FormField name="message" label="Tell us about you (optional)" type="textarea" rows={3} maxlength={3000} />
+  <FormField name="resumeUrl" label="Link to your resume (optional)" type="url" maxlength={300} />
+</FormShell>
+
+<style>
+  .careers-form__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.9rem, 1.8vw, 1.5rem);
+  }
+  @media (min-width: 560px) {
+    .careers-form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,12 @@
+{
+  "name": "Babaloo Coffee Club",
+  "short_name": "Babaloo",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#503226",
+  "background_color": "#f1ede7",
+  "display": "browser",
+  "start_url": "/"
+}

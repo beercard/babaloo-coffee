@@ -1,0 +1,76 @@
+{
+  "menuPage": {
+    "intro": {
+      "title": "homemade creations",
+      "text": "specialty coffee, ceremonial matcha and homemade sweets,\nmade in house every morning."
+    },
+    "showPrices": true,
+    "seo": {
+      "title": "Menu — Coffee, Matcha, Food & Sweets",
+      "description": "Babaloo Coffee Club menu: espresso drinks, cold brew, ceremonial matcha, smoothies, sandwiches, pan de bono and homemade sweets. Order online in Charlotte, NC.",
+      "twitterCard": "summary_large_image"
+    }
+  },
+  "aboutPage": {
+    "title": "About",
+    "frames": [],
+    "text": "Babaloo is a little devotion to the everyday. A place for familiar faces and new ones.\nFor coffee that turns into conversation, quick stops that take a little longer,\nand dogs we know by name. Nothing here is too serious. Nothing is by accident.",
+    "showTeamSection": true,
+    "teamImage": {
+      "src": "photos/team-baristas.jpg",
+      "alt": "Two Babaloo baristas in striped aprons working behind the counter under the menu board",
+      "width": 1500,
+      "height": 2000
+    },
+    "showContactSection": true,
+    "seo": {
+      "title": "About Babaloo — A little to the every day",
+      "description": "Babaloo Coffee Club is a neighbourhood coffee and matcha club in Charlotte, NC. Familiar faces, new ones, and dogs we know by name. Join our team or say hello.",
+      "twitterCard": "summary_large_image"
+    }
+  },
+  "contactPage": {
+    "title": "Contact us",
+    "text": "Questions, catering, collaborations or just to say hi — write to us and we'll get back to you soon.",
+    "seo": {
+      "title": "Contact Babaloo Coffee Club",
+      "description": "Get in touch with Babaloo Coffee Club in South End, Charlotte, NC. Send us a message or email info@babaloocoffeeclub.com."
+    }
+  },
+  "joinPage": {
+    "title": "Join our team",
+    "text": "We're always looking for warm, curious people who love coffee, matcha and dogs. Tell us about yourself.",
+    "positions": [
+      "Barista",
+      "Shift lead",
+      "Kitchen",
+      "Front of house",
+      "Other"
+    ],
+    "experienceLevels": [
+      "No experience",
+      "Less than 1 year",
+      "1-3 years",
+      "3+ years"
+    ],
+    "image": {
+      "src": "photos/team-baristas.jpg",
+      "alt": "Two Babaloo baristas in striped aprons working behind the counter under the menu board",
+      "width": 1500,
+      "height": 2000
+    },
+    "seo": {
+      "title": "Join our team — Careers at Babaloo",
+      "description": "Work with us at Babaloo Coffee Club in Charlotte, NC. Barista, kitchen and front-of-house positions. Apply online."
+    }
+  },
+  "galleryPage": {
+    "title": "Gallery",
+    "text": "",
+    "gallery": "main",
+    "seo": {
+      "title": "Gallery — Babaloo Coffee Club",
+      "description": "Photos from Babaloo Coffee Club: our coffee, matcha, sweets and the space in South End, Charlotte."
+    }
+  }
+}

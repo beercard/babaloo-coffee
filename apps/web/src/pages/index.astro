@@ -1,0 +1,13 @@
+---
+/** Home — PDF page 1. Sections are ordered and toggled from the CMS. */
+import Base from '@/layouts/Base.astro';
+import SectionRenderer from '@/components/sections/SectionRenderer.astro';
+import { getContent } from '@/lib/cms';
+
+const content = await getContent();
+const { homepage } = content;
+---
+
+<Base seo={homepage.seo} isHome bodyClass="page-home">
+  <SectionRenderer sections={homepage.sections} content={content} />
+</Base>

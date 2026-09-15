@@ -1,0 +1,68 @@
+---
+/** Optional call-to-action band (title + text + button, optional image). */
+import type { CtaSection } from '@/lib/cms/types';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Picture from '@/components/ui/Picture.astro';
+
+interface Props {
+  section: CtaSection;
+}
+const { section } = Astro.props;
+const id = section.anchor ?? section.id;
+---
+
+<Section id={id} background={section.background} padded="y" reveal ariaLabelledby={`${id}-title`}>
+  <div class:list={['container', 'cta', section.image && 'cta--with-image']}>
+    {section.image && <Picture image={section.image} mobile={section.imageMobile} sizes="(min-width: 900px) 40vw, 92vw" widths={[400, 700, 1000]} aspect={1} class="cta__img" />}
+    <div class="cta__body">
+      <h2 id={`${id}-title`} class="cta__title script">{section.title}</h2>
+      {section.text && <p class="cta__text">{section.text}</p>}
+      <Button href={section.cta.href} external={section.cta.external} variant={section.background === 'bark' ? 'outline' : 'solid'} size="lg">
+        {section.cta.label}
+      </Button>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .cta {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: center;
+    text-align: center;
+  }
+  .cta--with-image {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .cta--with-image {
+      grid-template-columns: 2fr 3fr;
+      text-align: left;
+    }
+  }
+  .cta__img {
+    border-radius: 4px;
+    box-shadow: var(--shadow-frame);
+    width: 100%;
+  }
+  .cta__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .cta--with-image .cta__body {
+      align-items: flex-start;
+    }
+  }
+  .cta__title {
+    font-size: var(--text-script);
+  }
+  .cta__text {
+    font-style: italic;
+    font-size: var(--text-body-sm);
+    max-width: 44ch;
+  }
+</style>

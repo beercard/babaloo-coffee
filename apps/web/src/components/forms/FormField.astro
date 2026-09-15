@@ -1,0 +1,161 @@
+---
+/**
+ * Form field styled after the PDF: rounded outlined box on cream with the
+ * label written inside in the script typeface. The label floats above the box
+ * once the field has a value or focus, so it never hides the input.
+ */
+interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'url' | 'textarea' | 'select';
+  required?: boolean;
+  autocomplete?: string;
+  options?: string[];
+  rows?: number;
+  pattern?: string;
+  minlength?: number;
+  maxlength?: number;
+  errorMessage?: string;
+  class?: string;
+}
+const {
+  name,
+  label,
+  type = 'text',
+  required = false,
+  autocomplete,
+  options = [],
+  rows = 4,
+  pattern,
+  minlength,
+  maxlength = 2000,
+  errorMessage,
+  class: className,
+} = Astro.props;
+const id = `field-${name}-${Math.random().toString(36).slice(2, 7)}`;
+const errorId = `${id}-error`;
+const common = {
+  id,
+  name,
+  required,
+  autocomplete,
+  'aria-describedby': errorId,
+  placeholder: ' ',
+};
+---
+
+<div class:list={['field', type === 'textarea' && 'field--textarea', className]} data-field data-error-message={errorMessage}>
+  {
+    type === 'textarea' ? (
+      <textarea {...common} rows={rows} minlength={minlength} maxlength={maxlength} class="field__control" />
+    ) : type === 'select' ? (
+      <select {...common} class="field__control field__control--select">
+        <option value="" />
+        {options.map((o) => (
+          <option value={o}>{o}</option>
+        ))}
+      </select>
+    ) : (
+      <input {...common} type={type} pattern={pattern} minlength={minlength} maxlength={maxlength} class="field__control" />
+    )
+  }
+  <label for={id} class="field__label script">
+    {label}
+    {required && <span class="field__req" aria-hidden="true">*</span>}
+  </label>
+  <p id={errorId} class="field__error" data-error hidden></p>
+</div>
+
+<style>
+  .field {
+    position: relative;
+  }
+  .field__control {
+    width: 100%;
+    /* PDF: 60px tall fields on a 1920 artboard */
+    min-height: clamp(2.9rem, 3.6vw, 4rem);
+    padding: 0.7em 1em 0.55em;
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-field);
+    font-family: var(--font-ui);
+    font-size: var(--text-body-sm);
+    line-height: 1.3;
+    color: var(--ink);
+    transition:
+      box-shadow var(--dur),
+      border-color var(--dur);
+    appearance: none;
+  }
+  .field--textarea .field__control {
+    min-height: 7.5rem;
+    resize: vertical;
+  }
+  .field__control--select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.3em) 50%,
+      calc(100% - 0.9em) 50%;
+    background-size: 0.4em 0.4em;
+    background-repeat: no-repeat;
+    padding-right: 2.5em;
+  }
+  .field__control:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(80, 50, 38, 0.25);
+  }
+  .field__control[aria-invalid='true'] {
+    border-color: #9c2f2f;
+  }
+  .field__label {
+    position: absolute;
+    left: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: calc(var(--text-body-sm) * 1.55);
+    line-height: 1;
+    color: var(--ink);
+    pointer-events: none;
+    transition:
+      transform 200ms var(--ease-out),
+      font-size 200ms var(--ease-out),
+      top 200ms var(--ease-out);
+    transform-origin: left center;
+    white-space: nowrap;
+  }
+  .field--textarea .field__label {
+    top: 1.3em;
+  }
+  .field__control:focus ~ .field__label,
+  .field__control:is(input, textarea):not(:placeholder-shown) ~ .field__label,
+  .field__control--select:valid ~ .field__label,
+  .field__control--select:focus ~ .field__label {
+    top: 0;
+    left: 0.9em;
+    transform: translateY(-135%);
+    font-family: var(--font-ui);
+    font-style: italic;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+  .field__control--select:invalid:not(:focus) ~ .field__label {
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1em;
+  }
+  .field__req {
+    margin-left: 0.15em;
+    font-family: var(--font-ui);
+    font-size: 0.55em;
+    vertical-align: top;
+  }
+  .field__error {
+    margin-top: 0.35em;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: #9c2f2f;
+  }
+  .field__error[hidden] {
+    display: none;
+  }
+</style>

@@ -1,0 +1,108 @@
+[
+  {
+    "id": "south-end",
+    "slug": "south-end",
+    "name": "South End",
+    "scriptName": "",
+    "status": "open",
+    "address": {
+      "street": "1425 Winnifred St",
+      "suite": "Suite 117",
+      "city": "Charlotte",
+      "region": "NC",
+      "postalCode": "28203",
+      "country": "US"
+    },
+    "email": "info@babaloocoffeeclub.com",
+    "hoursDisplay": [
+      {
+        "days": "Monday - Friday",
+        "hours": "7:00am - 6:00pm"
+      },
+      {
+        "days": "Saturday - Sunday",
+        "hours": "8:00am - 6:00pm"
+      }
+    ],
+    "hoursSpec": [
+      {
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "opens": "07:00",
+        "closes": "18:00"
+      },
+      {
+        "dayOfWeek": [
+          "Saturday",
+          "Sunday"
+        ],
+        "opens": "08:00",
+        "closes": "18:00"
+      }
+    ],
+    "mapUrl": "https://www.google.com/maps/search/?api=1&query=Babaloo+Coffee+Club+1425+Winnifred+St+Suite+117+Charlotte+NC",
+    "geo": {
+      "lat": 35.2129,
+      "lng": -80.8608
+    },
+    "image": {
+      "src": "photos/location-bar.jpg",
+      "alt": "Babaloo bar with the hand-written logo glowing above the counter",
+      "width": 1600,
+      "height": 809
+    },
+    "orderUrl": "https://order.toasttab.com/online/babaloo-coffee-club-1425-winnifred-st-suite-117",
+    "order": 1
+  },
+  {
+    "id": "location-2",
+    "slug": "location-2",
+    "name": "Second location",
+    "scriptName": "",
+    "status": "coming-soon",
+    "address": {
+      "street": "",
+      "city": "Charlotte",
+      "region": "NC",
+      "country": "US"
+    },
+    "hoursDisplay": [],
+    "hoursSpec": [],
+    "image": {
+      "src": "photos/location-dining.jpg",
+      "alt": "Dining room with a pleated linen pendant lamp, wooden tables and bentwood chairs",
+      "width": 1460,
+      "height": 715
+    },
+    "note": "Coming soon",
+    "order": 2
+  },
+  {
+    "id": "location-3",
+    "slug": "location-3",
+    "name": "Third location",
+    "scriptName": "",
+    "status": "coming-soon",
+    "address": {
+      "street": "",
+      "city": "Charlotte",
+      "region": "NC",
+      "country": "US"
+    },
+    "hoursDisplay": [],
+    "hoursSpec": [],
+    "image": {
+      "src": "photos/location-counter.jpg",
+      "alt": "Curved stone counter with a warm light strip and built-in shelving",
+      "width": 1032,
+      "height": 550
+    },
+    "note": "Coming soon",
+    "order": 3
+  }
+]

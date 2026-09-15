@@ -1,0 +1,39 @@
+---
+/** Gallery — kept from the WordPress site (/gallery/), fully editable. */
+import Base from '@/layouts/Base.astro';
+import GalleryGrid from '@/components/sections/GalleryGrid.astro';
+import { getContent, findGallery } from '@/lib/cms';
+import { breadcrumbSchema } from '@/utils/schema';
+
+const content = await getContent();
+const { galleryPage } = content;
+const gallery = findGallery(content.galleries, galleryPage.gallery) ?? content.galleries[0];
+const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
+const schema = [
+  breadcrumbSchema([
+    { name: 'Home', url: siteUrl },
+    { name: 'Gallery', url: `${siteUrl}gallery` },
+  ]),
+];
+---
+
+<Base seo={galleryPage.seo} title={galleryPage.title} schema={schema} bodyClass="page-gallery">
+  <section class="page-head" aria-labelledby="gallery-title">
+    <div class="container text-center">
+      <h1 id="gallery-title" class="eyebrow-link">{galleryPage.title}</h1>
+      {galleryPage.text && <p class="page-head__text italic">{galleryPage.text}</p>}
+    </div>
+  </section>
+  {gallery && <GalleryGrid gallery={gallery} id="gallery" />}
+</Base>
+
+<style>
+  .page-head {
+    padding-top: calc(var(--curtain-h) + clamp(1.5rem, 2.5vw, 3rem));
+    background: var(--cream);
+  }
+  .page-head__text {
+    margin-top: 1rem;
+    font-size: var(--text-body-sm);
+  }
+</style>

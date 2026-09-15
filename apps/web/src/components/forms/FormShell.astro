@@ -1,0 +1,117 @@
+---
+/**
+ * Shared chrome for the two forms: endpoint wiring, honeypot, status region,
+ * submit button and the no-endpoint fallback.
+ */
+import Button from '@/components/ui/Button.astro';
+import { getFormEndpoint } from '@/lib/forms';
+
+interface Props {
+  form: 'contact' | 'careers';
+  email?: string;
+  submitLabel?: string;
+  successMessage?: string;
+  class?: string;
+  ariaLabelledby?: string;
+}
+const { form, email, submitLabel = 'send', successMessage, class: className, ariaLabelledby } = Astro.props;
+const endpoint = getFormEndpoint();
+const subject = form === 'careers' ? 'Job application' : 'Website contact';
+---
+
+{
+  endpoint ? (
+    <form
+      class:list={['form', className]}
+      method="post"
+      action={endpoint}
+      data-form={form}
+      data-endpoint={endpoint}
+      data-success-message={successMessage}
+      aria-labelledby={ariaLabelledby}
+      novalidate
+    >
+      <slot />
+      {/* Honeypot: hidden from people, filled by bots. Rejected server-side. */}
+      <div class="form__hp" aria-hidden="true">
+        <label for={`${form}-website`}>Website</label>
+        <input type="text" id={`${form}-website`} name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="form" value={form} />
+      <p class="form__status" data-form-status role="status" aria-live="polite" hidden />
+      <div class="form__actions">
+        <Button type="submit" size="lg" data-label-idle={submitLabel} data-label-loading="sending…" data-label-success="sent ✓">
+          {submitLabel}
+        </Button>
+      </div>
+    </form>
+  ) : (
+    <div class:list={['form', 'form--fallback', className]}>
+      <p class="form__fallback-text italic">
+        {email ? (
+          <Fragment>
+            Email us at{' '}
+            <a href={`mailto:${email}?subject=${encodeURIComponent(subject)}`}>{email}</a> and we'll get back to you soon.
+          </Fragment>
+        ) : (
+          'Contact form coming soon.'
+        )}
+      </p>
+      {email && (
+        <div class="form__actions">
+          <Button href={`mailto:${email}?subject=${encodeURIComponent(subject)}`} size="lg">
+            {submitLabel}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+<script>
+  import { initForms } from '@/scripts/forms';
+  initForms();
+</script>
+
+<style>
+  .form {
+    display: grid;
+    gap: clamp(0.9rem, 1.8vw, 1.5rem);
+    width: 100%;
+  }
+  .form__hp {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .form__status {
+    font-family: var(--font-ui);
+    font-size: var(--text-small);
+    padding: 0.75em 1em;
+    border-radius: var(--radius-field);
+    background: rgba(80, 50, 38, 0.08);
+  }
+  .form__status[data-tone='error'] {
+    background: rgba(156, 47, 47, 0.1);
+    color: #7a1f1f;
+  }
+  .form__status[data-tone='success'] {
+    background: rgba(39, 68, 51, 0.12);
+    color: #1f3a2a;
+  }
+  .form__status[hidden] {
+    display: none;
+  }
+  .form__actions {
+    display: flex;
+    justify-content: center;
+    padding-top: clamp(0.5rem, 2vw, 2rem);
+  }
+  .form__fallback-text {
+    text-align: center;
+    font-size: var(--text-body-sm);
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+/** Menu — PDF page 2. */
+import Base from '@/layouts/Base.astro';
+import MenuBoard from '@/components/menu/MenuBoard.astro';
+import { getContent, buildMenuTree } from '@/lib/cms';
+import { breadcrumbSchema, menuSchema } from '@/utils/schema';
+
+const content = await getContent();
+const { menuPage, menu } = content;
+const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
+
+const tree = buildMenuTree(menu.categories, menu.items);
+const sections = tree.flatMap((top) => [
+  ...(top.items.length ? [{ name: top.category.name, items: top.items }] : []),
+  ...top.children.map((sub) => ({ name: `${top.category.name} — ${sub.category.name}`, items: sub.items })),
+]);
+const schema = [
+  breadcrumbSchema([
+    { name: 'Home', url: siteUrl },
+    { name: 'Menu', url: `${siteUrl}menu` },
+  ]),
+  menuSchema(siteUrl, sections, menu.currency),
+];
+---
+
+<Base seo={menuPage.seo} title="Menu" schema={schema} bodyClass="page-menu">
+  <section class="menu-intro" aria-labelledby="menu-title">
+    <div class="container container--narrow text-center">
+      <h1 id="menu-title" class="menu-intro__title script">{menuPage.intro.title}</h1>
+      {
+        menuPage.intro.text && (
+          <p class="menu-intro__text script">
+            {menuPage.intro.text.split('\n').map((line, i, arr) => (
+              <Fragment>
+                {line}
+                {i < arr.length - 1 && <br />}
+              </Fragment>
+            ))}
+          </p>
+        )
+      }
+    </div>
+  </section>
+  <MenuBoard menu={menu} showPrices={menuPage.showPrices} />
+</Base>
+
+<style>
+  .menu-intro {
+    /* PDF: curtain ends ≈470, script starts ≈520 */
+    padding-block: calc(var(--curtain-h) + clamp(1.5rem, 2.5vw, 3rem)) clamp(1.5rem, 4vw, 4.5rem);
+    background: var(--cream);
+  }
+  .menu-intro__title {
+    font-size: var(--text-script);
+  }
+  .menu-intro__text {
+    font-size: var(--text-script);
+    line-height: 1.05;
+    margin-top: 0.1em;
+    text-wrap: balance;
+  }
+  @media (max-width: 640px) {
+    .menu-intro__text {
+      font-size: var(--text-script-sm);
+    }
+  }
+</style>

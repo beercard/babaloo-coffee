@@ -1,0 +1,41 @@
+# Variables de entorno
+
+Ningún secreto se incluye en el repositorio. Los archivos `.env` están ignorados por git; se documentan en `.env.example` de cada app.
+
+## Frontend — `apps/web/.env`
+
+| Variable | Obligatoria | Descripción |
+|---|---|---|
+| `SITE_URL` | sí (prod) | URL canónica, p. ej. `https://babaloocoffeeclub.com`. Sitemap, canonical, JSON-LD. |
+| `PAYLOAD_URL` | no | URL del CMS. **Vacía = build con el contenido de `src/content/seed`.** |
+| `PAYLOAD_API_KEY` | no | Sólo si el API REST del CMS se hace privado (usuario con API key). |
+| `PUBLIC_CMS_URL` | no | URL pública del CMS que usa el navegador para enviar formularios (normalmente igual a `PAYLOAD_URL`). |
+| `PUBLIC_FORM_ENDPOINT` | no | Sustituye el endpoint de formularios por otro servicio (Formspree, n8n, Zapier…). |
+| `PUBLIC_GTM_ID` | no | Google Tag Manager `GTM-XXXX`. Si está vacío no se carga nada. |
+| `PUBLIC_GA4_ID` | no | Google Analytics 4 `G-XXXX`. |
+| `PUBLIC_GADS_ID` | no | Google Ads `AW-XXXX` (conversiones). |
+| `PUBLIC_META_PIXEL_ID` | no | Meta Pixel. |
+
+Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas.
+
+## CMS — `apps/cms/.env`
+
+| Variable | Obligatoria | Descripción |
+|---|---|---|
+| `PAYLOAD_SECRET` | sí | Cadena aleatoria larga (`openssl rand -hex 32`). Firma sesiones. |
+| `DATABASE_URL` | sí | SQLite: `file:./babaloo.db` (en Docker `file:/app/apps/cms/data/babaloo.db`). |
+| `PAYLOAD_PUBLIC_SERVER_URL` | sí (prod) | URL pública del CMS, p. ej. `https://cms.babaloocoffeeclub.com`. |
+| `SITE_URL` | sí (prod) | Orígenes permitidos (CORS/CSRF) separados por coma: `https://babaloocoffeeclub.com,http://localhost:4321`. |
+| `DEPLOY_HOOK_URL` | recomendado | Webhook que reconstruye el sitio al guardar contenido. GitHub: `https://api.github.com/repos/<owner>/<repo>/dispatches`. |
+| `DEPLOY_HOOK_TOKEN` | con GitHub | Fine-grained PAT con permiso *Contents: write* sobre el repo. |
+| `DEPLOY_HOOK_BODY` | con GitHub | `{"event_type":"cms-publish"}` |
+| `DEPLOY_DEBOUNCE_MS` | no | Espera antes de disparar (agrupa ediciones). Default 60000. |
+| `FORM_NOTIFY_EMAIL` | no | Email que recibe los formularios (requiere adaptador de email en `payload.config.ts`). |
+| `FORM_WEBHOOK_URL` | no | Webhook para CRM / WhatsApp / newsletter con cada envío. |
+| `FORM_RATE_LIMIT` | no | Envíos por IP cada 10 min. Default 5. |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | sólo seed | Primer usuario admin. |
+
+## GitHub Actions (Settings → Secrets and variables → Actions)
+
+Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`, `PAYLOAD_URL`, `PAYLOAD_API_KEY` (opcional).
+Variables: `SITE_URL`, `FTP_SERVER_DIR` (`/public_html/`), `FTP_PROTOCOL` (`ftps`), `PUBLIC_GTM_ID`, `PUBLIC_GA4_ID`, `PUBLIC_GADS_ID`, `PUBLIC_META_PIXEL_ID`, `PUBLIC_FORM_ENDPOINT`.

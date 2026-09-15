@@ -1,0 +1,111 @@
+---
+/** Optional home section: featured menu items with their photos and live prices. */
+import type { MenuItem, Link } from '@/lib/cms/types';
+import { itemPrice } from '@/utils/format';
+import Picture from '@/components/ui/Picture.astro';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  items: MenuItem[];
+  title?: string;
+  text?: string;
+  cta?: Link;
+  currency?: string;
+  id?: string;
+}
+const { items, title = 'homemade creations', text, cta, currency = 'USD', id = 'featured' } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="featured" id={id} aria-labelledby={`${id}-title`}>
+      <div class="container">
+        <h2 id={`${id}-title`} class="featured__title script text-center">
+          {title}
+        </h2>
+        {text && <p class="featured__text text-center italic">{text}</p>}
+        <ul role="list" class="featured__grid">
+          {items.map((item, i) => {
+            const price = itemPrice(item, currency);
+            return (
+              <li class="featured__item reveal" style={`--i:${i}`}>
+                <a href={`/menu#${item.slug}`} class="featured__link">
+                  {item.image && <Picture image={item.image} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw" widths={[360, 560, 800]} aspect={4 / 5} class="featured__img" />}
+                  <span class="featured__row">
+                    <span class="featured__name">{item.name}</span>
+                    {price && <span class="featured__price">{price}</span>}
+                  </span>
+                  {item.description && <span class="featured__desc">{item.description}</span>}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+        {cta && (
+          <p class="text-center featured__cta">
+            <Button href={cta.href} external={cta.external} variant="outline">
+              {cta.label}
+            </Button>
+          </p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .featured {
+    padding-block: var(--section-y-sm) var(--section-y);
+    background: var(--cream);
+  }
+  .featured__title {
+    font-size: var(--text-script);
+    margin-bottom: 0.4em;
+  }
+  .featured__text {
+    font-size: var(--text-body-sm);
+    margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  }
+  .featured__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+  }
+  .featured__item {
+    transition-delay: calc(var(--i) * 80ms);
+  }
+  .featured__link {
+    display: block;
+    text-decoration: none;
+  }
+  .featured__img {
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: var(--shadow-frame);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .featured__link:hover .featured__img {
+    transform: translateY(-4px);
+  }
+  .featured__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    margin-top: 0.9rem;
+    font-weight: 700;
+    font-style: italic;
+    font-size: var(--text-body-sm);
+  }
+  .featured__desc {
+    display: block;
+    font-family: var(--font-ui);
+    font-weight: 300;
+    font-style: italic;
+    font-size: var(--text-small);
+    margin-top: 0.25rem;
+  }
+  .featured__cta {
+    margin-top: clamp(1.5rem, 3vw, 3rem);
+  }
+</style>

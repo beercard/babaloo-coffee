@@ -1,0 +1,67 @@
+---
+/**
+ * Optional free-form section: rich text from the CMS (already sanitised to
+ * HTML by the CMS) with an optional image on either side.
+ */
+import type { RichTextSection } from '@/lib/cms/types';
+import Section from '@/components/ui/Section.astro';
+import Picture from '@/components/ui/Picture.astro';
+
+interface Props {
+  section: RichTextSection;
+}
+const { section } = Astro.props;
+const id = section.anchor ?? section.id;
+---
+
+<Section id={id} background={section.background} padded="y" reveal ariaLabelledby={section.title ? `${id}-title` : undefined}>
+  <div class:list={['container', 'rich', section.image && 'rich--with-image', section.image && `rich--image-${section.imagePosition}`]}>
+    {section.image && <Picture image={section.image} mobile={section.imageMobile} sizes="(min-width: 900px) 42vw, 92vw" widths={[400, 700, 1000]} class="rich__img" />}
+    <div class="rich__body">
+      {section.title && <h2 id={`${id}-title`} class="rich__title script">{section.title}</h2>}
+      <div class="rich__content" set:html={section.html} />
+    </div>
+  </div>
+</Section>
+
+<style>
+  .rich {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .rich--with-image {
+      grid-template-columns: 1fr 1fr;
+    }
+    .rich--image-right .rich__img {
+      order: 2;
+    }
+  }
+  .rich__img {
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: var(--shadow-frame);
+  }
+  .rich__title {
+    font-size: var(--text-script-sm);
+    margin-bottom: 0.5em;
+  }
+  .rich__content {
+    font-style: italic;
+    font-size: var(--text-body-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+  .rich__content :global(h3) {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-style: normal;
+    font-size: var(--text-title);
+  }
+  .rich__content :global(ul),
+  .rich__content :global(ol) {
+    padding-left: 1.2em;
+  }
+</style>

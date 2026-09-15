@@ -1,0 +1,72 @@
+---
+/** Optional quotes section (collection `testimonials`). */
+import type { Testimonial } from '@/lib/cms/types';
+
+interface Props {
+  items: Testimonial[];
+  title?: string;
+  id?: string;
+}
+const { items, title = 'familiar faces', id = 'testimonials' } = Astro.props;
+const sorted = [...items].sort((a, b) => a.order - b.order);
+---
+
+{
+  sorted.length > 0 && (
+    <section class="quotes" id={id} aria-labelledby={`${id}-title`}>
+      <div class="container container--narrow">
+        <h2 id={`${id}-title`} class="quotes__title script text-center">
+          {title}
+        </h2>
+        <ul role="list" class="quotes__list">
+          {sorted.map((t, i) => (
+            <li class="quote reveal" style={`--i:${i}`}>
+              <blockquote>
+                <p class="quote__text">“{t.quote}”</p>
+                <footer class="quote__author">
+                  {t.author}
+                  {t.role ? `, ${t.role}` : ''}
+                </footer>
+              </blockquote>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .quotes {
+    padding-block: var(--section-y-sm);
+    background: var(--cream);
+  }
+  .quotes__title {
+    font-size: var(--text-script);
+    margin-bottom: clamp(1rem, 2.5vw, 2.5rem);
+  }
+  .quotes__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+  .quote {
+    transition-delay: calc(var(--i) * 80ms);
+  }
+  blockquote {
+    margin: 0;
+    text-align: center;
+  }
+  .quote__text {
+    font-style: italic;
+    font-size: var(--text-body-sm);
+    text-wrap: balance;
+  }
+  .quote__author {
+    margin-top: 0.75rem;
+    font-family: var(--font-ui);
+    font-size: var(--text-small);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+</style>

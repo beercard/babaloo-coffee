@@ -1,0 +1,153 @@
+---
+/**
+ * Three gold frames with the locations underneath (PDF page 1): address,
+ * hours and a "map" link; "COMING SOON" for future locations. The section is
+ * the scroll target of the "Locations" navigation link.
+ */
+import type { Location } from '@/lib/cms/types';
+import Frame from '@/components/ui/Frame.astro';
+
+interface Props {
+  locations: Location[];
+  id?: string;
+  title?: string;
+  text?: string;
+}
+const { locations, id = 'locations', title = 'Locations', text } = Astro.props;
+---
+
+<section class="locations" id={id} aria-labelledby={`${id}-title`}>
+  <div class="container">
+    <h2 id={`${id}-title`} class="visually-hidden">{title}</h2>
+    {text && <p class="locations__text">{text}</p>}
+    <ul role="list" class="locations__grid">
+      {
+        locations.map((loc, i) => (
+          <li class="location reveal" style={`--i:${i}`}>
+            <Frame image={loc.image} label={loc.scriptName} loading="lazy" />
+            <div class="location__body">
+              <h3 class="visually-hidden">{loc.name}</h3>
+              {loc.status === 'open' && loc.address?.street ? (
+                <Fragment>
+                  <address class="location__address">
+                    {loc.address.street}
+                    {loc.address.suite ? `, ${loc.address.suite}` : ''}
+                    <br />
+                    {loc.address.city}, {loc.address.region} {loc.address.postalCode ?? ''}
+                  </address>
+                  {loc.hoursDisplay.length > 0 && (
+                    <div class="location__hours">
+                      <p>Hours</p>
+                      <dl>
+                        {loc.hoursDisplay.map((h) => (
+                          <div class="location__hours-row">
+                            <dt>{h.days}</dt>
+                            <dd>{h.hours}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  )}
+                  <ul role="list" class="location__links">
+                    {loc.mapUrl && (
+                      <li>
+                        <a href={loc.mapUrl} target="_blank" rel="noopener">
+                          map
+                        </a>
+                      </li>
+                    )}
+                    {loc.orderUrl && (
+                      <li>
+                        <a href={loc.orderUrl} target="_blank" rel="noopener">
+                          order
+                        </a>
+                      </li>
+                    )}
+                    {loc.phone && (
+                      <li>
+                        <a href={`tel:${loc.phone.replace(/[^+\d]/g, '')}`}>{loc.phone}</a>
+                      </li>
+                    )}
+                  </ul>
+                </Fragment>
+              ) : (
+                <p class="location__soon">{loc.note ?? (loc.status === 'coming-soon' ? 'Coming soon' : loc.name)}</p>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .locations {
+    background: var(--cream);
+    /* PDF: frames start at 2870, footer at 3580 */
+    padding-block: clamp(1.5rem, 4vw, 5rem) clamp(3rem, 6vw, 7rem);
+    scroll-margin-top: 1rem;
+  }
+  .locations__text {
+    text-align: center;
+    font-style: italic;
+    font-size: var(--text-body);
+    margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  }
+  .locations__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    column-gap: clamp(1.5rem, 4vw, 5rem);
+    row-gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .locations__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .location {
+    transition-delay: calc(var(--i) * 90ms);
+  }
+  .location__body {
+    /* PDF: 3350 → 3290 text starts ~90px under the frame */
+    padding-top: clamp(1rem, 2vw, 2.25rem);
+    padding-inline: clamp(0.5rem, 2vw, 2rem);
+    font-style: italic;
+    font-size: var(--text-small);
+    line-height: 1.4;
+    min-height: 8em;
+  }
+  .location__address {
+    font-style: italic;
+  }
+  .location__hours {
+    margin-top: 1.4em;
+  }
+  .location__hours dl {
+    margin: 0;
+  }
+  .location__hours-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.4em;
+  }
+  .location__hours dd {
+    margin: 0;
+  }
+  .location__links {
+    display: flex;
+    gap: 1.5em;
+    margin-top: 1.6em;
+  }
+  .location__links a {
+    text-decoration: underline;
+  }
+  .location__soon {
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+    padding-top: 2.5em;
+  }
+</style>

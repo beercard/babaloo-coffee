@@ -1,0 +1,13 @@
+# Netlify / Cloudflare Pages redirects (WordPress → new site)
+/drinks         /menu                   301
+/drinks/        /menu                   301
+/food           /menu#food-and-sweets   301
+/food/          /menu#food-and-sweets   301
+/hours          /#locations             301
+/hours/         /#locations             301
+/contact-us     /contact                301
+/contact-us/    /contact                301
+/wp-admin/*     /                       301
+/wp-login.php   /                       301
+/wp-content/*   /                       301
+/feed           /                       301

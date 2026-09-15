@@ -1,0 +1,94 @@
+---
+/**
+ * Bark-coloured band with the nine hand-drawn icons from the PDF sliding
+ * continuously ("elementos que se deslicen"). Pure CSS marquee; the track is
+ * duplicated once (aria-hidden) so the loop is seamless. Icons come from the
+ * external sprite, so the markup stays tiny.
+ */
+import type { IconStripSection } from '@/lib/cms/types';
+import { stripIcons } from '@/lib/sprite';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  section?: IconStripSection;
+}
+const { section } = Astro.props;
+const speed = section?.speed ?? 40;
+---
+
+<div class="strip" style={`--speed:${speed}s`} aria-hidden="true">
+  <div class="strip__track">
+    {
+      [0, 1].map(() => (
+        <ul role="list" class="strip__set">
+          {stripIcons.map((name) => (
+            <li class="strip__item">
+              <Icon name={name} class="strip__icon" />
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .strip {
+    position: relative;
+    height: var(--strip-h);
+    background: var(--bark);
+    color: var(--cream-bright);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .strip__track {
+    display: flex;
+    width: max-content;
+    animation: strip-marquee var(--speed) linear infinite;
+    will-change: transform;
+  }
+  .strip__set {
+    display: flex;
+    align-items: center;
+    /* PDF: icons ≈ 213px apart on 1920 */
+    gap: clamp(2rem, 5.5vw, 6.5rem);
+    padding-inline: clamp(1rem, 2.75vw, 3.25rem);
+  }
+  .strip__item {
+    display: grid;
+    place-items: center;
+    height: calc(var(--strip-h) * 0.62);
+    width: calc(var(--strip-h) * 0.95);
+  }
+  .strip__icon {
+    width: 100%;
+    height: 100%;
+  }
+  @keyframes strip-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .strip:hover .strip__track {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .strip__track {
+      animation: none;
+      width: 100%;
+      justify-content: center;
+    }
+    .strip__set:last-child {
+      display: none;
+    }
+    .strip__set {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.25rem;
+    }
+  }
+</style>

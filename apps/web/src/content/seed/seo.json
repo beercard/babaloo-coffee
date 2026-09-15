@@ -1,0 +1,14 @@
+{
+  "titleTemplate": "%s | Babaloo Coffee Club",
+  "defaultTitle": "Babaloo Coffee Club | Coffee & Matcha Club in Charlotte, NC",
+  "description": "Babaloo is a little devotion to the everyday. Specialty coffee, ceremonial matcha, homemade sweets and dogs we know by name. South End, Charlotte, NC.",
+  "ogImage": {
+    "src": "photos/hero-dogs.jpg",
+    "alt": "Two dogs sitting together on a sofa at Babaloo Coffee Club",
+    "width": 1800,
+    "height": 2400
+  },
+  "twitterHandle": "",
+  "robots": "index, follow, max-image-preview:large",
+  "locale": "en_US"
+}

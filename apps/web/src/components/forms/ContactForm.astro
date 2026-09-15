@@ -1,0 +1,32 @@
+---
+/** CONTACT US (PDF about page): Name · Email · comment · send. */
+import FormShell from './FormShell.astro';
+import FormField from './FormField.astro';
+
+interface Props {
+  email?: string;
+  ariaLabelledby?: string;
+}
+const { email, ariaLabelledby } = Astro.props;
+---
+
+<FormShell form="contact" email={email} submitLabel="send" successMessage="Thank you! Your message is on its way." ariaLabelledby={ariaLabelledby} class="contact-form">
+  <div class="contact-form__row">
+    <FormField name="name" label="Name" required autocomplete="name" minlength={2} maxlength={120} />
+    <FormField name="email" label="Email" type="email" required autocomplete="email" maxlength={200} />
+  </div>
+  <FormField name="message" label="comment" type="textarea" required minlength={5} maxlength={3000} rows={3} />
+</FormShell>
+
+<style>
+  .contact-form__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.9rem, 1.8vw, 1.5rem);
+  }
+  @media (min-width: 560px) {
+    .contact-form__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

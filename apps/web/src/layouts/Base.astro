@@ -1,0 +1,104 @@
+---
+/**
+ * Root layout: fonts, global CSS, SEO head, JSON-LD, analytics, header, footer.
+ * Pages only provide their sections and their SEO meta.
+ */
+import '@fontsource/lato/latin-400.css';
+import '@fontsource/lato/latin-400-italic.css';
+import '@fontsource/lato/latin-700-italic.css';
+import '@fontsource/poppins/latin-300-italic.css';
+import '@fontsource/poppins/latin-400.css';
+import '@fontsource/poppins/latin-400-italic.css';
+import '@fontsource/poppins/latin-700.css';
+import '@fontsource/mrs-saint-delafield/latin-400.css';
+import '@/styles/global.css';
+
+import latoItalic from '@fontsource/lato/files/lato-latin-400-italic.woff2?url';
+import poppinsItalic from '@fontsource/poppins/files/poppins-latin-400-italic.woff2?url';
+import scriptFont from '@fontsource/mrs-saint-delafield/files/mrs-saint-delafield-latin-400-normal.woff2?url';
+
+import type { SEOMeta, SiteContent } from '@/lib/cms/types';
+import { getContent } from '@/lib/cms';
+import { imageOptions, absoluteUrl } from '@/lib/images';
+import { getImage } from 'astro:assets';
+import { organizationSchema, websiteSchema, cafeSchema, graph } from '@/utils/schema';
+import SEO from '@/components/seo/SEO.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import Analytics from '@/components/seo/Analytics.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+
+interface Props {
+  seo: SEOMeta;
+  /** Title used when the CMS page has no SEO title. */
+  title?: string;
+  isHome?: boolean;
+  /** Extra JSON-LD nodes for this page (breadcrumbs, menu…). */
+  schema?: Record<string, unknown>[];
+  bodyClass?: string;
+}
+
+const { seo, title, isHome = false, schema = [], bodyClass } = Astro.props;
+const content: SiteContent = await getContent();
+const { settings, seoDefaults, locations } = content;
+const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
+
+// Organisation logo for schema (uses the CMS logo when present, else the OG image).
+const logoRef = settings.logo ?? seoDefaults.ogImage;
+const logoUrl = logoRef ? absoluteUrl((await getImage({ ...imageOptions(logoRef, 800), format: 'jpg' })).src, Astro.site) : undefined;
+
+const cafeNodes = await Promise.all(
+  locations.map(async (l) => {
+    const img = l.image ? absoluteUrl((await getImage({ ...imageOptions(l.image, 1200), format: 'jpg' })).src, Astro.site) : undefined;
+    return cafeSchema(l, settings, siteUrl, img);
+  }),
+);
+const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(settings, siteUrl), ...cafeNodes, ...schema]);
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.remove('no-js');</script>
+    <SEO meta={seo} defaults={seoDefaults} fallbackTitle={title} raw={isHome} siteName={settings.name} />
+    <meta name="theme-color" content="#503226" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" as="font" type="font/woff2" href={latoItalic} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={poppinsItalic} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={scriptFont} crossorigin />
+    <meta name="generator" content={Astro.generator} />
+    <JsonLd data={ld} />
+    <Analytics />
+  </head>
+  <body class={bodyClass}>
+    <a href="#main" class="skip-link">Skip to content</a>
+    {
+      import.meta.env.PUBLIC_GTM_ID && (
+        <noscript>
+          <iframe src={`https://www.googletagmanager.com/ns.html?id=${import.meta.env.PUBLIC_GTM_ID}`} height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager" />
+        </noscript>
+      )
+    }
+    <Header settings={settings} isHome={isHome} currentPath={Astro.url.pathname} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer settings={settings} />
+    <script>
+      import { initReveal } from '@/scripts/reveal';
+      initReveal();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  main:focus {
+    outline: none;
+  }
+</style>

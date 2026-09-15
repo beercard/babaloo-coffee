@@ -1,0 +1,132 @@
+{
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "enabled": true,
+      "interval": 5,
+      "slides": [
+        {
+          "image": {
+            "src": "photos/hero-07.jpg",
+            "alt": "The Babaloo Coffee Club sign lit on a textured wall",
+            "width": 1800,
+            "height": 2400
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-01.jpg",
+            "alt": "A guest walking down the sidewalk with a Babaloo coffee in hand",
+            "width": 1600,
+            "height": 2400
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-03.jpg",
+            "alt": "Working on a laptop with a Babaloo latte and a to-go cup",
+            "width": 1694,
+            "height": 2400
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-02.jpg",
+            "alt": "Two friends laughing over coffee at a table outside Babaloo",
+            "width": 2400,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-08.jpg",
+            "alt": "Barista pouring matcha into a Babaloo to-go cup",
+            "width": 1800,
+            "height": 2400
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-04.jpg",
+            "alt": "Latte in a stoneware cup and a Babaloo to-go cup on a café table",
+            "width": 1896,
+            "height": 2400
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-05.jpg",
+            "alt": "Guests relaxing under a green umbrella outside Babaloo",
+            "width": 2400,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/hero-06.jpg",
+            "alt": "Two Babaloo to-go cups in a tray on a sunny pavement",
+            "width": 1587,
+            "height": 2400
+          }
+        }
+      ]
+    },
+    {
+      "id": "icons",
+      "type": "iconStrip",
+      "enabled": true,
+      "speed": 40
+    },
+    {
+      "id": "nav",
+      "type": "navRow",
+      "enabled": true
+    },
+    {
+      "id": "intro",
+      "type": "intro",
+      "enabled": true,
+      "text": "Babaloo is a little devotion to the everyday.\nA place for familiar faces and new ones.\nFor coffee that turns into conversation,\nquick stops that take a little longer,\nand dogs we know by name.\nNothing here is too serious. Nothing is by accident."
+    },
+    {
+      "id": "locations",
+      "type": "locations",
+      "enabled": true,
+      "anchor": "locations"
+    },
+    {
+      "id": "featured",
+      "type": "featuredMenu",
+      "enabled": false,
+      "title": "homemade creations",
+      "limit": 4,
+      "cta": {
+        "label": "See the menu",
+        "href": "/menu"
+      }
+    },
+    {
+      "id": "gallery",
+      "type": "gallery",
+      "enabled": false,
+      "gallery": "main",
+      "limit": 6,
+      "cta": {
+        "label": "Gallery",
+        "href": "/gallery"
+      }
+    },
+    {
+      "id": "testimonials",
+      "type": "testimonials",
+      "enabled": false,
+      "title": "familiar faces"
+    }
+  ],
+  "seo": {
+    "title": "Babaloo Coffee Club | Coffee & Matcha Club in Charlotte, NC",
+    "description": "Specialty coffee, ceremonial matcha, homemade sweets and dogs we know by name. Visit Babaloo Coffee Club in South End, Charlotte, or order online.",
+    "twitterCard": "summary_large_image"
+  }
+}

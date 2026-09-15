@@ -1,0 +1,146 @@
+---
+/** Contact — replaces /contact-us/ (301). Form on concrete + practical details. */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+import { getContent, sortedLocations } from '@/lib/cms';
+import { breadcrumbSchema } from '@/utils/schema';
+
+const content = await getContent();
+const { contactPage, settings } = content;
+const open = sortedLocations(content.locations).filter((l) => l.status === 'open');
+const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
+const schema = [
+  breadcrumbSchema([
+    { name: 'Home', url: siteUrl },
+    { name: 'Contact', url: `${siteUrl}contact` },
+  ]),
+];
+---
+
+<Base seo={contactPage.seo} title={contactPage.title} schema={schema} bodyClass="page-contact">
+  <Section background="concrete" padded="y" offsetCurtain class="contact-page" ariaLabelledby="contact-title">
+    <div class="container contact-page__inner">
+      <div class="contact-page__form">
+        <h1 id="contact-title" class="contact-page__title ui">{contactPage.title}</h1>
+        {contactPage.text && <p class="contact-page__text italic">{contactPage.text}</p>}
+        <ContactForm email={settings.email} ariaLabelledby="contact-title" />
+      </div>
+      <aside class="contact-page__aside" aria-label="Contact details">
+        {settings.email && (
+          <p>
+            <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          </p>
+        )}
+        {settings.phone && (
+          <p>
+            <a href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`}>{settings.phone}</a>
+          </p>
+        )}
+        {
+          open.map((loc) => (
+            <div class="contact-page__location">
+              <h2 class="contact-page__loc-name">{loc.name}</h2>
+              {loc.address?.street && (
+                <address>
+                  {loc.address.street}
+                  {loc.address.suite ? `, ${loc.address.suite}` : ''}
+                  <br />
+                  {loc.address.city}, {loc.address.region} {loc.address.postalCode ?? ''}
+                </address>
+              )}
+              {loc.hoursDisplay.length > 0 && (
+                <dl class="contact-page__hours">
+                  {loc.hoursDisplay.map((h) => (
+                    <div>
+                      <dt>{h.days}</dt>
+                      <dd>{h.hours}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {loc.mapUrl && (
+                <a href={loc.mapUrl} target="_blank" rel="noopener">
+                  map
+                </a>
+              )}
+            </div>
+          ))
+        }
+        {
+          settings.social.length > 0 && (
+            <ul role="list" class="contact-page__social">
+              {settings.social.map((s) => (
+                <li>
+                  <a href={s.url} target="_blank" rel="noopener">
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </aside>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .contact-page__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+  @media (min-width: 900px) {
+    .contact-page__inner {
+      grid-template-columns: 3fr 2fr;
+      align-items: start;
+    }
+  }
+  .contact-page__form {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 2rem);
+  }
+  .contact-page__title {
+    font-weight: 700;
+    font-size: var(--text-title);
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .contact-page__text {
+    text-align: center;
+    font-size: var(--text-body-sm);
+  }
+  .contact-page__aside {
+    font-style: italic;
+    font-size: var(--text-body-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-top: clamp(0rem, 2vw, 4rem);
+  }
+  .contact-page__loc-name {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-style: normal;
+    text-transform: uppercase;
+    font-size: var(--text-small);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+  .contact-page__hours {
+    margin: 0.6rem 0;
+  }
+  .contact-page__hours div {
+    display: flex;
+    gap: 0.4em;
+  }
+  .contact-page__hours dd {
+    margin: 0;
+  }
+  .contact-page__social {
+    display: flex;
+    gap: 1rem;
+  }
+</style>

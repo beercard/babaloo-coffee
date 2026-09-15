@@ -1,0 +1,98 @@
+---
+/**
+ * Pill button as drawn in the PDF ("sent"): bark background, cream Poppins Bold.
+ * Renders an <a> when `href` is given, otherwise a <button>.
+ */
+import { isExternal } from '@/utils/format';
+
+interface Props {
+  href?: string;
+  external?: boolean;
+  type?: 'button' | 'submit';
+  variant?: 'solid' | 'outline' | 'script';
+  size?: 'md' | 'lg';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, external, type = 'button', variant = 'solid', size = 'md', class: className, ...rest } = Astro.props;
+const ext = external ?? (href ? isExternal(href) && !href.startsWith('mailto:') && !href.startsWith('tel:') : false);
+const classes = ['btn', `btn--${variant}`, `btn--${size}`, className];
+---
+
+{
+  href ? (
+    <a href={href} class:list={classes} {...(ext ? { target: '_blank', rel: 'noopener' } : {})} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class:list={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    min-width: 7.5em;
+    padding: 0.6em 1.6em;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: var(--text-body-sm);
+    line-height: 1.2;
+    text-decoration: none;
+    text-align: center;
+    transition:
+      transform var(--dur) var(--ease-out),
+      background-color var(--dur) var(--ease-out),
+      color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
+  }
+  .btn--lg {
+    font-size: var(--text-body);
+    padding: 0.55em 1.8em;
+  }
+  .btn--solid {
+    background: var(--bark);
+    color: var(--cream-bright);
+  }
+  .btn--solid:hover,
+  .btn--solid:focus-visible {
+    background: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px -12px rgba(60, 26, 30, 0.7);
+  }
+  .btn--outline {
+    background: transparent;
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1.5px var(--ink);
+  }
+  .btn--outline:hover,
+  .btn--outline:focus-visible {
+    background: var(--ink);
+    color: var(--cream-bright);
+  }
+  .btn--script {
+    background: var(--bark);
+    color: var(--cream-bright);
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: calc(var(--text-body) * 1.15);
+    padding: 0.25em 1.6em 0.35em;
+  }
+  .btn--script:hover,
+  .btn--script:focus-visible {
+    background: var(--ink);
+  }
+  .btn[disabled],
+  .btn[aria-disabled='true'] {
+    opacity: 0.6;
+    cursor: progress;
+    transform: none;
+  }
+</style>

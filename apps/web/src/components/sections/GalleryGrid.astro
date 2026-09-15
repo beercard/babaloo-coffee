@@ -1,0 +1,94 @@
+---
+/** Editable photo gallery. Column layout keeps the tall product photos intact. */
+import type { Gallery, Link } from '@/lib/cms/types';
+import Picture from '@/components/ui/Picture.astro';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  gallery: Gallery;
+  title?: string;
+  limit?: number;
+  cta?: Link;
+  headingLevel?: 'h1' | 'h2';
+  id?: string;
+}
+const { gallery, title, limit, cta, headingLevel = 'h2', id = 'gallery' } = Astro.props;
+const Heading = headingLevel;
+const images = [...gallery.images].sort((a, b) => a.order - b.order).slice(0, limit ?? gallery.images.length);
+---
+
+<section class="gallery" id={id} aria-labelledby={title ? `${id}-title` : undefined} aria-label={title ? undefined : gallery.name}>
+  <div class="container">
+    {title && <Heading id={`${id}-title`} class="gallery__title script text-center">{title}</Heading>}
+    <ul role="list" class="gallery__grid">
+      {
+        images.map((g, i) => (
+          <li class="gallery__item reveal" style={`--i:${i % 4}`}>
+            <figure>
+              <Picture image={g.image} sizes="(min-width: 1024px) 23vw, (min-width: 640px) 45vw, 92vw" widths={[360, 560, 800]} loading={i < 4 ? 'eager' : 'lazy'} class="gallery__img" />
+              {g.caption && <figcaption class="gallery__caption">{g.caption}</figcaption>}
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+    {
+      cta && (
+        <p class="gallery__cta">
+          <Button href={cta.href} external={cta.external} variant="outline">
+            {cta.label}
+          </Button>
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .gallery {
+    padding-block: var(--section-y-sm) var(--section-y);
+    background: var(--cream);
+  }
+  .gallery__title {
+    font-size: var(--text-script);
+    margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  }
+  .gallery__grid {
+    columns: 2;
+    column-gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+  @media (min-width: 640px) {
+    .gallery__grid {
+      columns: 3;
+    }
+  }
+  @media (min-width: 1024px) {
+    .gallery__grid {
+      columns: 4;
+    }
+  }
+  .gallery__item {
+    break-inside: avoid;
+    margin-bottom: clamp(0.75rem, 2vw, 1.5rem);
+    transition-delay: calc(var(--i) * 70ms);
+  }
+  .gallery__img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: var(--shadow-frame);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .gallery__item:hover .gallery__img {
+    transform: translateY(-3px);
+  }
+  .gallery__caption {
+    font-style: italic;
+    font-size: var(--text-small);
+    padding: 0.5em 0.25em 0;
+  }
+  .gallery__cta {
+    text-align: center;
+    margin-top: clamp(1.5rem, 3vw, 3rem);
+  }
+</style>

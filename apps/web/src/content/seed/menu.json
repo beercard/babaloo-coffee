@@ -1,0 +1,63 @@
+{
+  "currency": "USD",
+  "categories": [
+    { "id": "coffee", "name": "Coffee", "slug": "coffee", "order": 1, "active": true, "image": { "src": "photos/product-latte-tiramisu.png", "alt": "Iced latte tiramisu in a Babaloo cup topped with mascarpone, cocoa and a ladyfinger", "width": 675, "height": 1077 } },
+    { "id": "coffee-hot", "name": "Hot", "slug": "hot", "parent": "coffee", "order": 1, "active": true },
+    { "id": "coffee-iced", "name": "Iced", "slug": "iced", "parent": "coffee", "order": 2, "active": true },
+
+    { "id": "matcha", "name": "Matcha & more", "slug": "matcha", "order": 2, "active": true, "image": { "src": "photos/product-matcha.jpg", "alt": "Stoneware cup of matcha on a sunlit table", "width": 1092, "height": 1600 } },
+    { "id": "matcha-hot", "name": "Hot", "slug": "hot", "parent": "matcha", "order": 1, "active": true },
+    { "id": "matcha-iced", "name": "Iced", "slug": "iced", "parent": "matcha", "order": 2, "active": true },
+
+    { "id": "food", "name": "Food and sweets", "slug": "food-and-sweets", "order": 3, "active": true, "image": { "src": "photos/product-pan-de-bono.jpg", "alt": "Babaloo pastry box on a stone counter", "width": 1133, "height": 1600 } },
+    { "id": "food-salty", "name": "Salty", "slug": "salty", "parent": "food", "order": 1, "active": true },
+    { "id": "food-sweets", "name": "Sweets", "slug": "sweets", "parent": "food", "order": 2, "active": true },
+
+    { "id": "extras", "name": "Extras", "slug": "extras", "order": 4, "active": true, "image": { "src": "photos/product-syrups.jpg", "alt": "Babaloo to-go cup on a stone counter", "width": 1242, "height": 1600 } },
+    { "id": "extras-syrups", "name": "Syrups", "slug": "syrups", "parent": "extras", "order": 1, "active": true },
+    { "id": "extras-milk", "name": "Alternative milk (made in house)", "slug": "alternative-milk", "parent": "extras", "order": 2, "active": true }
+  ],
+  "items": [
+    { "id": "espresso", "name": "Espresso", "slug": "espresso", "price": 4.5, "category": "coffee-hot", "order": 1, "image": { "src": "photos/product-espresso.jpg", "alt": "Espresso being pulled from the machine", "width": 1067, "height": 1600 } },
+    { "id": "americano", "name": "Americano", "slug": "americano", "price": 5, "category": "coffee-hot", "order": 2, "image": { "src": "photos/product-americano.jpg", "alt": "Hot water poured over espresso in a glass", "width": 1146, "height": 1600 } },
+    { "id": "drip-coffee", "name": "Drip coffee", "slug": "drip-coffee", "price": 5, "category": "coffee-hot", "order": 3, "image": { "src": "photos/product-drip-coffee.jpg", "alt": "Coffee poured into a Babaloo cup", "width": 1032, "height": 1600 } },
+    { "id": "macchiato", "name": "Macchiato", "slug": "macchiato", "price": 5, "category": "coffee-hot", "order": 4, "image": { "src": "photos/product-macchiato.jpg", "alt": "A splash of milk poured over espresso", "width": 1032, "height": 1600 } },
+    { "id": "cortado", "name": "Cortado", "slug": "cortado", "price": 5, "category": "coffee-hot", "order": 5, "image": { "src": "photos/product-cortado.jpg", "alt": "Cortado in a stoneware cup held by a guest", "width": 1067, "height": 1600 } },
+    { "id": "cappuccino", "name": "Cappuccino", "slug": "cappuccino", "price": 5, "category": "coffee-hot", "order": 6, "image": { "src": "photos/product-cappuccino.jpg", "alt": "Cappuccino with latte art in a stoneware cup", "width": 1066, "height": 1600 } },
+    { "id": "latte", "name": "Latte", "slug": "latte", "price": 6, "category": "coffee-hot", "order": 7, "tags": ["Popular"], "featured": true, "image": { "src": "photos/product-latte.jpg", "alt": "Latte in a stoneware cup held in warm light", "width": 1172, "height": 1600 } },
+    { "id": "mocha", "name": "Mocha / White mocha", "slug": "mocha", "price": 6.5, "category": "coffee-hot", "order": 8, "image": { "src": "photos/product-mocha.jpg", "alt": "Mocha in a stoneware cup on a saucer", "width": 1238, "height": 1600 } },
+    { "id": "draft-latte", "name": "La Colombe draft latte", "slug": "la-colombe-draft-latte", "description": "with oat milk", "price": 6.5, "category": "coffee-hot", "order": 9, "image": { "src": "photos/product-draft-latte.jpg", "alt": "Babaloo to-go cup on a stone table", "width": 1124, "height": 1600 } },
+
+    { "id": "freddo-espresso", "name": "Freddo espresso", "slug": "freddo-espresso", "price": 5.5, "category": "coffee-iced", "order": 1, "image": { "src": "photos/product-freddo-espresso.jpg", "alt": "Two iced coffees in Babaloo cups", "width": 1288, "height": 1600 } },
+    { "id": "freddo-cappuccino", "name": "Freddo cappuccino", "slug": "freddo-cappuccino", "description": "cold foam served over iced espresso", "price": 7, "category": "coffee-iced", "order": 2, "image": { "src": "photos/product-freddo-cappuccino.jpg", "alt": "Milk poured over iced espresso", "width": 1032, "height": 1600 } },
+    { "id": "cold-brew", "name": "Cold brew", "slug": "cold-brew", "price": 5, "category": "coffee-iced", "order": 3, "image": { "src": "photos/product-cold-brew.jpg", "alt": "Iced coffee in a Babaloo cup", "width": 1288, "height": 1600 } },
+    { "id": "latte-tiramisu", "name": "Latte Tiramisu", "slug": "latte-tiramisu", "description": "an iced latte made with double shot of espresso, vanilla syrup, choice of milk, topped with homemade mascarpone and a ladyfinger", "price": 7.5, "category": "coffee-iced", "order": 4, "tags": ["New"], "featured": true, "image": { "src": "photos/product-latte-tiramisu.png", "alt": "Iced latte tiramisu in a Babaloo cup topped with mascarpone, cocoa and a ladyfinger", "width": 675, "height": 1077 } },
+
+    { "id": "matcha-latte", "name": "Matcha", "slug": "matcha", "description": "ceremonial grade", "price": 6, "category": "matcha-hot", "order": 1, "tags": ["Popular"], "featured": true, "image": { "src": "photos/product-matcha.jpg", "alt": "Stoneware cup of matcha on a sunlit table", "width": 1092, "height": 1600 } },
+    { "id": "chai", "name": "Chai", "slug": "chai", "price": 6, "category": "matcha-hot", "order": 2, "image": { "src": "photos/product-chai.jpg", "alt": "Chai in a stoneware cup held with both hands", "width": 1444, "height": 1600 } },
+    { "id": "hot-chocolate", "name": "Hot chocolate", "slug": "hot-chocolate", "price": 6, "category": "matcha-hot", "order": 3, "image": { "src": "photos/product-hot-chocolate.jpg", "alt": "Hot chocolate in a stoneware cup", "width": 1324, "height": 1600 } },
+
+    { "id": "strawberry-matcha", "name": "Strawberry matcha", "slug": "strawberry-matcha", "description": "with homemade strawberry puree", "price": 8, "category": "matcha-iced", "order": 1, "tags": ["Popular"], "featured": true, "image": { "src": "photos/product-strawberry-matcha.jpg", "alt": "Matcha poured over strawberry puree and ice", "width": 1015, "height": 1600 } },
+    { "id": "matcha-tiramisu", "name": "Matcha Tiramisu", "slug": "matcha-tiramisu", "description": "iced ceremonial matcha, vanilla syrup, choice of milk, topped with homemade mascarpone and a ladyfinger", "price": 8, "category": "matcha-iced", "order": 2, "tags": ["New"], "image": { "src": "photos/product-matcha-tiramisu.jpg", "alt": "Iced matcha in a Babaloo to-go cup", "width": 1067, "height": 1600 } },
+    { "id": "guava-kolada", "name": "Guava kolada smoothie", "slug": "guava-kolada-smoothie", "description": "guava puree, homemade coconut cream", "price": 6, "category": "matcha-iced", "order": 3, "image": { "src": "photos/product-guava-smoothie.jpg", "alt": "Layered green and red smoothie held in the sun", "width": 1558, "height": 1071 } },
+    { "id": "berries-smoothie", "name": "Berries smoothie", "slug": "berries-smoothie", "description": "berries puree, hollander white chocolate", "price": 6, "category": "matcha-iced", "order": 4, "image": { "src": "photos/product-berries-smoothie.jpg", "alt": "Berry syrup poured into an iced drink", "width": 1067, "height": 1600 } },
+
+    { "id": "ny-breakfast", "name": "NY Breakfast", "slug": "ny-breakfast", "description": "double egg patty, cheddar cheese on kaiser roll", "price": 8, "category": "food-salty", "order": 1, "image": { "src": "photos/product-sandwich.jpg", "alt": "Babaloo paper bag on a stone counter", "width": 1116, "height": 1600 } },
+    { "id": "cubano", "name": "Cubano", "slug": "cubano", "description": "roasted pork, ham, gruyere cheese, dill pickles, mustard on baguette", "price": 14, "category": "food-salty", "order": 2, "image": { "src": "photos/product-sandwich.jpg", "alt": "Babaloo paper bag on a stone counter", "width": 1116, "height": 1600 } },
+    { "id": "italiano", "name": "Italiano", "slug": "italiano", "description": "cured capicola, prosciutto, fresh mozzarella, lettuce, tomatoes, banana pepper, roasted pepper aioli on baguette", "price": 5, "category": "food-salty", "order": 3, "image": { "src": "photos/product-sandwich.jpg", "alt": "Babaloo paper bag on a stone counter", "width": 1116, "height": 1600 } },
+    { "id": "pan-de-bono", "name": "Pan de bono", "slug": "pan-de-bono", "price": 6, "category": "food-salty", "order": 4, "image": { "src": "photos/product-pan-de-bono.jpg", "alt": "Babaloo pastry box on a stone counter", "width": 1133, "height": 1600 } },
+
+    { "id": "tres-leches", "name": "Tres leches", "slug": "tres-leches", "price": 8, "category": "food-sweets", "order": 1, "image": { "src": "photos/product-tres-leches.jpg", "alt": "Babaloo pastry box with the dogs illustration", "width": 1151, "height": 1600 } },
+    { "id": "key-lime-pie", "name": "Key lime pie", "slug": "key-lime-pie", "price": 8, "category": "food-sweets", "order": 2, "image": { "src": "photos/product-key-lime-pie.jpg", "alt": "Babaloo pastry box with a handle", "width": 1151, "height": 1600 } },
+    { "id": "pave", "name": "Pavé", "slug": "pave", "description": "Biscoff / Kinder Bueno / Nutella", "price": 7, "category": "food-sweets", "order": 3, "tags": ["New"], "variants": [ { "name": "Biscoff", "price": 7 }, { "name": "Kinder Bueno", "price": 7 }, { "name": "Nutella", "price": 7 } ], "image": { "src": "photos/product-tres-leches.jpg", "alt": "Babaloo pastry box with the dogs illustration", "width": 1151, "height": 1600 } },
+
+    { "id": "syrup-caramel", "name": "Caramel", "slug": "caramel", "priceLabel": "+$0.75", "category": "extras-syrups", "order": 1 },
+    { "id": "syrup-dulce", "name": "Dulce de leche", "slug": "dulce-de-leche", "priceLabel": "+$0.75", "category": "extras-syrups", "order": 2 },
+    { "id": "syrup-vanilla", "name": "Vanilla", "slug": "vanilla", "priceLabel": "+$0.75", "category": "extras-syrups", "order": 3 },
+    { "id": "syrup-french-vanilla", "name": "French vanilla", "slug": "french-vanilla", "priceLabel": "+$0.75", "category": "extras-syrups", "order": 4 },
+    { "id": "syrup-hazelnut", "name": "Hazelnut", "slug": "hazelnut", "priceLabel": "+$0.75", "category": "extras-syrups", "order": 5 },
+    { "id": "syrup-sf-vanilla", "name": "Sugar free vanilla", "slug": "sugar-free-vanilla", "priceLabel": "+$0.75", "category": "extras-syrups", "order": 6 },
+    { "id": "milk-almond", "name": "Almond", "slug": "almond", "priceLabel": "+$0.75", "category": "extras-milk", "order": 1, "image": { "src": "photos/product-alt-milk.jpg", "alt": "Babaloo to-go cup on a stone counter", "width": 1101, "height": 1600 } },
+    { "id": "milk-oat", "name": "Oat", "slug": "oat", "priceLabel": "+$0.75", "category": "extras-milk", "order": 2, "image": { "src": "photos/product-alt-milk.jpg", "alt": "Babaloo to-go cup on a stone counter", "width": 1101, "height": 1600 } }
+  ]
+}

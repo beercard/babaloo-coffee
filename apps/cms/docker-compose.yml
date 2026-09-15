@@ -1,0 +1,22 @@
+# Run the CMS on a VPS (Hostinger VPS, Hetzner, DigitalOcean…):
+#   cd apps/cms && cp .env.example .env   # fill PAYLOAD_SECRET etc.
+#   docker compose up -d --build
+# Put a reverse proxy with HTTPS in front (Caddy / Nginx / Traefik) on cms.babaloocoffeeclub.com.
+services:
+  cms:
+    build:
+      context: ../..
+      dockerfile: apps/cms/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: file:/app/apps/cms/data/babaloo.db
+    ports:
+      - '3000:3000'
+    volumes:
+      - cms-data:/app/apps/cms/data
+      - cms-media:/app/apps/cms/media
+
+volumes:
+  cms-data:
+  cms-media:

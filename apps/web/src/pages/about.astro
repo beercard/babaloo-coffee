@@ -1,0 +1,164 @@
+---
+/** About — PDF page 3: ABOUT · frames · text · club strip · team + Join form · Contact form. */
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/ui/Section.astro';
+import Frame from '@/components/ui/Frame.astro';
+import Intro from '@/components/sections/Intro.astro';
+import ClubStrip from '@/components/sections/ClubStrip.astro';
+import Picture from '@/components/ui/Picture.astro';
+import CareersForm from '@/components/forms/CareersForm.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+import { getContent, findGallery, sortedLocations } from '@/lib/cms';
+import { breadcrumbSchema } from '@/utils/schema';
+
+const content = await getContent();
+const { aboutPage, joinPage, contactPage, settings } = content;
+const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
+
+// Framed photos: explicit list → "about-frames" gallery → location photos.
+const frames =
+  aboutPage.frames.length > 0
+    ? aboutPage.frames
+    : (findGallery(content.galleries, 'about-frames')?.images.map((g) => g.image) ??
+      sortedLocations(content.locations)
+        .map((l) => l.image)
+        .filter((i): i is NonNullable<typeof i> => Boolean(i)));
+const teamImage = aboutPage.teamImage ?? joinPage.image;
+
+const schema = [
+  breadcrumbSchema([
+    { name: 'Home', url: siteUrl },
+    { name: 'About', url: `${siteUrl}about` },
+  ]),
+];
+---
+
+<Base seo={aboutPage.seo} title={aboutPage.title} schema={schema} bodyClass="page-about">
+  <section class="about" aria-labelledby="about-title">
+    <div class="container">
+      <h1 id="about-title" class="about__title eyebrow-link">{aboutPage.title}</h1>
+      {
+        frames.length > 0 && (
+          <ul role="list" class="about__frames">
+            {frames.slice(0, 3).map((image, i) => (
+              <li class="reveal" style={`--i:${i}`}>
+                <Frame image={image} loading={i === 0 ? 'eager' : 'lazy'} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+    <Intro text={aboutPage.text} size="lg" />
+  </section>
+
+  <ClubStrip />
+
+  {
+    aboutPage.showTeamSection && (
+      <section class="team" aria-labelledby="join-title" id="join-our-team">
+        {teamImage && (
+          <div class="team__photo">
+            <Picture image={teamImage} sizes="(min-width: 900px) 50vw, 100vw" widths={[480, 768, 1024, 1400]} class="team__img" />
+          </div>
+        )}
+        <div class="team__form">
+          <h2 id="join-title" class="team__title ui">{joinPage.title}</h2>
+          {joinPage.text && <p class="team__text italic">{joinPage.text}</p>}
+          <CareersForm email={settings.email} positions={joinPage.positions} experienceLevels={joinPage.experienceLevels} ariaLabelledby="join-title" />
+        </div>
+      </section>
+    )
+  }
+
+  {
+    aboutPage.showContactSection && (
+      <Section background="concrete" padded="y" id="contact" ariaLabelledby="contact-title">
+        <div class="container contact">
+          <h2 id="contact-title" class="contact__title ui">
+            {contactPage.title}
+          </h2>
+          <ContactForm email={settings.email} ariaLabelledby="contact-title" />
+        </div>
+      </Section>
+    )
+  }
+</Base>
+
+<style>
+  .about {
+    padding-top: calc(var(--curtain-h) + clamp(1.5rem, 2.5vw, 3rem));
+    background: var(--cream);
+  }
+  .about__title {
+    display: block;
+    text-align: center;
+    margin-bottom: clamp(1.5rem, 3.5vw, 4rem);
+  }
+  .about__frames {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: clamp(1.5rem, 4vw, 4.5rem);
+  }
+  @media (min-width: 900px) {
+    .about__frames {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .about__frames li {
+    transition-delay: calc(var(--i) * 90ms);
+  }
+
+  .team {
+    display: grid;
+    grid-template-columns: 1fr;
+    background: var(--cream);
+  }
+  @media (min-width: 900px) {
+    .team {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .team__photo {
+    min-height: 18rem;
+  }
+  .team__photo :global(picture),
+  .team__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (min-width: 900px) {
+    .team__photo :global(picture) {
+      height: 100%;
+    }
+    .team__img {
+      max-height: 60rem;
+    }
+  }
+  .team__form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1rem, 2vw, 2rem);
+    padding: clamp(2rem, 5vw, 6rem) var(--gutter);
+  }
+  .team__title,
+  .contact__title {
+    font-weight: 700;
+    font-size: var(--text-title);
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+  .team__text {
+    text-align: center;
+    font-size: var(--text-body-sm);
+  }
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 2rem);
+    max-width: 62rem;
+  }
+</style>

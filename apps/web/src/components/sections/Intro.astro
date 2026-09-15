@@ -1,0 +1,72 @@
+---
+/** Centred Lato Italic manifesto text (PDF home + about). Line breaks are kept. */
+import type { Link } from '@/lib/cms/types';
+import { paragraphs } from '@/utils/format';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  text: string;
+  title?: string;
+  cta?: Link;
+  /** Render the title as h2 (default) or h1. */
+  headingLevel?: 'h1' | 'h2';
+  size?: 'md' | 'lg';
+  id?: string;
+}
+const { text, title, cta, headingLevel = 'h2', size = 'md', id } = Astro.props;
+const Heading = headingLevel;
+const paras = paragraphs(text);
+---
+
+<section class:list={['intro', `intro--${size}`, 'reveal']} id={id} aria-label={title ?? 'About Babaloo'}>
+  <div class="container container--narrow intro__inner">
+    {title && <Heading class="intro__title eyebrow-link">{title}</Heading>}
+    {
+      paras.map((lines) => (
+        <p class="intro__text">
+          {lines.map((line, i) => (
+            <Fragment>
+              {line}
+              {i < lines.length - 1 && <br />}
+            </Fragment>
+          ))}
+        </p>
+      ))
+    }
+    {
+      cta && (
+        <Button href={cta.href} external={cta.external} variant="outline">
+          {cta.label}
+        </Button>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .intro {
+    /* PDF: 2250 → 2400 : ~150px above the text on 1920 */
+    padding-block: clamp(2.5rem, 7.5vw, 9rem) clamp(2rem, 5vw, 6rem);
+    background: var(--cream);
+  }
+  .intro__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    text-align: center;
+  }
+  .intro__title {
+    text-decoration: underline;
+  }
+  .intro__text {
+    font-style: italic;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    text-wrap: balance;
+    max-width: 34em;
+  }
+  .intro--lg .intro__text {
+    max-width: 40em;
+  }
+</style>

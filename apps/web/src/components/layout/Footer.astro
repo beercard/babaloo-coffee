@@ -1,0 +1,128 @@
+---
+/**
+ * Concrete footer from the PDF: full lockup (dogs + logo + "coffee & matcha
+ * club"), the footer navigation row and the Instagram mark, followed by a
+ * small legal line.
+ */
+import type { SiteSettings } from '@/lib/cms/types';
+import { isExternal } from '@/utils/format';
+import Section from '@/components/ui/Section.astro';
+import { Image } from 'astro:assets';
+import logoFooter from '@/assets/brand/logo-footer.png';
+import SocialIcon from '@/components/ui/SocialIcon.astro';
+
+interface Props {
+  settings: SiteSettings;
+}
+const { settings } = Astro.props;
+const year = new Date().getFullYear();
+const address = settings.address;
+---
+
+<Section as="footer" background="concrete" padded="y" class="footer" ariaLabelledby="footer-heading">
+  <h2 id="footer-heading" class="visually-hidden">{settings.name}</h2>
+  <div class="container footer__inner">
+    <a href="/" class="footer__lockup" aria-label={`${settings.name} — home`}>
+      <Image src={logoFooter} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720, 944]} sizes="(min-width: 1200px) 45rem, (min-width: 640px) 38vw, 80vw" format="webp" quality={82} class="footer__logo" loading="lazy" />
+    </a>
+
+    {
+      settings.footerNav.length > 0 && (
+        <nav aria-label="Footer">
+          <ul role="list" class="footer__nav">
+            {settings.footerNav.map((item) => {
+              const external = item.external ?? isExternal(item.href);
+              return (
+                <li>
+                  <a href={item.href} class="eyebrow-link" {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+                    {item.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )
+    }
+
+    {
+      settings.social.length > 0 && (
+        <ul role="list" class="footer__social">
+          {settings.social.map((s) => (
+            <li>
+              <a href={s.url} target="_blank" rel="noopener" aria-label={s.label} class="footer__social-link">
+                <SocialIcon platform={s.platform} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p class="footer__legal">
+      © {year} {settings.copyright ?? settings.name}
+      {address?.street && (
+        <Fragment>
+          {' · '}
+          <span>
+            {address.street}
+            {address.suite ? `, ${address.suite}` : ''}, {address.city}, {address.region}
+          </span>
+        </Fragment>
+      )}
+      {settings.email && (
+        <Fragment>
+          {' · '}
+          <a href={`mailto:${settings.email}`}>{settings.email}</a>
+        </Fragment>
+      )}
+    </p>
+  </div>
+</Section>
+
+<style>
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    text-align: center;
+  }
+  .footer__lockup {
+    display: block;
+    /* PDF lockup ≈ 720px on 1920 */
+    width: clamp(15rem, 38vw, 45rem);
+  }
+  .footer__logo {
+    width: 100%;
+    height: auto;
+  }
+  .footer__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: clamp(1.25rem, 5vw, 6rem);
+    row-gap: 0.75rem;
+  }
+  .footer__social {
+    display: flex;
+    gap: 1.25rem;
+  }
+  .footer__social-link {
+    display: grid;
+    place-items: center;
+    width: clamp(2.5rem, 3.5vw, 3.75rem);
+    height: clamp(2.5rem, 3.5vw, 3.75rem);
+    color: var(--ink);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .footer__social-link:hover {
+    transform: translateY(-2px) scale(1.06);
+  }
+  .footer__legal {
+    font-size: var(--text-small);
+    font-style: italic;
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+</style>

@@ -1,0 +1,65 @@
+/*
+  Design tokens — values measured directly in WEB.pdf (1920px artboards).
+  Colours are the exact fills used in the PDF; type sizes are the PDF sizes
+  converted to fluid clamp() so that a 1920px viewport reproduces the artboard.
+*/
+:root {
+  /* Colour */
+  --ink: #3c1a1e;            /* all body text, rules, icons on cream           */
+  --cream: #f1ede7;          /* page background                                */
+  --cream-bright: #f2eee7;   /* text on wood / bark                            */
+  --bark: #503226;           /* icon strip, buttons                            */
+  --wood: #5b4a3d;           /* header fallback under the wood texture         */
+  --concrete: #a39c91;       /* footer fallback under the concrete texture     */
+  --concrete-light: #b0a79e;
+  --sage: #d0cebf;           /* alternating photo panel on the menu page       */
+  --gold: #c9a24a;
+  --focus: #8a4b2a;
+
+  /* Type */
+  --font-body: 'Lato', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-ui: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-script: 'Mrs Saint Delafield', 'Jimmy Script', 'Brush Script MT', cursive;
+
+  /* PDF 46px @1920 = 2.4vw */
+  --text-body: clamp(1.0625rem, 0.75rem + 1.3vw, 1.9rem);
+  --text-body-sm: clamp(0.9375rem, 0.8rem + 0.55vw, 1.25rem);
+  /* PDF 26px @1920 */
+  --text-small: clamp(0.875rem, 0.78rem + 0.4vw, 1.15rem);
+  /* PDF nav 46px */
+  --text-nav: clamp(1rem, 0.65rem + 1.25vw, 2.1rem);
+  /* PDF menu titles 60px */
+  --text-menu-title: clamp(1.25rem, 0.8rem + 1.5vw, 2.6rem);
+  /* PDF menu description 46px */
+  --text-menu-desc: clamp(0.95rem, 0.75rem + 0.8vw, 1.5rem);
+  /* PDF script 80–88px */
+  --text-script: clamp(2rem, 1.2rem + 3.4vw, 5.25rem);
+  --text-script-sm: clamp(1.5rem, 1rem + 2vw, 3.2rem);
+  /* PDF form titles 46px Poppins Bold */
+  --text-title: clamp(1.25rem, 0.9rem + 1.3vw, 2.4rem);
+
+  --leading-tight: 1.15;
+  --leading-body: 1.4;
+
+  /* Spacing (PDF gutters: 87px @1920 ≈ 4.5vw) */
+  --gutter: clamp(1rem, 4.5vw, 5.5rem);
+  --section-y: clamp(3rem, 7vw, 8.5rem);
+  --section-y-sm: clamp(2rem, 4vw, 5rem);
+  --max-w: 1920px;
+  --content-w: 1200px;
+
+  /* Shape & motion */
+  --radius-pill: 999px;
+  --radius-field: 0.625rem;
+  --shadow-frame: 0 18px 40px -18px rgba(60, 26, 30, 0.45);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 400ms;
+  --dur-slow: 1200ms;
+
+  /* Header proportions (PDF: 300px header on 1920) */
+  --header-h: clamp(5rem, 13.5vw, 16.5rem);
+  --curtain-h: clamp(2.25rem, 8.8vw, 10.6rem);
+  --strip-h: clamp(3.75rem, 8.9vw, 10.6rem);
+
+  color-scheme: light;
+}

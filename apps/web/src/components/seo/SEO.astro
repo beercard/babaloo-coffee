@@ -1,0 +1,59 @@
+---
+/**
+ * Head metadata for every page. Page-level SEO (from the CMS) overrides the
+ * site-wide defaults; nothing here is hard-coded except sensible fallbacks.
+ */
+import type { SEODefaults, SEOMeta, ImageRef } from '@/lib/cms/types';
+import { imageOptions, absoluteUrl } from '@/lib/images';
+import { getImage } from 'astro:assets';
+
+interface Props {
+  meta: SEOMeta;
+  defaults: SEODefaults;
+  /** Page title without template. Used when `meta.title` is empty. */
+  fallbackTitle?: string;
+  /** Skip the title template (home page). */
+  raw?: boolean;
+  siteName: string;
+}
+
+const { meta, defaults, fallbackTitle, raw = false, siteName } = Astro.props;
+
+const pageTitle = meta.title ?? fallbackTitle ?? defaults.defaultTitle;
+const title = raw || !meta.title && !fallbackTitle ? pageTitle : defaults.titleTemplate.replace('%s', pageTitle);
+const description = meta.description ?? defaults.description;
+const canonical = meta.canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+const robots = meta.robots ?? defaults.robots;
+const ogTitle = meta.ogTitle ?? title;
+const ogDescription = meta.ogDescription ?? description;
+const twitterCard = meta.twitterCard ?? (meta.ogImage || defaults.ogImage ? 'summary_large_image' : 'summary');
+
+async function ogImageUrl(ref?: ImageRef): Promise<{ url: string; width: number; height: number; alt: string } | undefined> {
+  if (!ref) return undefined;
+  const img = await getImage({ ...imageOptions(ref, 1200), format: 'jpg', quality: 80 });
+  return { url: absoluteUrl(img.src, Astro.site), width: img.attributes.width as number, height: img.attributes.height as number, alt: ref.alt };
+}
+const og = await ogImageUrl(meta.ogImage ?? defaults.ogImage);
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta name="robots" content={robots} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content={defaults.locale} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={ogTitle} />
+<meta property="og:description" content={ogDescription} />
+{og && <meta property="og:image" content={og.url} />}
+{og && <meta property="og:image:width" content={String(og.width)} />}
+{og && <meta property="og:image:height" content={String(og.height)} />}
+{og && og.alt && <meta property="og:image:alt" content={og.alt} />}
+
+<meta name="twitter:card" content={twitterCard} />
+<meta name="twitter:title" content={ogTitle} />
+<meta name="twitter:description" content={ogDescription} />
+{og && <meta name="twitter:image" content={og.url} />}
+{defaults.twitterHandle && <meta name="twitter:site" content={defaults.twitterHandle} />}

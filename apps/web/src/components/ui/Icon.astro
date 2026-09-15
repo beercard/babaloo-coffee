@@ -1,0 +1,17 @@
+---
+/** Brand vector from the external sprite (see lib/sprite.ts). Decorative unless a `title` is given. */
+import { spriteUrl, viewBoxes, type SpriteId } from '@/lib/sprite';
+
+interface Props {
+  name: SpriteId;
+  class?: string;
+  title?: string;
+  [key: string]: unknown;
+}
+const { name, class: className, title, ...rest } = Astro.props;
+---
+
+<svg class={className} viewBox={viewBoxes[name]} aria-hidden={title ? undefined : 'true'} role={title ? 'img' : undefined} focusable="false" {...rest}>
+  {title && <title>{title}</title>}
+  <use href={`${spriteUrl}#${name}`}></use>
+</svg>

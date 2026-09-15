@@ -1,0 +1,88 @@
+{
+  "name": "Babaloo Coffee Club",
+  "legalName": "Babaloo Coffee Club LLC",
+  "tagline": "Coffee & Matcha Club",
+  "phone": "",
+  "email": "info@babaloocoffeeclub.com",
+  "address": {
+    "street": "1425 Winnifred St",
+    "suite": "Suite 117",
+    "city": "Charlotte",
+    "region": "NC",
+    "postalCode": "28203",
+    "country": "US"
+  },
+  "social": [
+    {
+      "platform": "instagram",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/babaloocoffeeclub/"
+    }
+  ],
+  "orderUrl": "https://order.toasttab.com/online/babaloo-coffee-club-1425-winnifred-st-suite-117",
+  "mapUrl": "https://www.google.com/maps/search/?api=1&query=Babaloo+Coffee+Club+1425+Winnifred+St+Suite+117+Charlotte+NC",
+  "priceRange": "$$",
+  "nav": [
+    {
+      "label": "Locations",
+      "href": "/#locations"
+    },
+    {
+      "label": "Menu",
+      "href": "/menu"
+    },
+    {
+      "label": "Order online",
+      "href": "https://order.toasttab.com/online/babaloo-coffee-club-1425-winnifred-st-suite-117",
+      "external": true
+    },
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "Contact us",
+      "href": "/contact"
+    }
+  ],
+  "footerNav": [
+    {
+      "label": "Locations",
+      "href": "/#locations"
+    },
+    {
+      "label": "Menu",
+      "href": "/menu"
+    },
+    {
+      "label": "Order online",
+      "href": "https://order.toasttab.com/online/babaloo-coffee-club-1425-winnifred-st-suite-117",
+      "external": true
+    },
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "Social",
+      "href": "https://www.instagram.com/babaloocoffeeclub/",
+      "external": true
+    }
+  ],
+  "primaryCta": {
+    "label": "Order online",
+    "href": "https://order.toasttab.com/online/babaloo-coffee-club-1425-winnifred-st-suite-117",
+    "external": true
+  },
+  "secondaryCta": {
+    "label": "See the menu",
+    "href": "/menu"
+  },
+  "copyright": "Babaloo Coffee Club",
+  "logo": {
+    "src": "brand/logo-footer.png",
+    "alt": "Babaloo Coffee & Matcha Club logo",
+    "width": 943,
+    "height": 450
+  }
+}

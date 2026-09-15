@@ -1,0 +1,72 @@
+# Babaloo Coffee Club — Apache / LiteSpeed (Hostinger shared hosting)
+
+# ---------- 301 redirects from the WordPress site ----------
+RewriteEngine On
+RewriteBase /
+
+# Force HTTPS + non-www (adjust if the canonical domain uses www)
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,NE]
+
+# Old WordPress URLs → new pages
+RewriteRule ^drinks/?$        /menu                    [R=301,L,NC]
+RewriteRule ^food/?$          /menu#food-and-sweets    [R=301,L,NC,NE]
+RewriteRule ^hours/?$         /#locations              [R=301,L,NC,NE]
+RewriteRule ^contact-us/?$    /contact                 [R=301,L,NC]
+RewriteRule ^gallery/$        /gallery                 [R=301,L,NC]
+RewriteRule ^join-our-team/$  /join-our-team           [R=301,L,NC]
+RewriteRule ^(wp-admin|wp-login\.php|wp-content|wp-includes|xmlrpc\.php|feed)(/.*)?$ / [R=301,L,NC]
+
+# Strip trailing slashes (Astro is built with trailingSlash: 'never')
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+# Serve /page → /page/index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.*)$ $1/index.html [L]
+
+ErrorDocument 404 /404/index.html
+
+# ---------- Compression ----------
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript application/json image/svg+xml text/plain application/xml
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/plain application/xml
+</IfModule>
+
+# ---------- Caching ----------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/xml "access plus 1 hour"
+  ExpiresByType text/plain "access plus 1 hour"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/avif "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|avif|webp|jpe?g|png|svg|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+AddType image/avif .avif
+AddType font/woff2 .woff2
+AddType application/manifest+json .webmanifest

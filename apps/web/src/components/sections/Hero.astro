@@ -1,0 +1,229 @@
+---
+/**
+ * Full-bleed photo carousel (PDF page 1, "fotos que cambien").
+ * Autoplays with a crossfade; arrows and dots let visitors change the photo.
+ * Only the first photo loads with the page — the rest sit in <template>
+ * elements and are inserted after load (or on first interaction).
+ */
+import type { HeroSection } from '@/lib/cms/types';
+import Picture from '@/components/ui/Picture.astro';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  section: HeroSection;
+}
+const { section } = Astro.props;
+const slides = section.slides;
+const multiple = slides.length > 1;
+---
+
+{
+  slides.length > 0 && (
+    <section class="hero" data-hero data-interval={section.interval * 1000} aria-roledescription="carousel" aria-label="Photos of Babaloo">
+      <div class="hero__slides">
+        {slides.map((slide, i) => (
+          <div
+            class:list={['hero__slide', i === 0 && 'is-active']}
+            data-slide
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${slides.length}`}
+            aria-hidden={i === 0 ? undefined : 'true'}
+          >
+            {i === 0 ? (
+              <Picture image={slide.image} mobile={slide.imageMobile} sizes="100vw" widths={[480, 768, 1024, 1440, 1920]} loading="eager" fetchpriority="high" decoding="sync" quality={62} class="hero__img" />
+            ) : (
+              <template data-slide-picture>
+                <Picture image={slide.image} mobile={slide.imageMobile} sizes="100vw" widths={[480, 768, 1024, 1440, 1920]} loading="lazy" quality={60} class="hero__img" />
+              </template>
+            )}
+            {(slide.title || slide.subtitle || slide.text || slide.cta) && (
+              <div class="hero__copy container">
+                {slide.title && <p class="hero__title script">{slide.title}</p>}
+                {slide.subtitle && <p class="hero__subtitle">{slide.subtitle}</p>}
+                {slide.text && <p class="hero__text">{slide.text}</p>}
+                {slide.cta && (
+                  <Button href={slide.cta.href} external={slide.cta.external} size="lg">
+                    {slide.cta.label}
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {multiple && (
+        <div class="hero__controls" data-hero-controls hidden>
+          <button type="button" class="hero__arrow hero__arrow--prev" data-hero-prev aria-label="Previous photo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="hero__arrow hero__arrow--next" data-hero-next aria-label="Next photo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="hero__dots" role="tablist" aria-label="Choose photo">
+            {slides.map((_, i) => (
+              <button type="button" class:list={['hero__dot', i === 0 && 'is-active']} data-hero-dot={i} role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={`Photo ${i + 1}`} />
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
+<script>
+  import { initHero } from '@/scripts/hero';
+  initHero();
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    width: 100%;
+    /* PDF: 1920 × 1590 */
+    aspect-ratio: 1920 / 1590;
+    max-height: 92vh;
+    min-height: 20rem;
+    overflow: hidden;
+    background: var(--wood);
+  }
+  @media (max-width: 767px) {
+    .hero {
+      aspect-ratio: 4 / 5;
+      max-height: none;
+    }
+  }
+  .hero__slides {
+    position: absolute;
+    inset: 0;
+  }
+  .hero__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--dur-slow) ease-in-out;
+  }
+  .hero__slide.is-active {
+    opacity: 1;
+    z-index: 1;
+  }
+  .hero__slide :global(picture),
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .hero__copy {
+    position: absolute;
+    inset: auto 0 clamp(2rem, 8vw, 7rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    color: var(--cream-bright);
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+  }
+  .hero__title {
+    font-size: var(--text-script);
+  }
+  .hero__subtitle {
+    font-family: var(--font-ui);
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: var(--text-body-sm);
+    letter-spacing: 0.06em;
+  }
+  .hero__text {
+    font-style: italic;
+    max-width: 40ch;
+    font-size: var(--text-body-sm);
+  }
+
+  /* ---------- controls (shown once the script runs) ---------- */
+  .hero__controls[hidden] {
+    display: none;
+  }
+  .hero__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    width: clamp(2.5rem, 4vw, 3.5rem);
+    height: clamp(2.5rem, 4vw, 3.5rem);
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--cream-bright);
+    background: rgba(60, 26, 30, 0.35);
+    backdrop-filter: blur(4px);
+    transition:
+      background-color var(--dur),
+      transform var(--dur) var(--ease-out),
+      opacity var(--dur);
+  }
+  .hero__arrow svg {
+    width: 55%;
+    height: 55%;
+  }
+  .hero__arrow--prev {
+    left: clamp(0.75rem, 2.5vw, 2.5rem);
+  }
+  .hero__arrow--next {
+    right: clamp(0.75rem, 2.5vw, 2.5rem);
+  }
+  .hero__arrow:hover,
+  .hero__arrow:focus-visible {
+    background: rgba(60, 26, 30, 0.7);
+  }
+  .hero__arrow:hover {
+    transform: translateY(-50%) scale(1.06);
+  }
+  .hero__arrow:focus-visible {
+    outline-color: var(--cream-bright);
+  }
+  .hero__dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(0.75rem, 2.2vw, 1.75rem);
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .hero__dot {
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+  }
+  .hero__dot::before {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: rgba(242, 238, 231, 0.55);
+    box-shadow: 0 0 0 1px rgba(60, 26, 30, 0.35);
+    transition:
+      transform var(--dur) var(--ease-out),
+      background-color var(--dur);
+  }
+  .hero__dot.is-active::before {
+    background: var(--cream-bright);
+    transform: scale(1.5);
+  }
+  .hero__dot:hover::before {
+    background: var(--cream-bright);
+  }
+  .hero__dot:focus-visible {
+    outline-color: var(--cream-bright);
+  }
+</style>

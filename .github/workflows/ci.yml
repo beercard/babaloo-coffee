@@ -1,0 +1,32 @@
+# Type-checks and builds both apps on pull requests.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Astro check + build (seed content)
+        working-directory: apps/web
+        run: |
+          npm run check
+          npm run build
+      - name: Payload type check
+        working-directory: apps/cms
+        env:
+          PAYLOAD_SECRET: ci
+          DATABASE_URL: file:./ci.db
+        run: |
+          npm run generate:types
+          npm run typecheck

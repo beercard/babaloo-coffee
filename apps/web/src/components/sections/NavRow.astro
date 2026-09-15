@@ -1,0 +1,60 @@
+---
+/**
+ * The underlined uppercase link row from the PDF home page
+ * (LOCATIONS · MENU · ORDER ONLINE · ABOUT · CONTACT US).
+ */
+import type { Link } from '@/lib/cms/types';
+import { isExternal } from '@/utils/format';
+
+interface Props {
+  links: Link[];
+  label?: string;
+  class?: string;
+}
+const { links, label = 'Sections', class: className } = Astro.props;
+---
+
+<nav aria-label={label} class:list={['nav-row', className]}>
+  <ul role="list" class="nav-row__list container">
+    {
+      links.map((item) => {
+        const external = item.external ?? isExternal(item.href);
+        return (
+          <li>
+            <a href={item.href} class="eyebrow-link nav-row__link" {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+              {item.label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  .nav-row {
+    background: var(--cream);
+    padding-block: clamp(1.5rem, 3.5vw, 4.25rem) 0;
+  }
+  .nav-row__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    column-gap: clamp(1.25rem, 3vw, 3rem);
+    row-gap: 0.75rem;
+  }
+  @media (max-width: 767px) {
+    .nav-row__list {
+      justify-content: center;
+      column-gap: 1.25rem;
+    }
+  }
+  .nav-row__link {
+    display: inline-block;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .nav-row__link:hover {
+    transform: translateY(-2px);
+  }
+</style>

@@ -1,0 +1,78 @@
+---
+/**
+ * Bark band with the two dogs and "COFFEE & MATCHA CLUB" repeated
+ * (PDF about page). CSS marquee, same technique as IconStrip.
+ */
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  speed?: number;
+}
+const { speed = 45 } = Astro.props;
+const repeats = [0, 1, 2, 3, 4, 5];
+---
+
+<div class="club" style={`--speed:${speed}s`} aria-hidden="true">
+  <div class="club__track">
+    {
+      [0, 1].map(() => (
+        <ul role="list" class="club__set">
+          {repeats.map(() => (
+            <li class="club__unit">
+              <Icon name="dog-poodle" class="club__dog" />
+              <Icon name="wordmark-club" class="club__word" />
+              <Icon name="dog-basenji" class="club__dog" />
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .club {
+    height: var(--strip-h);
+    background: var(--bark);
+    color: var(--cream-bright);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .club__track {
+    display: flex;
+    width: max-content;
+    animation: club-marquee var(--speed) linear infinite;
+    will-change: transform;
+  }
+  .club__set {
+    display: flex;
+  }
+  .club__unit {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 1vw, 1rem);
+    padding-inline: clamp(0.5rem, 1.2vw, 1.5rem);
+  }
+  /* Explicit widths: an SVG with width:auto inside a max-content flex track collapses to 0 in Chromium. */
+  .club__dog {
+    height: calc(var(--strip-h) * 0.72);
+    width: calc(var(--strip-h) * 0.72 * 0.65);
+    flex: none;
+  }
+  .club__word {
+    height: calc(var(--strip-h) * 0.22);
+    width: calc(var(--strip-h) * 0.22 * 5.08);
+    flex: none;
+  }
+  @keyframes club-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .club__track {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+/**
+ * Renders the ordered, toggleable home sections configured in the CMS.
+ * Adding a new block type = one entry here + one block in apps/cms.
+ */
+import type { HomeSection, SiteContent } from '@/lib/cms/types';
+import { featuredItems, findGallery, sortedLocations } from '@/lib/cms';
+import Hero from './Hero.astro';
+import IconStrip from './IconStrip.astro';
+import NavRow from './NavRow.astro';
+import Intro from './Intro.astro';
+import Locations from './Locations.astro';
+import ClubStrip from './ClubStrip.astro';
+import FeaturedMenu from './FeaturedMenu.astro';
+import GalleryGrid from './GalleryGrid.astro';
+import Testimonials from './Testimonials.astro';
+import CtaBlock from './CtaBlock.astro';
+import RichText from './RichText.astro';
+
+interface Props {
+  sections: HomeSection[];
+  content: SiteContent;
+}
+const { sections, content } = Astro.props;
+const enabled = sections.filter((s) => s.enabled);
+---
+
+{
+  enabled.map((section) => {
+    switch (section.type) {
+      case 'hero':
+        return <Hero section={section} />;
+      case 'iconStrip':
+        return <IconStrip section={section} />;
+      case 'navRow':
+        return <NavRow links={content.settings.nav} />;
+      case 'intro':
+        return <Intro text={section.text} title={section.title} cta={section.cta} id={section.anchor} />;
+      case 'locations':
+        return <Locations locations={sortedLocations(content.locations)} id={section.anchor ?? 'locations'} title={section.title} text={section.text} />;
+      case 'clubStrip':
+        return <ClubStrip />;
+      case 'featuredMenu':
+        return (
+          <FeaturedMenu items={featuredItems(content.menu.items, section.limit)} title={section.title} text={section.text} cta={section.cta} currency={content.menu.currency} id={section.anchor ?? 'featured'} />
+        );
+      case 'gallery': {
+        const gallery = findGallery(content.galleries, section.gallery);
+        return gallery ? <GalleryGrid gallery={gallery} title={section.title} limit={section.limit} cta={section.cta} id={section.anchor ?? 'gallery'} /> : null;
+      }
+      case 'testimonials':
+        return <Testimonials items={content.testimonials} title={section.title} id={section.anchor ?? 'testimonials'} />;
+      case 'cta':
+        return <CtaBlock section={section} />;
+      case 'richText':
+        return <RichText section={section} />;
+      default:
+        return null;
+    }
+  })
+}

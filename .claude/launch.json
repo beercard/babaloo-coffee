@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--workspace", "apps/web", "--", "--port", "4321", "--host", "127.0.0.1"],
+      "port": 4321
+    },
+    {
+      "name": "web-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace", "apps/web", "--", "--port", "4322", "--host", "127.0.0.1"],
+      "port": 4322
+    },
+    {
+      "name": "cms-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace", "apps/cms"],
+      "port": 3000
+    }
+  ]
+}

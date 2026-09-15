@@ -1,0 +1,95 @@
+---
+/**
+ * Responsive, art-directed picture element.
+ *
+ * Generates AVIF + WebP sources (plus the original format as fallback) for the
+ * desktop image and, optionally, a different image for narrow screens.
+ * Every variant is resized to `widths`, so no original upload is ever served.
+ */
+import { getImage } from 'astro:assets';
+import type { ImageRef } from '@/lib/cms/types';
+import { resolveImage } from '@/lib/images';
+
+interface Props {
+  image: ImageRef;
+  /** Alternative crop for viewports below `mobileMaxWidth`. */
+  mobile?: ImageRef;
+  mobileMaxWidth?: number;
+  alt?: string;
+  sizes: string;
+  widths?: number[];
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  decoding?: 'async' | 'sync' | 'auto';
+  quality?: number;
+  class?: string;
+  pictureClass?: string;
+  /** Force a specific aspect ratio by cropping (width/height). */
+  aspect?: number;
+  style?: string;
+}
+
+const {
+  image,
+  mobile,
+  mobileMaxWidth = 767,
+  alt,
+  sizes,
+  widths = [400, 640, 960, 1280, 1600],
+  loading = 'lazy',
+  fetchpriority,
+  decoding = 'async',
+  quality = 78,
+  class: className,
+  pictureClass,
+  aspect,
+  style,
+} = Astro.props;
+
+async function variants(ref: ImageRef) {
+  const src = resolveImage(ref);
+  const maxW = Math.min(ref.width, Math.max(...widths));
+  const ws = widths.filter((w) => w <= ref.width);
+  if (!ws.includes(maxW)) ws.push(maxW);
+  const common = {
+    src,
+    widths: ws,
+    quality,
+    // Remote sources need the intrinsic size; a fixed aspect ratio crops every variant.
+    ...(aspect ? { width: maxW, height: Math.round(maxW / aspect) } : typeof src === 'string' ? { width: ref.width, height: ref.height } : {}),
+  };
+  const [avif, webp, fallback] = await Promise.all([
+    getImage({ ...common, format: 'avif' }),
+    getImage({ ...common, format: 'webp' }),
+    getImage({ ...common, format: 'jpg' }),
+  ]);
+  return { avif, webp, fallback };
+}
+
+const desktop = await variants(image);
+const narrow = mobile ? await variants(mobile) : undefined;
+const mediaNarrow = `(max-width: ${mobileMaxWidth}px)`;
+const mediaWide = `(min-width: ${mobileMaxWidth + 1}px)`;
+const fallbackAttrs = desktop.fallback.attributes as Record<string, string | number | undefined>;
+---
+
+<picture class={pictureClass}>
+  {narrow && <source type="image/avif" media={mediaNarrow} srcset={narrow.avif.srcSet.attribute} sizes={sizes} />}
+  {narrow && <source type="image/webp" media={mediaNarrow} srcset={narrow.webp.srcSet.attribute} sizes={sizes} />}
+  {narrow && <source media={mediaNarrow} srcset={narrow.fallback.srcSet.attribute} sizes={sizes} />}
+  <source type="image/avif" media={narrow ? mediaWide : undefined} srcset={desktop.avif.srcSet.attribute} sizes={sizes} />
+  <source type="image/webp" media={narrow ? mediaWide : undefined} srcset={desktop.webp.srcSet.attribute} sizes={sizes} />
+  <img
+    src={desktop.fallback.src}
+    srcset={desktop.fallback.srcSet.attribute}
+    sizes={sizes}
+    width={fallbackAttrs.width}
+    height={fallbackAttrs.height}
+    alt={alt ?? image.alt}
+    loading={loading}
+    decoding={decoding}
+    fetchpriority={fetchpriority}
+    class={className}
+    style={style}
+  />
+</picture>

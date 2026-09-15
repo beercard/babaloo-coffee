@@ -1,0 +1,287 @@
+---
+/**
+ * Wood header band with the hand-written logo, the three-dot menu toggle from
+ * the PDF, the full-screen navigation overlay and the linen curtain that hangs
+ * below the band on every page.
+ */
+import { getImage, Image } from 'astro:assets';
+import type { SiteSettings } from '@/lib/cms/types';
+import { isExternal } from '@/utils/format';
+import Logo from '@/assets/brand/logo-wordmark.svg';
+import MenuIcon from '@/assets/brand/menu-toggle.svg';
+import Icon from '@/components/ui/Icon.astro';
+import wood from '@/assets/textures/wood.jpg';
+import curtain from '@/assets/textures/curtain.png';
+
+interface Props {
+  settings: SiteSettings;
+  /** Renders the logo inside an <h1> (home page only). */
+  isHome?: boolean;
+  currentPath: string;
+}
+
+const { settings, isHome = false, currentPath } = Astro.props;
+const woodImg = await getImage({ src: wood, width: 464, format: 'webp', quality: 60 });
+const social = settings.social;
+---
+
+<header class="header" style={`--wood:url(${woodImg.src})`}>
+  <div class="header__band">
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      aria-label="Open menu"
+      data-nav-toggle
+    >
+      <MenuIcon class="nav-toggle__icon" width="24" height="24" />
+    </button>
+
+    {
+      isHome ? (
+        <h1 class="header__brand">
+          <a href="/" class="header__logo-link" aria-label={`${settings.name} — home`}>
+            <Logo class="header__logo" />
+          </a>
+        </h1>
+      ) : (
+        <p class="header__brand">
+          <a href="/" class="header__logo-link" aria-label={`${settings.name} — home`}>
+            <Logo class="header__logo" />
+          </a>
+        </p>
+      )
+    }
+  </div>
+
+  <nav id="site-nav" class="site-nav" aria-label="Main" data-nav hidden>
+    <div class="site-nav__inner container">
+      <button class="site-nav__close" type="button" aria-label="Close menu" data-nav-close>
+        <span aria-hidden="true">×</span>
+      </button>
+      <ul role="list" class="site-nav__list">
+        {
+          settings.nav.map((item) => {
+            const external = item.external ?? isExternal(item.href);
+            const base = item.href.split('#')[0] || '/';
+            const current = !external && (base === '/' ? currentPath === '/' && !item.href.includes('#') : currentPath === base || currentPath.startsWith(`${base}/`));
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class="site-nav__link"
+                  aria-current={current ? 'page' : undefined}
+                  {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <div class="site-nav__aside">
+        <Icon name="dog-poodle" class="site-nav__dog" />
+        <div class="site-nav__meta">
+          {settings.email && <a href={`mailto:${settings.email}`}>{settings.email}</a>}
+          {settings.phone && <a href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`}>{settings.phone}</a>}
+          {
+            social.length > 0 && (
+              <ul role="list" class="site-nav__social">
+                {social.map((s) => (
+                  <li>
+                    <a href={s.url} target="_blank" rel="noopener">
+                      {s.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+        <Icon name="dog-basenji" class="site-nav__dog site-nav__dog--right" />
+      </div>
+    </div>
+  </nav>
+
+  <Image src={curtain} alt="" widths={[640, 1280, 1920]} sizes="100vw" format="webp" quality={72} loading="eager" class="curtain" />
+</header>
+
+<script>
+  import { initNav } from '@/scripts/nav';
+  initNav();
+</script>
+
+<style>
+  .header {
+    position: relative;
+    z-index: 20;
+  }
+  .header__band {
+    position: relative;
+    height: var(--header-h);
+    background-color: var(--wood);
+    background-image: var(--wood);
+    background-size: 464px auto;
+    background-repeat: repeat;
+    display: grid;
+    place-items: center;
+    color: var(--cream-bright);
+    box-shadow: 0 6px 22px -10px rgba(0, 0, 0, 0.55);
+  }
+  .header__brand {
+    margin: 0;
+    font-size: 0;
+    line-height: 0;
+  }
+  .header__logo-link {
+    display: block;
+    color: var(--cream-bright);
+  }
+  .header__logo {
+    /* PDF: 500px wide on a 1920 artboard */
+    width: clamp(8.5rem, 26vw, 31.25rem);
+    height: auto;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .header__logo-link:hover .header__logo {
+    transform: scale(1.02) rotate(-0.6deg);
+  }
+
+  /* three stacked dots at the far left, as in the PDF */
+  .nav-toggle {
+    position: absolute;
+    left: clamp(0.75rem, 6vw, 7rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    display: grid;
+    place-items: center;
+    color: var(--cream-bright);
+    border-radius: 50%;
+    transition: background-color var(--dur);
+  }
+  .nav-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .nav-toggle__icon {
+    width: clamp(1.25rem, 1.8vw, 2rem);
+    height: auto;
+  }
+
+  .curtain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    height: var(--curtain-h);
+    object-fit: cover;
+    object-position: center top;
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.18));
+  }
+
+  /* ---------- overlay navigation ---------- */
+  .site-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: var(--wood);
+    background-image: var(--wood);
+    background-size: 464px auto;
+    color: var(--cream-bright);
+    overflow-y: auto;
+    animation: nav-in 320ms var(--ease-out);
+  }
+  .site-nav[hidden] {
+    display: none;
+  }
+  @keyframes nav-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .site-nav__inner {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(2rem, 6vh, 5rem);
+    padding-block: clamp(4rem, 10vh, 7rem);
+  }
+  .site-nav__close {
+    position: absolute;
+    top: clamp(0.75rem, 3vw, 2rem);
+    right: clamp(0.75rem, 4vw, 3rem);
+    width: 3rem;
+    height: 3rem;
+    font-size: 2.25rem;
+    line-height: 1;
+    border-radius: 50%;
+    color: var(--cream-bright);
+  }
+  .site-nav__list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.75rem, 2.5vh, 1.75rem);
+    text-align: center;
+  }
+  .site-nav__link {
+    font-family: var(--font-ui);
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: clamp(1.5rem, 4.5vw, 3rem);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    padding: 0.1em 0.2em;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--dur), opacity var(--dur);
+  }
+  .site-nav__link:hover,
+  .site-nav__link:focus-visible,
+  .site-nav__link[aria-current='page'] {
+    border-bottom-color: currentColor;
+  }
+  .site-nav__aside {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(1rem, 4vw, 3rem);
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-small);
+  }
+  .site-nav__dog {
+    width: clamp(3.5rem, 8vw, 7rem);
+    aspect-ratio: 197 / 305;
+    height: auto;
+    opacity: 0.9;
+  }
+  .site-nav__dog--right {
+    aspect-ratio: 188 / 287;
+  }
+  .site-nav__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .site-nav__social {
+    display: flex;
+    gap: 1rem;
+  }
+  :global(body.nav-open) {
+    overflow: hidden;
+  }
+</style>

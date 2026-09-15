@@ -1,0 +1,75 @@
+---
+/**
+ * Ornate gold frame from the PDF with a photo behind it and an optional
+ * hand-written label ("rea farms") drawn over the picture.
+ *
+ * The frame PNG measures 803×636 with its opening at
+ * left 13.7% / top 14.8% / right 14.2% / bottom 17.5%; the photo is inset a
+ * little less so it always tucks under the moulding.
+ */
+import { Image } from 'astro:assets';
+import type { ImageRef } from '@/lib/cms/types';
+import Picture from './Picture.astro';
+import frameGold from '@/assets/brand/frame-gold.png';
+
+interface Props {
+  image?: ImageRef;
+  label?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  class?: string;
+}
+
+const { image, label, sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw', loading = 'lazy', class: className } = Astro.props;
+---
+
+<figure class:list={['frame', className]}>
+  <div class="frame__photo">
+    {image ? <Picture image={image} sizes={sizes} widths={[360, 560, 800]} loading={loading} quality={62} aspect={579 / 431} class="frame__img" /> : <div class="frame__empty" />}
+  </div>
+  <Image src={frameGold} alt="" widths={[360, 520, 803]} sizes={sizes} format="webp" quality={60} class="frame__gold" loading={loading} />
+  {label && <figcaption class="frame__label script">{label}</figcaption>}
+</figure>
+
+<style>
+  .frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 803 / 636;
+    filter: drop-shadow(var(--shadow-frame));
+  }
+  .frame__gold {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .frame__photo {
+    position: absolute;
+    inset: 13.5% 13% 16.3% 12.5%;
+    overflow: hidden;
+    background: var(--concrete);
+  }
+  .frame__photo :global(picture),
+  .frame__img,
+  .frame__empty {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .frame__label {
+    position: absolute;
+    inset: 13.5% 13% 16.3% 12.5%;
+    display: grid;
+    place-items: center;
+    color: var(--cream-bright);
+    font-size: var(--text-script);
+    text-shadow:
+      0 2px 14px rgba(0, 0, 0, 0.55),
+      0 0 2px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    padding: 0 6%;
+    text-align: center;
+  }
+</style>

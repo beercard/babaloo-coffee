@@ -1,0 +1,48 @@
+---
+import Base from '@/layouts/Base.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+const seo = { title: 'Page not found', description: 'The page you were looking for is not here.', robots: 'noindex, follow' };
+---
+
+<Base seo={seo} title="Page not found" bodyClass="page-404">
+  <section class="nf">
+    <div class="container text-center nf__inner">
+      <Icon name="dog-poodle" class="nf__dog" />
+      <h1 class="nf__title script">nothing here</h1>
+      <p class="italic">The page you were looking for wandered off. Try the menu, or head home.</p>
+      <div class="nf__actions">
+        <Button href="/">Home</Button>
+        <Button href="/menu" variant="outline">Menu</Button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    padding-block: calc(var(--curtain-h) + var(--section-y)) var(--section-y);
+    background: var(--cream);
+  }
+  .nf__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .nf__dog {
+    width: clamp(6rem, 14vw, 11rem);
+    aspect-ratio: 197 / 305;
+    height: auto;
+  }
+  .nf__title {
+    font-size: var(--text-script);
+  }
+  .nf__actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+</style>
