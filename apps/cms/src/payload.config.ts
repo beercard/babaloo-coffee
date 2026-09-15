@@ -30,6 +30,16 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
     meta: {
       titleSuffix: ' · Babaloo CMS',
+      icons: [{ rel: 'icon', type: 'image/png', url: '/brand/icon.png' }],
+    },
+    components: {
+      graphics: {
+        Logo: '/components/Logo#Logo',
+        Icon: '/components/Icon#Icon',
+      },
+      views: {
+        dashboard: { Component: '/components/Dashboard#Dashboard' },
+      },
     },
     // Sidebar order: groups are listed in the order collections/globals appear.
   },

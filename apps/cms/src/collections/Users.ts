@@ -6,7 +6,8 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     group: 'Settings',
-    description: 'Admins manage everything (including users). Editors edit content only.',
+    hidden: ({ user }) => (user as { role?: string } | null)?.role !== 'admin',
+    description: 'Super admins manage everything (including users). Editors edit content only.',
   },
   auth: {
     useAPIKey: true,
@@ -27,7 +28,7 @@ export const Users: CollectionConfig = {
       required: true,
       defaultValue: 'editor',
       options: [
-        { label: 'Admin', value: 'admin' },
+        { label: 'Super admin', value: 'admin' },
         { label: 'Editor', value: 'editor' },
       ],
       access: { update: isAdminField, create: isAdminField },

@@ -1,17 +1,19 @@
 import type { GlobalConfig } from 'payload';
-import { isEditorOrAdmin, publicRead } from '../access/roles';
+import { isAdmin, isEditorOrAdmin, publicRead } from '../access/roles';
 import { addressGroup, imageField, linkFields, linkGroup, seoGroup } from '../fields';
 import { homeBlocks } from '../blocks/home';
 import { triggerDeployGlobal } from '../hooks/triggerDeploy';
 
 const globalAccess = { read: publicRead, update: isEditorOrAdmin };
+const adminOnlyAccess = { read: publicRead, update: isAdmin };
+const adminOnly = ({ user }: { user?: { role?: string } | null }) => user?.role !== 'admin';
 const hooks = { afterChange: [triggerDeployGlobal] };
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Site settings',
-  admin: { group: 'Settings', description: 'Business name, contact details, social links and navigation. Used on every page and for Google.' },
-  access: globalAccess,
+  admin: { group: 'Settings', hidden: adminOnly, description: 'Business name, contact details, social links and navigation. Used on every page and for Google.' },
+  access: adminOnlyAccess,
   hooks,
   fields: [
     {
@@ -79,8 +81,8 @@ export const SiteSettings: GlobalConfig = {
 export const SEODefaults: GlobalConfig = {
   slug: 'seo-defaults',
   label: 'SEO defaults',
-  admin: { group: 'Settings', description: 'Site-wide defaults. Each page can override them in its own SEO box.' },
-  access: globalAccess,
+  admin: { group: 'Settings', hidden: adminOnly, description: 'Site-wide defaults. Each page can override them in its own SEO box.' },
+  access: adminOnlyAccess,
   hooks,
   fields: [
     { name: 'titleTemplate', type: 'text', label: 'Title template', defaultValue: '%s | Babaloo Coffee Club', admin: { description: '%s is replaced by the page title.' } },

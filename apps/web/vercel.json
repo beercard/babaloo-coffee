@@ -1,18 +1,51 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/drinks", "destination": "/menu", "permanent": true },
-    { "source": "/food", "destination": "/menu#food-and-sweets", "permanent": true },
-    { "source": "/hours", "destination": "/#locations", "permanent": true },
-    { "source": "/contact-us", "destination": "/contact", "permanent": true },
-    { "source": "/wp-admin/:path*", "destination": "/", "permanent": true },
-    { "source": "/wp-content/:path*", "destination": "/", "permanent": true }
+    {
+      "source": "/drinks",
+      "destination": "/menu",
+      "permanent": true
+    },
+    {
+      "source": "/food",
+      "destination": "/menu#food-and-sweets",
+      "permanent": true
+    },
+    {
+      "source": "/hours",
+      "destination": "/#locations",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/wp-admin/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/wp-content/:path*",
+      "destination": "/",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/_astro/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

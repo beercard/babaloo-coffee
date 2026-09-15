@@ -398,7 +398,7 @@ export interface FormSubmission {
   createdAt: string;
 }
 /**
- * Admins manage everything (including users). Editors edit content only.
+ * Super admins manage everything (including users). Editors edit content only.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".

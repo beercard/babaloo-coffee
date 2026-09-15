@@ -1,0 +1,244 @@
+/* Babaloo admin theme — the website's palette and typefaces applied to Payload. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lato:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  /* Website tokens */
+  --bb-ink: #3c1a1e;
+  --bb-cream: #f1ede7;
+  --bb-cream-2: #e9e3da;
+  --bb-bark: #503226;
+  --bb-sage: #d0cebf;
+  --bb-concrete: #a39c91;
+
+  /* Payload theme variables */
+  --font-body: 'Poppins', system-ui, sans-serif;
+  --font-serif: 'Lato', Georgia, serif;
+  --theme-bg: var(--bb-cream);
+  --theme-input-bg: #fffdfa;
+  --theme-text: var(--bb-ink);
+  --theme-elevation-0: var(--bb-cream);
+  --theme-elevation-50: #f7f4ef;
+  --theme-elevation-100: #ece7df;
+  --theme-elevation-150: #e3dcd2;
+  --theme-elevation-200: #d9d1c6;
+  --theme-elevation-250: #cfc6ba;
+  --theme-elevation-300: #c3b9ac;
+  --theme-elevation-400: #ab9f91;
+  --theme-elevation-500: #8f8275;
+  --theme-elevation-600: #75685c;
+  --theme-elevation-700: #5c4f45;
+  --theme-elevation-800: var(--bb-bark);
+  --theme-elevation-900: #402820;
+  --theme-elevation-1000: var(--bb-ink);
+  --theme-success-500: #4b7a5a;
+  --theme-warning-500: #b98a2b;
+  --theme-error-500: #a3402f;
+  --style-radius-s: 6px;
+  --style-radius-m: 10px;
+  --style-radius-l: 14px;
+}
+
+html[data-theme='dark'] {
+  color-scheme: light;
+}
+
+/* ---------- sidebar ---------- */
+.nav {
+  background: #fbf9f5;
+  border-right: 1px solid var(--theme-elevation-150);
+}
+.nav__link,
+.nav-group__toggle {
+  font-family: var(--font-body);
+}
+.nav-group__toggle {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--theme-elevation-500);
+  padding-block: 0.6rem;
+}
+.nav__link {
+  border-radius: var(--style-radius-s);
+  padding: 0.45rem 0.6rem;
+  margin: 1px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 150ms, color 150ms;
+}
+.nav__link:hover {
+  background: var(--theme-elevation-100);
+}
+.nav__link--active,
+.nav__link[aria-current='page'] {
+  background: var(--bb-ink);
+  color: var(--bb-cream) !important;
+}
+.nav__link--active .nav__link-indicator,
+.nav__link-indicator {
+  display: none;
+}
+
+/* ---------- header / actions ---------- */
+.app-header {
+  background: #fbf9f5;
+  border-bottom: 1px solid var(--theme-elevation-150);
+}
+.btn--style-primary {
+  background: var(--bb-bark);
+  color: var(--bb-cream);
+  border-radius: 999px;
+  font-weight: 600;
+}
+.btn--style-primary:hover {
+  background: var(--bb-ink);
+}
+.btn--style-secondary {
+  border-radius: 999px;
+}
+.doc-header__title,
+.collection-list__header h1,
+h1,
+h2,
+h3 {
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+}
+.field-label,
+.field-description {
+  font-family: var(--font-body);
+}
+.field-description {
+  color: var(--theme-elevation-500);
+}
+input,
+textarea,
+select,
+.rs__control {
+  border-radius: var(--style-radius-s) !important;
+}
+
+/* Collection lists: roomier rows, clearer hover */
+.table table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table td,
+.table th {
+  padding-block: 0.7rem;
+}
+.table tbody tr:hover td {
+  background: var(--theme-elevation-50);
+}
+.collection-list .card,
+.dashboard .card {
+  border-radius: var(--style-radius-m);
+}
+
+/* ---------- custom dashboard ---------- */
+.bb-dashboard {
+  padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  max-width: 1200px;
+}
+.bb-dashboard__head {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.bb-dashboard__logo {
+  width: 160px;
+  height: auto;
+}
+.bb-dashboard__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+.bb-dashboard__lead {
+  margin: 0;
+  color: var(--theme-elevation-600);
+  max-width: 60ch;
+}
+.bb-dashboard__group {
+  margin-bottom: 2rem;
+}
+.bb-dashboard__group-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--theme-elevation-500);
+  margin: 0 0 0.75rem;
+}
+.bb-dashboard__grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.9rem;
+}
+.bb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 100%;
+  padding: 1rem 1.1rem 1.1rem;
+  background: #fffdfa;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m);
+  color: var(--bb-ink);
+  text-decoration: none;
+  transition: transform 150ms, box-shadow 150ms, border-color 150ms;
+}
+.bb-card:hover,
+.bb-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--bb-bark);
+  box-shadow: 0 10px 24px -14px rgba(60, 26, 30, 0.45);
+  outline: none;
+}
+.bb-card:focus-visible {
+  box-shadow: 0 0 0 3px rgba(80, 50, 38, 0.35);
+}
+.bb-card__icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.bb-card__title {
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+.bb-card__text {
+  font-size: 0.85rem;
+  color: var(--theme-elevation-600);
+  line-height: 1.4;
+}
+.bb-dashboard__howto {
+  background: #fffdfa;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m);
+  padding: 1.1rem 1.25rem;
+}
+.bb-dashboard__howto-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+}
+.bb-dashboard__howto-list em {
+  font-style: normal;
+  background: var(--theme-elevation-100);
+  padding: 0 0.3em;
+  border-radius: 4px;
+}
+
+/* ---------- login ---------- */
+.login .template-minimal__wrap {
+  background: #fffdfa;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-l);
+  padding: 2rem;
+}

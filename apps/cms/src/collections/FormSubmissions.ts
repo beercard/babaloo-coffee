@@ -5,7 +5,7 @@ export const FormSubmissions: CollectionConfig = {
   slug: 'form-submissions',
   labels: { singular: 'Message', plural: 'Inbox' },
   admin: {
-    group: 'Settings',
+    group: 'Messages',
     useAsTitle: 'summary',
     defaultColumns: ['summary', 'form', 'status', 'createdAt'],
     description: 'Messages sent from the Contact and Join our team forms.',

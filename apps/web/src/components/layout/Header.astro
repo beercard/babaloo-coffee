@@ -35,7 +35,7 @@ const social = settings.social;
       aria-label="Open menu"
       data-nav-toggle
     >
-      <MenuIcon class="nav-toggle__icon" width="24" height="24" />
+      <MenuIcon class="nav-toggle__icon" />
     </button>
 
     {
@@ -167,8 +167,9 @@ const social = settings.social;
     background: rgba(255, 255, 255, 0.08);
   }
   .nav-toggle__icon {
-    width: clamp(1.25rem, 1.8vw, 2rem);
+    width: clamp(1.5rem, 2vw, 2.125rem);
     height: auto;
+    aspect-ratio: 1;
   }
 
   .curtain {
@@ -177,12 +178,10 @@ const social = settings.social;
     right: 0;
     top: 100%;
     width: 100%;
-    height: var(--curtain-h);
-    object-fit: cover;
-    object-position: center top;
+    height: auto;
     z-index: 3;
     pointer-events: none;
-    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.18));
+    filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
   }
 
   /* ---------- overlay navigation ---------- */

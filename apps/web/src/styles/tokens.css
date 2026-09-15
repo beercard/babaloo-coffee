@@ -58,7 +58,7 @@
 
   /* Header proportions (PDF: 300px header on 1920, reduced ~30% for screens) */
   --header-h: clamp(4.5rem, 9.5vw, 11.5rem);
-  --curtain-h: clamp(2rem, 7vw, 8.5rem);
+  --curtain-h: 8.85vw; /* natural aspect of the curtain image (1920×170) */
   --strip-h: clamp(3.5rem, 6.5vw, 7.5rem);
 
   color-scheme: light;
