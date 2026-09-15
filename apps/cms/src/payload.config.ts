@@ -39,6 +39,9 @@ const smtp = process.env.SMTP_HOST
   ? nodemailerAdapter({
       defaultFromAddress: process.env.EMAIL_FROM ?? process.env.SMTP_USER ?? 'no-reply@babaloocoffeeclub.com',
       defaultFromName: process.env.EMAIL_FROM_NAME ?? 'Babaloo Coffee Club',
+      // Don't verify the SMTP login at boot: a wrong password must not take the whole CMS down,
+      // it just fails (and is logged) when a notification is sent.
+      skipVerify: true,
       transportOptions: {
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT ?? 465),
