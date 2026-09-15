@@ -15,8 +15,8 @@ RewriteRule ^drinks/?$        /menu                    [R=301,L,NC]
 RewriteRule ^food/?$          /menu#food-and-sweets    [R=301,L,NC,NE]
 RewriteRule ^hours/?$         /#locations              [R=301,L,NC,NE]
 RewriteRule ^contact-us/?$    /contact                 [R=301,L,NC]
-RewriteRule ^gallery/$        /gallery                 [R=301,L,NC]
-RewriteRule ^join-our-team/$  /join-our-team           [R=301,L,NC]
+RewriteRule ^gallery/?$       /                        [R=301,L,NC]
+RewriteRule ^join-our-team/?$ /about#join-our-team     [R=301,L,NC,NE]
 RewriteRule ^(wp-admin|wp-login\.php|wp-content|wp-includes|xmlrpc\.php|feed)(/.*)?$ / [R=301,L,NC]
 
 # Strip trailing slashes (Astro is built with trailingSlash: 'never')

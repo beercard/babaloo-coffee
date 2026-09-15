@@ -70,7 +70,7 @@ const subject = form === 'careers' ? 'Job application' : 'Website contact';
 
 <script>
   import { initForms } from '@/scripts/forms';
-  initForms();
+  document.addEventListener('astro:page-load', initForms);
 </script>
 
 <style>

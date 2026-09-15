@@ -7,7 +7,8 @@
  */
 export function initMenuBoard(): void {
   const board = document.querySelector<HTMLElement>('[data-board]');
-  if (!board) return;
+  if (!board || board.dataset.bound) return;
+  board.dataset.bound = 'true';
   const panel = board.querySelector<HTMLElement>('[data-board-visual]');
   const figures = new Map<string, HTMLElement>();
   board.querySelectorAll<HTMLElement>('[data-board-image]').forEach((f) => figures.set(f.dataset.boardImage ?? '', f));
@@ -29,10 +30,15 @@ export function initMenuBoard(): void {
     active = id;
   };
 
+  /** Steam only rises over hot drinks. */
+  const setHot = (el: Element | null) => {
+    if (panel) panel.dataset.hot = String(el?.closest<HTMLElement>('[data-kind]')?.dataset.kind === 'hot');
+  };
   const select = (btn: HTMLButtonElement) => {
     buttons.forEach((b) => b.setAttribute('aria-pressed', 'false'));
     btn.setAttribute('aria-pressed', 'true');
     show(btn.dataset.visual);
+    setHot(btn);
   };
 
   buttons.forEach((btn) => btn.addEventListener('click', () => select(btn)));
@@ -79,7 +85,9 @@ export function initMenuBoard(): void {
 
   board.querySelectorAll<HTMLDetailsElement>('[data-board-sub]').forEach((sub) => {
     sub.addEventListener('toggle', () => {
-      if (sub.open && sub.dataset.visual) show(sub.dataset.visual);
+      if (!sub.open) return;
+      if (sub.dataset.visual) show(sub.dataset.visual);
+      setHot(sub);
     });
   });
 

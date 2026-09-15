@@ -82,7 +82,17 @@ export const AboutPage: GlobalConfig = {
           fields: [
             { name: 'showTeamSection', type: 'checkbox', label: t('Show this section', 'Mostrar esta sección'), defaultValue: true },
             imageField('teamImage', t('Team photo (next to the form)', 'Foto del equipo (junto al formulario)')),
-            { name: 'note', type: 'text', admin: { readOnly: true, description: t('The form texts, positions and experience options are edited in the "Join our team page".', 'Los textos del formulario, puestos y experiencia se editan en la "Página Únete al equipo".') } },
+            {
+              name: 'join',
+              type: 'group',
+              label: t('Form', 'Formulario'),
+              fields: [
+                { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Join our team' },
+                { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
+                { name: 'positions', type: 'array', label: t('Positions (dropdown)', 'Puestos (desplegable)'), labels: { singular: t('Position', 'Puesto'), plural: t('Positions', 'Puestos') }, fields: [{ name: 'label', type: 'text', required: true, label: t('Position', 'Puesto') }] },
+                { name: 'experienceLevels', type: 'array', label: t('Experience levels (dropdown)', 'Niveles de experiencia (desplegable)'), labels: { singular: t('Level', 'Nivel'), plural: t('Levels', 'Niveles') }, fields: [{ name: 'label', type: 'text', required: true, label: t('Level', 'Nivel') }] },
+              ],
+            },
           ],
         },
         {
@@ -100,49 +110,45 @@ export const AboutPage: GlobalConfig = {
 export const ContactPage: GlobalConfig = {
   slug: 'contact-page',
   label: t('Contact page', 'Página Contacto'),
-  admin: { group: PAGES, description: t('Texts of /contact. Email, phone, address and hours come from the first location (Home page) and Site settings.', 'Textos de /contact. Email, teléfono, dirección y horario vienen del primer local (Página de inicio) y de Ajustes del sitio.') },
+  admin: { group: PAGES, description: t('Everything on /contact: the form texts on the left and the contact details on the right.', 'Todo lo de /contact: los textos del formulario a la izquierda y los datos de contacto a la derecha.') },
   access: globalAccess,
   hooks,
   fields: [
-    { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Contact us' },
-    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
-    seoGroup(),
-  ],
-};
-
-export const JoinPage: GlobalConfig = {
-  slug: 'join-page',
-  label: t('Join our team page', 'Página Únete al equipo'),
-  admin: { group: PAGES, description: t('Used on /join-our-team and in the "Join our team" section of About.', 'Se usa en /join-our-team y en la sección "Join our team" de About.') },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Join our team' },
-    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
-    imageField('image', t('Photo', 'Foto')),
-    { name: 'positions', type: 'array', label: t('Positions (dropdown)', 'Puestos (desplegable)'), labels: { singular: t('Position', 'Puesto'), plural: t('Positions', 'Puestos') }, fields: [{ name: 'label', type: 'text', required: true, label: t('Position', 'Puesto') }] },
-    { name: 'experienceLevels', type: 'array', label: t('Experience levels (dropdown)', 'Niveles de experiencia (desplegable)'), labels: { singular: t('Level', 'Nivel'), plural: t('Levels', 'Niveles') }, fields: [{ name: 'label', type: 'text', required: true, label: t('Level', 'Nivel') }] },
-    seoGroup(),
-  ],
-};
-
-export const GalleryPage: GlobalConfig = {
-  slug: 'gallery-page',
-  label: t('Gallery page', 'Página Galería'),
-  admin: { group: PAGES, description: t('The photos of /gallery (the home page preview uses the first ones). Drag to reorder.', 'Las fotos de /gallery (la vista previa de la portada usa las primeras). Arrastra para ordenar.') },
-  access: globalAccess,
-  hooks,
-  fields: [
-    { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Gallery' },
-    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
     {
-      name: 'images',
-      type: 'array',
-      label: t('Photos', 'Fotos'),
-      labels: { singular: t('Photo', 'Foto'), plural: t('Photos', 'Fotos') },
-      fields: [
-        imageField('image', t('Photo', 'Foto'), true),
-        { name: 'caption', type: 'text', label: t('Caption (optional)', 'Pie de foto (opcional)') },
+      type: 'tabs',
+      tabs: [
+        {
+          label: t('1 · Form texts', '1 · Textos del formulario'),
+          fields: [
+            { name: 'title', type: 'text', label: t('Title', 'Título'), defaultValue: 'Contact us' },
+            { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
+          ],
+        },
+        {
+          label: t('2 · Contact details (right column)', '2 · Datos de contacto (columna derecha)'),
+          fields: [
+            {
+              name: 'details',
+              type: 'group',
+              label: t('Contact details', 'Datos de contacto'),
+              admin: { description: t('Leave a field empty to hide it.', 'Deja un campo vacío para ocultarlo.') },
+              fields: [
+                { type: 'row', fields: [{ name: 'email', type: 'email', label: 'Email', admin: { width: '50%' } }, { name: 'phone', type: 'text', label: t('Phone', 'Teléfono'), admin: { width: '50%' } }] },
+                { name: 'locationName', type: 'text', label: t('Location name', 'Nombre del local'), admin: { placeholder: 'South End' } },
+                { name: 'address', type: 'textarea', label: t('Address (one line per row)', 'Dirección (una línea por fila)'), admin: { placeholder: '1425 Winnifred St, Suite 117 / Charlotte, NC 28203' } },
+                {
+                  name: 'hours',
+                  type: 'array',
+                  label: t('Opening hours', 'Horario'),
+                  labels: { singular: t('Line', 'Línea'), plural: t('Lines', 'Líneas') },
+                  fields: [{ type: 'row', fields: [{ name: 'days', type: 'text', required: true, label: t('Days', 'Días'), admin: { width: '50%' } }, { name: 'hours', type: 'text', required: true, label: t('Hours', 'Horas'), admin: { width: '50%' } }] }],
+                },
+                { type: 'row', fields: [{ name: 'mapUrl', type: 'text', label: t('Map link', 'Enlace al mapa'), admin: { width: '70%' } }, { name: 'mapLabel', type: 'text', label: t('Map link text', 'Texto del enlace'), defaultValue: 'map', admin: { width: '30%' } }] },
+                { name: 'showSocial', type: 'checkbox', label: t('Show social links (from Site settings)', 'Mostrar redes sociales (de Ajustes del sitio)'), defaultValue: true },
+              ],
+            },
+          ],
+        },
       ],
     },
     seoGroup(),
@@ -236,4 +242,4 @@ export const SEODefaults: GlobalConfig = {
 };
 
 /** Order = order in the sidebar: pages in site order, then settings. */
-export const globals: GlobalConfig[] = [Homepage, MenuPage, AboutPage, GalleryPage, ContactPage, JoinPage, SiteSettings, SEODefaults];
+export const globals: GlobalConfig[] = [Homepage, MenuPage, AboutPage, ContactPage, SiteSettings, SEODefaults];

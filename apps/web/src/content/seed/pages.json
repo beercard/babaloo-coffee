@@ -46,6 +46,23 @@
       "title": "About Babaloo — A little to the every day",
       "description": "Babaloo Coffee Club is a neighbourhood coffee and matcha club in Charlotte, NC. Familiar faces, new ones, and dogs we know by name. Join our team or say hello.",
       "twitterCard": "summary_large_image"
+    },
+    "join": {
+      "title": "Join our team",
+      "text": "We're always looking for warm, curious people who love coffee, matcha and dogs. Tell us about yourself.",
+      "positions": [
+        "Barista",
+        "Shift lead",
+        "Kitchen",
+        "Front of house",
+        "Other"
+      ],
+      "experienceLevels": [
+        "No experience",
+        "Less than 1 year",
+        "1-3 years",
+        "3+ years"
+      ]
     }
   },
   "contactPage": {
@@ -54,171 +71,25 @@
     "seo": {
       "title": "Contact Babaloo Coffee Club",
       "description": "Get in touch with Babaloo Coffee Club in South End, Charlotte, NC. Send us a message or email info@babaloocoffeeclub.com."
-    }
-  },
-  "joinPage": {
-    "title": "Join our team",
-    "text": "We're always looking for warm, curious people who love coffee, matcha and dogs. Tell us about yourself.",
-    "positions": [
-      "Barista",
-      "Shift lead",
-      "Kitchen",
-      "Front of house",
-      "Other"
-    ],
-    "experienceLevels": [
-      "No experience",
-      "Less than 1 year",
-      "1-3 years",
-      "3+ years"
-    ],
-    "image": {
-      "src": "photos/team-baristas.jpg",
-      "alt": "Two Babaloo baristas in striped aprons working behind the counter under the menu board",
-      "width": 1500,
-      "height": 2000
     },
-    "seo": {
-      "title": "Join our team — Careers at Babaloo",
-      "description": "Work with us at Babaloo Coffee Club in Charlotte, NC. Barista, kitchen and front-of-house positions. Apply online."
-    }
-  },
-  "galleryPage": {
-    "title": "Gallery",
-    "text": "",
-    "images": [
-      {
-        "image": {
-          "src": "photos/gallery-01.jpg",
-          "alt": "Matcha in a stoneware cup on a saucer, morning light",
-          "width": 1067,
-          "height": 1600
+    "details": {
+      "email": "info@babaloocoffeeclub.com",
+      "phone": "(704) 817-7261",
+      "locationName": "South End",
+      "address": "1425 Winnifred St, Suite 117\nCharlotte, NC 28203",
+      "hours": [
+        {
+          "days": "Monday - Friday",
+          "hours": "7:00am - 6:00pm"
+        },
+        {
+          "days": "Saturday - Sunday",
+          "hours": "8:00am - 6:00pm"
         }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-02.jpg",
-          "alt": "Latte in a stoneware cup on a sunlit table",
-          "width": 1144,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-03.jpg",
-          "alt": "A guest holding a cappuccino in both hands",
-          "width": 1146,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-04.jpg",
-          "alt": "Barista at the Babaloo counter",
-          "width": 1204,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-05.jpg",
-          "alt": "Cappuccino with latte art in a stoneware cup",
-          "width": 1124,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-06.jpg",
-          "alt": "Pastries on the Babaloo counter",
-          "width": 1067,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-07.jpg",
-          "alt": "Iced drink in a Babaloo cup on a stone table",
-          "width": 1067,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-08.jpg",
-          "alt": "Detail of the Babaloo bar",
-          "width": 1067,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-09.jpg",
-          "alt": "A guest walking past the Babaloo wall in warm light",
-          "width": 1067,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-10.jpg",
-          "alt": "Babaloo pastry box with a handle",
-          "width": 1151,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-11.jpg",
-          "alt": "Whisking ceremonial matcha in a stoneware bowl",
-          "width": 1167,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-12.jpg",
-          "alt": "Babaloo to-go cup on a stone counter",
-          "width": 1101,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-13.jpg",
-          "alt": "Matcha poured over strawberry puree",
-          "width": 1098,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-14.jpg",
-          "alt": "Hands whisking matcha",
-          "width": 1114,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-15.jpg",
-          "alt": "A guest sipping a Babaloo drink",
-          "width": 1067,
-          "height": 1600
-        }
-      },
-      {
-        "image": {
-          "src": "photos/gallery-16.jpg",
-          "alt": "Detail of the Babaloo counter",
-          "width": 1200,
-          "height": 1600
-        }
-      }
-    ],
-    "seo": {
-      "title": "Gallery — Babaloo Coffee Club",
-      "description": "Photos from Babaloo Coffee Club: our coffee, matcha, sweets and the space in South End, Charlotte."
+      ],
+      "mapUrl": "https://www.google.com/maps/search/?api=1&query=Babaloo+Coffee+Club+1425+Winnifred+St+Suite+117+Charlotte+NC",
+      "mapLabel": "map",
+      "showSocial": true
     }
   }
 }

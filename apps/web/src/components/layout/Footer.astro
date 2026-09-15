@@ -23,7 +23,7 @@ const address = settings.address;
 <Section as="footer" background="concrete" padded="y" class="footer" ariaLabelledby="footer-heading">
   <h2 id="footer-heading" class="visually-hidden">{settings.name}</h2>
   <div class="container footer__inner">
-    <a href="/" class="footer__lockup" aria-label={`${settings.name} — home`}>
+    <a href="/" class="footer__lockup reveal reveal--zoom" aria-label={`${settings.name} — home`}>
       <Icon name="dog-poodle" class="footer__dog" />
       <Image src={logoFooter} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720, 944]} sizes="(min-width: 1200px) 24rem, (min-width: 640px) 20vw, 44vw" format="webp" quality={82} class="footer__logo" loading="lazy" />
       <Icon name="dog-basenji" class="footer__dog footer__dog--right" />
@@ -80,6 +80,12 @@ const address = settings.address;
         </Fragment>
       )}
     </p>
+    <p class="footer__credit">
+      Developed by{' '}
+      <a href="https://vektra.digital/en" target="_blank" rel="noopener">
+        Vektra
+      </a>
+    </p>
   </div>
 </Section>
 
@@ -105,6 +111,13 @@ const address = settings.address;
     aspect-ratio: 197 / 305;
     height: auto;
     flex: none;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .footer__lockup:hover .footer__dog {
+    animation: float-y 1.6s ease-in-out infinite;
+  }
+  .footer__lockup:hover .footer__dog--right {
+    animation-delay: 0.4s;
   }
   .footer__dog--right {
     aspect-ratio: 188 / 287;
@@ -141,5 +154,16 @@ const address = settings.address;
     font-style: italic;
     opacity: 0.85;
     max-width: 60ch;
+  }
+  .footer__credit {
+    margin-top: -0.75rem;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .footer__credit a {
+    text-decoration: underline;
   }
 </style>

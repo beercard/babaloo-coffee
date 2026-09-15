@@ -212,12 +212,18 @@ export const FeaturedMenuBlock: Block = {
 
 export const GalleryBlock: Block = {
   slug: 'gallery',
-  labels: { singular: t('Photo gallery preview', 'Vista previa de la galería'), plural: t('Photo gallery preview', 'Vista previa de la galería') },
+  labels: { singular: t('Photo gallery', 'Galería de fotos'), plural: t('Photo gallery', 'Galería de fotos') },
   fields: [
     enabled,
     { name: 'title', type: 'text', label: t('Title (optional)', 'Título (opcional)') },
-    { name: 'limit', type: 'number', label: t('How many photos (from the Gallery page)', 'Cuántas fotos (de la página Galería)'), defaultValue: 6, min: 1, max: 40 },
-    linkGroup('cta', t('Button (optional)', 'Botón (opcional)')),
+    {
+      name: 'images',
+      type: 'array',
+      label: t('Photos — drag to reorder', 'Fotos — arrastra para ordenar'),
+      labels: { singular: t('Photo', 'Foto'), plural: t('Photos', 'Fotos') },
+      fields: [imageField('image', t('Photo', 'Foto'), true), { name: 'caption', type: 'text', label: t('Caption (optional)', 'Pie de foto (opcional)') }],
+    },
+    { name: 'limit', type: 'number', label: t('Max photos shown', 'Máximo de fotos'), defaultValue: 12, min: 1, max: 60 },
     anchor,
   ],
 };

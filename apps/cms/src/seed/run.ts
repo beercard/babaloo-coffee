@@ -194,6 +194,14 @@ async function main() {
         }
         block.slides = slides;
       }
+      if (type === 'gallery') {
+        const images: Json[] = [];
+        for (const g of ((s.images as { image: ImageRef; caption?: string }[] | undefined) ?? [])) {
+          const id = await upload(g.image);
+          if (id) images.push({ image: id, caption: g.caption });
+        }
+        block.images = images;
+      }
       if (type === 'locations') {
         const items: Json[] = [];
         for (const l of ((s.items as Json[] | undefined) ?? [])) {
@@ -233,34 +241,20 @@ async function main() {
         frames,
         showTeamSection: about.showTeamSection ?? true,
         teamImage: await upload(about.teamImage as ImageRef),
+        join: {
+          title: (about.join as Json).title,
+          text: (about.join as Json).text,
+          positions: ((about.join as Json).positions as string[]).map((label) => ({ label })),
+          experienceLevels: ((about.join as Json).experienceLevels as string[]).map((label) => ({ label })),
+        },
         showContactSection: about.showContactSection ?? true,
         seo: await seoData(about.seo as Json),
       } as never,
     });
 
     const contact = pages.contactPage as Json;
-    await payload.updateGlobal({ slug: 'contact-page', data: { title: contact.title, text: contact.text, seo: await seoData(contact.seo as Json) } as never });
+    await payload.updateGlobal({ slug: 'contact-page', data: { title: contact.title, text: contact.text, details: contact.details, seo: await seoData(contact.seo as Json) } as never });
 
-    const join = pages.joinPage as Json;
-    await payload.updateGlobal({
-      slug: 'join-page',
-      data: {
-        title: join.title,
-        text: join.text,
-        image: await upload(join.image as ImageRef),
-        positions: (join.positions as string[]).map((label) => ({ label })),
-        experienceLevels: (join.experienceLevels as string[]).map((label) => ({ label })),
-        seo: await seoData(join.seo as Json),
-      } as never,
-    });
-
-    const gallery = pages.galleryPage as Json;
-    const images: Json[] = [];
-    for (const g of ((gallery.images as { image: ImageRef; caption?: string }[] | undefined) ?? [])) {
-      const id = await upload(g.image);
-      if (id) images.push({ image: id, caption: g.caption });
-    }
-    await payload.updateGlobal({ slug: 'gallery-page', data: { title: gallery.title, text: gallery.text, images, seo: await seoData(gallery.seo as Json) } as never });
     payload.logger.info('[seed] pages done');
   }
 

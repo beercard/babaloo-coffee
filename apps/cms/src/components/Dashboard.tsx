@@ -15,10 +15,8 @@ const groups: Group[] = [
     cards: [
       { title: ['Home page', 'Página de inicio'], text: ['Hero photos · icons band · welcome text · locations & hours · optional sections.', 'Fotos del hero · franja de iconos · texto de bienvenida · locales y horarios · secciones opcionales.'], href: '/admin/globals/homepage', icon: '🏠' },
       { title: ['Menu page', 'Página Menú'], text: ['Intro text of the menu page (products are below).', 'Texto de intro de la página del menú (los productos están abajo).'], href: '/admin/globals/menu-page', icon: '✏️' },
-      { title: ['About page', 'Página About'], text: ['Title · 3 framed photos · text · team photo · contact form.', 'Título · 3 fotos enmarcadas · texto · foto del equipo · formulario.'], href: '/admin/globals/about-page', icon: '🐶' },
-      { title: ['Gallery page', 'Página Galería'], text: ['All the gallery photos, in order.', 'Todas las fotos de la galería, en orden.'], href: '/admin/globals/gallery-page', icon: '🖼️' },
+      { title: ['About page', 'Página About'], text: ['Title · 3 framed photos · text · Join our team (photo + form) · contact form.', 'Título · 3 fotos enmarcadas · texto · Únete al equipo (foto + formulario) · formulario de contacto.'], href: '/admin/globals/about-page', icon: '🐶' },
       { title: ['Contact page', 'Página Contacto'], text: ['Title and intro text.', 'Título y texto de intro.'], href: '/admin/globals/contact-page', icon: '✉️' },
-      { title: ['Join our team page', 'Página Únete al equipo'], text: ['Careers text, photo, positions and experience options.', 'Texto, foto, puestos y niveles de experiencia.'], href: '/admin/globals/join-page', icon: '🤝' },
     ],
   },
   {
@@ -50,7 +48,7 @@ const howto: [string, string][] = [
   ['<b>Change a product photo</b> → Products → open the item → <em>Product photo</em> → Choose or Upload → Save.', '<b>Cambiar la foto de un producto</b> → Productos → abre el producto → <em>Product photo</em> → Elegir o Subir → Guardar.'],
   ['<b>Change opening hours</b> → Home page → section <em>Locations</em> → the location → <em>Opening hours</em> → Save.', '<b>Cambiar el horario</b> → Página de inicio → sección <em>Locales</em> → el local → <em>Horario</em> → Guardar.'],
   ['<b>Change the welcome text</b> → Home page → section <em>Welcome text</em> → Save.', '<b>Cambiar el texto de bienvenida</b> → Página de inicio → sección <em>Texto de bienvenida</em> → Guardar.'],
-  ['<b>Add gallery photos</b> → Gallery page → <em>Photos</em> → Add → upload into the Gallery folder → Save.', '<b>Añadir fotos a la galería</b> → Página Galería → <em>Fotos</em> → Añadir → subir en la carpeta Gallery → Guardar.'],
+  ['<b>Add gallery photos</b> → Home page → section <em>Photo gallery</em> → Add → upload into the Gallery folder → Save.', '<b>Añadir fotos a la galería</b> → Página de inicio → sección <em>Galería de fotos</em> → Añadir → subir en la carpeta Gallery → Guardar.'],
   ['<b>Hide something temporarily</b> → untick <em>Available</em> (products) or <em>Show this section</em> (home) instead of deleting.', '<b>Ocultar algo temporalmente</b> → desmarca <em>Available</em> (productos) o <em>Show this section</em> (portada) en vez de borrar.'],
 ]
 

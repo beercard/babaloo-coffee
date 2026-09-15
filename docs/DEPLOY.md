@@ -108,8 +108,8 @@ Con Vercel/Netlify basta con poner su *Deploy Hook URL* en `DEPLOY_HOOK_URL` (si
 | `/food/` | `/menu#food-and-sweets` |
 | `/hours/` | `/#locations` |
 | `/contact-us/` | `/contact` |
-| `/gallery/` | `/gallery` (misma URL, sin barra final) |
-| `/join-our-team/` | `/join-our-team` |
+| `/gallery/` | `/` |
+| `/join-our-team/` | `/about#join-our-team` |
 | `/wp-admin`, `/wp-content/…`, `/feed` | `/` |
 
 Definidos en `apps/web/public/.htaccess` (Hostinger), `public/_redirects` (Netlify/Cloudflare), `vercel.json` y `astro.config.mjs`.

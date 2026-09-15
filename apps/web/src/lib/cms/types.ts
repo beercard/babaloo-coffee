@@ -230,7 +230,7 @@ export interface FeaturedMenuSection extends SectionBase {
 export interface GallerySection extends SectionBase {
   type: 'gallery';
   title?: string;
-  /** Shows the first `limit` photos of the Gallery page. */
+  images: GalleryImage[];
   limit: number;
   cta?: Link;
 }
@@ -285,35 +285,42 @@ export interface MenuPage {
   seo: SEOMeta;
 }
 
+export interface JoinSection {
+  title: string;
+  text?: string;
+  positions: string[];
+  experienceLevels: string[];
+}
+
 export interface AboutPage {
   title: string;
   frames: ImageRef[];
   text: string;
   showTeamSection: boolean;
   teamImage?: ImageRef;
+  /** "Join our team" form texts (the section lives on the About page). */
+  join: JoinSection;
   showContactSection: boolean;
   seo: SEOMeta;
+}
+
+export interface ContactDetails {
+  email?: string;
+  phone?: string;
+  locationName?: string;
+  /** Multiline address; each line is rendered on its own row. */
+  address?: string;
+  hours: OpeningHoursDisplay[];
+  mapUrl?: string;
+  mapLabel?: string;
+  showSocial: boolean;
 }
 
 export interface ContactPage {
   title: string;
   text?: string;
-  seo: SEOMeta;
-}
-
-export interface JoinPage {
-  title: string;
-  text?: string;
-  positions: string[];
-  experienceLevels: string[];
-  image?: ImageRef;
-  seo: SEOMeta;
-}
-
-export interface GalleryPage {
-  title: string;
-  text?: string;
-  images: GalleryImage[];
+  /** Right column of /contact. Empty fields fall back to Site settings / the first location. */
+  details: ContactDetails;
   seo: SEOMeta;
 }
 
@@ -324,12 +331,10 @@ export interface SiteContent {
   menuPage: MenuPage;
   aboutPage: AboutPage;
   contactPage: ContactPage;
-  joinPage: JoinPage;
-  galleryPage: GalleryPage;
   menu: MenuData;
   /** Derived from the Home page "Locations" section (used by JSON-LD, contact page…). */
   locations: Location[];
-  /** Derived: the Gallery page photos as gallery "main". */
+  /** Derived: the Home page "Photo gallery" section as gallery "main". */
   galleries: Gallery[];
   /** Derived from the Home page "Testimonials" section. */
   testimonials: Testimonial[];

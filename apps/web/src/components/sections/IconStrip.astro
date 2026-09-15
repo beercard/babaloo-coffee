@@ -64,6 +64,10 @@ const speed = section?.speed ?? 40;
   .strip__icon {
     width: 100%;
     height: 100%;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .strip__item:hover .strip__icon {
+    animation: wiggle 700ms var(--ease-out);
   }
   @keyframes strip-marquee {
     from {

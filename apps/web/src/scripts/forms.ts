@@ -42,6 +42,8 @@ function validate(form: HTMLFormElement): boolean {
 
 export function initForms(): void {
   document.querySelectorAll<HTMLFormElement>('form[data-form]').forEach((form) => {
+    if (form.dataset.bound) return;
+    form.dataset.bound = 'true';
     const endpoint = form.dataset.endpoint;
     const startedAt = Date.now();
     form.setAttribute('novalidate', '');

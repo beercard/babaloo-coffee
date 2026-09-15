@@ -36,6 +36,16 @@
       "source": "/wp-content/:path*",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/gallery",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/join-our-team",
+      "destination": "/about#join-our-team",
+      "permanent": true
     }
   ],
   "headers": [

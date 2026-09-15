@@ -20,10 +20,10 @@ const { locations, id = 'locations', title = 'Locations', text } = Astro.props;
   <div class="container">
     <h2 id={`${id}-title`} class="visually-hidden">{title}</h2>
     {text && <p class="locations__text">{text}</p>}
-    <ul role="list" class="locations__grid">
+    <ul role="list" class="locations__grid reveal-stagger">
       {
         locations.map((loc, i) => (
-          <li class="location reveal" style={`--i:${i}`}>
+          <li class="location reveal reveal--zoom" style={`--i:${i}`}>
             <Frame image={loc.image} label={loc.scriptName} loading="lazy" />
             <div class="location__body">
               <h3 class="visually-hidden">{loc.name}</h3>

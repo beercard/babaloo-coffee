@@ -133,19 +133,103 @@ textarea {
 
 /* ---------- Scroll reveal ---------- */
 .reveal {
+  --reveal-y: 22px;
+  --reveal-x: 0px;
+  --reveal-scale: 1;
   opacity: 0;
-  transform: translateY(18px);
+  transform: translate(var(--reveal-x), var(--reveal-y)) scale(var(--reveal-scale));
   transition:
-    opacity 700ms var(--ease-out),
-    transform 700ms var(--ease-out);
+    opacity 800ms var(--ease-out),
+    transform 900ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal--left {
+  --reveal-x: -28px;
+  --reveal-y: 0px;
+}
+.reveal--right {
+  --reveal-x: 28px;
+  --reveal-y: 0px;
+}
+.reveal--zoom {
+  --reveal-y: 0px;
+  --reveal-scale: 0.94;
 }
 .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
+/* children of a stagger group enter one after another */
+.reveal-stagger > .reveal:nth-child(1) { --reveal-delay: 0ms; }
+.reveal-stagger > .reveal:nth-child(2) { --reveal-delay: 90ms; }
+.reveal-stagger > .reveal:nth-child(3) { --reveal-delay: 180ms; }
+.reveal-stagger > .reveal:nth-child(4) { --reveal-delay: 270ms; }
+.reveal-stagger > .reveal:nth-child(5) { --reveal-delay: 360ms; }
+.reveal-stagger > .reveal:nth-child(n + 6) { --reveal-delay: 450ms; }
 html.no-js .reveal {
   opacity: 1;
   transform: none;
+}
+
+/* ---------- Shared motion (coffee-flavoured) ---------- */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes sway {
+  0%, 100% { transform: translateY(0) skewX(0deg); }
+  50% { transform: translateY(2px) skewX(0.35deg); }
+}
+@keyframes steam {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
+  25% { opacity: 0.55; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--drift, 0px)), -110px) scale(1.4); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-6deg) translateY(-2px); }
+  60% { transform: rotate(5deg); }
+}
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+@keyframes fade-up-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Coffee steam: three soft wisps rising from the top of a cup image */
+.steam {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.steam span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 26px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+  filter: blur(6px);
+  opacity: 0;
+  animation: steam 3.6s ease-out infinite;
+}
+.steam span:nth-child(1) { --drift: -18px; animation-delay: 0s; }
+.steam span:nth-child(2) { --drift: 14px; animation-delay: 1.2s; width: 34px; }
+.steam span:nth-child(3) { --drift: -6px; animation-delay: 2.3s; height: 48px; }
+
+/* View transitions between pages: a calm cross-fade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -156,6 +240,9 @@ html.no-js .reveal {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+  .steam {
+    display: none;
   }
   *,
   *::before,

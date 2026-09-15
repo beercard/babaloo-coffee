@@ -12,7 +12,8 @@ import { getContent, sortedLocations } from '@/lib/cms';
 import { breadcrumbSchema } from '@/utils/schema';
 
 const content = await getContent();
-const { aboutPage, joinPage, contactPage, settings } = content;
+const { aboutPage, contactPage, settings } = content;
+const joinPage = aboutPage.join;
 const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
 
 // Framed photos: the About page's own list, else the location photos from the home page.
@@ -22,7 +23,7 @@ const frames =
     : sortedLocations(content.locations)
         .map((l) => l.image)
         .filter((i): i is NonNullable<typeof i> => Boolean(i));
-const teamImage = aboutPage.teamImage ?? joinPage.image;
+const teamImage = aboutPage.teamImage;
 
 const schema = [
   breadcrumbSchema([
@@ -38,9 +39,9 @@ const schema = [
       <h1 id="about-title" class="about__title eyebrow-link">{aboutPage.title}</h1>
       {
         frames.length > 0 && (
-          <ul role="list" class="about__frames">
+          <ul role="list" class="about__frames reveal-stagger">
             {frames.slice(0, 3).map((image, i) => (
-              <li class="reveal" style={`--i:${i}`}>
+              <li class="reveal reveal--zoom" style={`--i:${i}`}>
                 <Frame image={image} loading={i === 0 ? 'eager' : 'lazy'} />
               </li>
             ))}
@@ -57,11 +58,11 @@ const schema = [
     aboutPage.showTeamSection && (
       <section class="team" aria-labelledby="join-title" id="join-our-team">
         {teamImage && (
-          <div class="team__photo">
+          <div class="team__photo reveal reveal--left">
             <Picture image={teamImage} sizes="(min-width: 900px) 50vw, 100vw" widths={[480, 768, 1024, 1400]} class="team__img" />
           </div>
         )}
-        <div class="team__form">
+        <div class="team__form reveal reveal--right">
           <h2 id="join-title" class="team__title ui">{joinPage.title}</h2>
           {joinPage.text && <p class="team__text italic">{joinPage.text}</p>}
           <CareersForm email={settings.email} positions={joinPage.positions} experienceLevels={joinPage.experienceLevels} ariaLabelledby="join-title" />
@@ -73,7 +74,7 @@ const schema = [
   {
     aboutPage.showContactSection && (
       <Section background="concrete" padded="y" id="contact" ariaLabelledby="contact-title">
-        <div class="container contact">
+        <div class="container contact reveal">
           <h2 id="contact-title" class="contact__title ui">
             {contactPage.title}
           </h2>

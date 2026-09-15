@@ -35,7 +35,6 @@ function normaliseMenu(raw: { currency: string; categories: RawCategory[]; items
 
 export function loadSeed(): SiteContent {
   const homepage = home as unknown as Homepage;
-  const galleryPage = pages.galleryPage as unknown as SiteContent['galleryPage'];
   return {
     settings: site as SiteSettings,
     seoDefaults: seo as SEODefaults,
@@ -43,9 +42,7 @@ export function loadSeed(): SiteContent {
     menuPage: pages.menuPage as SiteContent['menuPage'],
     aboutPage: pages.aboutPage as unknown as SiteContent['aboutPage'],
     contactPage: pages.contactPage as SiteContent['contactPage'],
-    joinPage: pages.joinPage as SiteContent['joinPage'],
-    galleryPage,
     menu: normaliseMenu(menu as never),
-    ...deriveFromPages(homepage, galleryPage),
+    ...deriveFromPages(homepage),
   };
 }

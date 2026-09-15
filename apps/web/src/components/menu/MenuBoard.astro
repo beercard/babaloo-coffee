@@ -69,6 +69,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
 <div class="board" data-board>
   <div class="board__visual" data-board-visual data-tone="0" aria-live="polite">
     <div class="board__visual-inner">
+      <div class="steam board__steam" aria-hidden="true"><span></span><span></span><span></span></div>
       {
         [...visuals.entries()].map(([id, v], i) => (
           <figure class:list={['board__figure', id === firstVisual && 'is-active']} data-board-image={id} hidden={id === firstVisual ? undefined : true}>
@@ -124,7 +125,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
           )}
 
           {top.children.map((sub, si) => (
-            <details class="board__sub" data-board-sub data-visual={visuals.has(sub.category.id) ? sub.category.id : undefined} id={`${top.category.slug}-${sub.category.slug}`}>
+            <details class="board__sub" data-board-sub data-kind={subKind(sub.category.slug)} data-visual={visuals.has(sub.category.id) ? sub.category.id : undefined} id={`${top.category.slug}-${sub.category.slug}`}>
               <summary class:list={['board__row', 'board__row--sub', `board__row--${subKind(sub.category.slug)}`]}>
                 <h3 class="board__sub-name">
                   <span class="board__sub-icon" aria-hidden="true" set:html={SUB_ICONS[subKind(sub.category.slug)]} />
@@ -175,7 +176,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
 
 <script>
   import { initMenuBoard } from '@/scripts/menu-board';
-  initMenuBoard();
+  document.addEventListener('astro:page-load', initMenuBoard);
 </script>
 
 <style define:vars={{ texture: `url(${texture.src})` }}>
@@ -240,6 +241,17 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   .board__figure.is-active {
     opacity: 1;
     transform: none;
+  }
+  .board__steam {
+    top: 14%;
+    opacity: 0;
+    transition: opacity 600ms;
+  }
+  .board__visual[data-hot='true'] .board__steam {
+    opacity: 1;
+  }
+  .board__figure.is-active :global(.board__img) {
+    animation: float-y 6s ease-in-out infinite;
   }
   .board__figure[hidden] {
     display: none;
@@ -328,6 +340,13 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   .board__sub-icon :global(svg) {
     width: 62%;
     height: 62%;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .board__row--hot:hover .board__sub-icon :global(svg) {
+    animation: wiggle 700ms var(--ease-out);
+  }
+  .board__row--iced:hover .board__sub-icon :global(svg) {
+    transform: rotate(60deg);
   }
   .board__sub-count {
     font-family: var(--font-body);
@@ -451,10 +470,25 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     line-height: 1.2;
     transition: color var(--dur);
   }
+  .board__item-btn {
+    transition:
+      color var(--dur),
+      transform var(--dur) var(--ease-out);
+  }
   .board__item-btn:hover,
   .board__item-btn[aria-pressed='true'] {
     color: var(--bark);
   }
+  .board__item-btn:hover {
+    transform: translateX(4px);
+  }
+  .board__cat {
+    animation: fade-up-in 700ms var(--ease-out) both;
+  }
+  .board__cat:nth-of-type(2) { animation-delay: 90ms; }
+  .board__cat:nth-of-type(3) { animation-delay: 180ms; }
+  .board__cat:nth-of-type(4) { animation-delay: 270ms; }
+  .board__cat:nth-of-type(5) { animation-delay: 360ms; }
   .board__item-btn[aria-pressed='true'] .board__item-name {
     text-decoration: underline;
     text-decoration-thickness: 0.06em;

@@ -103,9 +103,7 @@ export interface Config {
     homepage: Homepage;
     'menu-page': MenuPage;
     'about-page': AboutPage;
-    'gallery-page': GalleryPage;
     'contact-page': ContactPage;
-    'join-page': JoinPage;
     'site-settings': SiteSetting;
     'seo-defaults': SeoDefault;
   };
@@ -113,9 +111,7 @@ export interface Config {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     'menu-page': MenuPageSelect<false> | MenuPageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
-    'gallery-page': GalleryPageSelect<false> | GalleryPageSelect<true>;
     'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
-    'join-page': JoinPageSelect<false> | JoinPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'seo-defaults': SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
   };
@@ -763,12 +759,14 @@ export interface Homepage {
         | {
             enabled?: boolean | null;
             title?: string | null;
+            images?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
             limit?: number | null;
-            cta?: {
-              label?: string | null;
-              href?: string | null;
-              external?: boolean | null;
-            };
             /**
              * Lets links jump to this section, e.g. "locations" → /#locations.
              */
@@ -906,10 +904,22 @@ export interface AboutPage {
   text: string;
   showTeamSection?: boolean | null;
   teamImage?: (number | null) | Media;
-  /**
-   * The form texts, positions and experience options are edited in the "Join our team page".
-   */
-  note?: string | null;
+  join?: {
+    title?: string | null;
+    text?: string | null;
+    positions?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    experienceLevels?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   showContactSection?: boolean | null;
   /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
@@ -931,43 +941,7 @@ export interface AboutPage {
   createdAt?: string | null;
 }
 /**
- * The photos of /gallery (the home page preview uses the first ones). Drag to reorder.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery-page".
- */
-export interface GalleryPage {
-  id: number;
-  title?: string | null;
-  text?: string | null;
-  images?:
-    | {
-        image: number | Media;
-        caption?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Leave a field empty to use the site-wide default (Settings → SEO).
-   */
-  seo?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Only if this page should point to another URL.
-     */
-    canonical?: string | null;
-    ogTitle?: string | null;
-    ogDescription?: string | null;
-    ogImage?: (number | null) | Media;
-    twitterCard?: ('summary_large_image' | 'summary') | null;
-    robots?: ('index, follow' | 'noindex, follow') | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Texts of /contact. Email, phone, address and hours come from the first location (Home page) and Site settings.
+ * Everything on /contact: the form texts on the left and the contact details on the right.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact-page".
@@ -977,47 +951,24 @@ export interface ContactPage {
   title?: string | null;
   text?: string | null;
   /**
-   * Leave a field empty to use the site-wide default (Settings → SEO).
+   * Leave a field empty to hide it.
    */
-  seo?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Only if this page should point to another URL.
-     */
-    canonical?: string | null;
-    ogTitle?: string | null;
-    ogDescription?: string | null;
-    ogImage?: (number | null) | Media;
-    twitterCard?: ('summary_large_image' | 'summary') | null;
-    robots?: ('index, follow' | 'noindex, follow') | null;
+  details?: {
+    email?: string | null;
+    phone?: string | null;
+    locationName?: string | null;
+    address?: string | null;
+    hours?:
+      | {
+          days: string;
+          hours: string;
+          id?: string | null;
+        }[]
+      | null;
+    mapUrl?: string | null;
+    mapLabel?: string | null;
+    showSocial?: boolean | null;
   };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Used on /join-our-team and in the "Join our team" section of About.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "join-page".
- */
-export interface JoinPage {
-  id: number;
-  title?: string | null;
-  text?: string | null;
-  image?: (number | null) | Media;
-  positions?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  experienceLevels?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
   /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
    */
@@ -1275,14 +1226,14 @@ export interface HomepageSelect<T extends boolean = true> {
           | {
               enabled?: T;
               title?: T;
-              limit?: T;
-              cta?:
+              images?:
                 | T
                 | {
-                    label?: T;
-                    href?: T;
-                    external?: T;
+                    image?: T;
+                    caption?: T;
+                    id?: T;
                   };
+              limit?: T;
               anchor?: T;
               id?: T;
               blockName?: T;
@@ -1398,38 +1349,25 @@ export interface AboutPageSelect<T extends boolean = true> {
   text?: T;
   showTeamSection?: T;
   teamImage?: T;
-  note?: T;
-  showContactSection?: T;
-  seo?:
+  join?:
     | T
     | {
         title?: T;
-        description?: T;
-        canonical?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        ogImage?: T;
-        twitterCard?: T;
-        robots?: T;
+        text?: T;
+        positions?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        experienceLevels?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
       };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery-page_select".
- */
-export interface GalleryPageSelect<T extends boolean = true> {
-  title?: T;
-  text?: T;
-  images?:
-    | T
-    | {
-        image?: T;
-        caption?: T;
-        id?: T;
-      };
+  showContactSection?: T;
   seo?:
     | T
     | {
@@ -1453,41 +1391,23 @@ export interface GalleryPageSelect<T extends boolean = true> {
 export interface ContactPageSelect<T extends boolean = true> {
   title?: T;
   text?: T;
-  seo?:
+  details?:
     | T
     | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        ogImage?: T;
-        twitterCard?: T;
-        robots?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "join-page_select".
- */
-export interface JoinPageSelect<T extends boolean = true> {
-  title?: T;
-  text?: T;
-  image?: T;
-  positions?:
-    | T
-    | {
-        label?: T;
-        id?: T;
-      };
-  experienceLevels?:
-    | T
-    | {
-        label?: T;
-        id?: T;
+        email?: T;
+        phone?: T;
+        locationName?: T;
+        address?: T;
+        hours?:
+          | T
+          | {
+              days?: T;
+              hours?: T;
+              id?: T;
+            };
+        mapUrl?: T;
+        mapLabel?: T;
+        showSocial?: T;
       };
   seo?:
     | T

@@ -1,5 +1,5 @@
 ---
-/** Contact — replaces /contact-us/ (301). Form on concrete + practical details. */
+/** Contact — replaces /contact-us/ (301). Form on concrete + editable details column. */
 import Base from '@/layouts/Base.astro';
 import Section from '@/components/ui/Section.astro';
 import ContactForm from '@/components/forms/ContactForm.astro';
@@ -8,7 +8,23 @@ import { breadcrumbSchema } from '@/utils/schema';
 
 const content = await getContent();
 const { contactPage, settings } = content;
-const open = sortedLocations(content.locations).filter((l) => l.status === 'open');
+const first = sortedLocations(content.locations).find((l) => l.status === 'open');
+const d = contactPage.details;
+
+// Editable details, falling back to Site settings / the first open location.
+const email = d.email ?? settings.email;
+const phone = d.phone ?? settings.phone ?? first?.phone;
+const locationName = d.locationName ?? first?.name;
+const addressLines = d.address
+  ? d.address.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
+  : first?.address?.street
+    ? [`${first.address.street}${first.address.suite ? `, ${first.address.suite}` : ''}`, `${first.address.city}, ${first.address.region} ${first.address.postalCode ?? ''}`.trim()]
+    : [];
+const hours = d.hours.length ? d.hours : (first?.hoursDisplay ?? []);
+const mapUrl = d.mapUrl ?? first?.mapUrl ?? settings.mapUrl;
+const mapLabel = d.mapLabel ?? 'map';
+const social = d.showSocial ? settings.social : [];
+
 const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
 const schema = [
   breadcrumbSchema([
@@ -21,37 +37,39 @@ const schema = [
 <Base seo={contactPage.seo} title={contactPage.title} schema={schema} bodyClass="page-contact">
   <Section background="concrete" padded="y" offsetCurtain class="contact-page" ariaLabelledby="contact-title">
     <div class="container contact-page__inner">
-      <div class="contact-page__form">
+      <div class="contact-page__form reveal reveal--left">
         <h1 id="contact-title" class="contact-page__title ui">{contactPage.title}</h1>
         {contactPage.text && <p class="contact-page__text italic">{contactPage.text}</p>}
-        <ContactForm email={settings.email} ariaLabelledby="contact-title" />
+        <ContactForm email={email} ariaLabelledby="contact-title" />
       </div>
-      <aside class="contact-page__aside" aria-label="Contact details">
-        {settings.email && (
+      <aside class="contact-page__aside reveal reveal--right" aria-label="Contact details">
+        {email && (
           <p>
-            <a href={`mailto:${settings.email}`}>{settings.email}</a>
+            <a href={`mailto:${email}`}>{email}</a>
           </p>
         )}
-        {settings.phone && (
+        {phone && (
           <p>
-            <a href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`}>{settings.phone}</a>
+            <a href={`tel:${phone.replace(/[^+\d]/g, '')}`}>{phone}</a>
           </p>
         )}
         {
-          open.map((loc) => (
+          (locationName || addressLines.length > 0 || hours.length > 0 || mapUrl) && (
             <div class="contact-page__location">
-              <h2 class="contact-page__loc-name">{loc.name}</h2>
-              {loc.address?.street && (
+              {locationName && <h2 class="contact-page__loc-name">{locationName}</h2>}
+              {addressLines.length > 0 && (
                 <address>
-                  {loc.address.street}
-                  {loc.address.suite ? `, ${loc.address.suite}` : ''}
-                  <br />
-                  {loc.address.city}, {loc.address.region} {loc.address.postalCode ?? ''}
+                  {addressLines.map((line, i) => (
+                    <Fragment>
+                      {line}
+                      {i < addressLines.length - 1 && <br />}
+                    </Fragment>
+                  ))}
                 </address>
               )}
-              {loc.hoursDisplay.length > 0 && (
+              {hours.length > 0 && (
                 <dl class="contact-page__hours">
-                  {loc.hoursDisplay.map((h) => (
+                  {hours.map((h) => (
                     <div>
                       <dt>{h.days}</dt>
                       <dd>{h.hours}</dd>
@@ -59,18 +77,18 @@ const schema = [
                   ))}
                 </dl>
               )}
-              {loc.mapUrl && (
-                <a href={loc.mapUrl} target="_blank" rel="noopener">
-                  map
+              {mapUrl && (
+                <a href={mapUrl} target="_blank" rel="noopener">
+                  {mapLabel}
                 </a>
               )}
             </div>
-          ))
+          )
         }
         {
-          settings.social.length > 0 && (
+          social.length > 0 && (
             <ul role="list" class="contact-page__social">
-              {settings.social.map((s) => (
+              {social.map((s) => (
                 <li>
                   <a href={s.url} target="_blank" rel="noopener">
                     {s.label}

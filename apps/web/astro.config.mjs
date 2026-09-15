@@ -40,6 +40,8 @@ export default defineConfig({
     '/food': '/menu#food-and-sweets',
     '/hours': '/#locations',
     '/contact-us': '/contact',
+    '/gallery': '/',
+    '/join-our-team': '/about#join-our-team',
   },
   prefetch: {
     prefetchAll: false,

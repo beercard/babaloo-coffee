@@ -63,12 +63,12 @@ const social = settings.social;
       </button>
       <ul role="list" class="site-nav__list">
         {
-          settings.nav.map((item) => {
+          settings.nav.map((item, i) => {
             const external = item.external ?? isExternal(item.href);
             const base = item.href.split('#')[0] || '/';
             const current = !external && (base === '/' ? currentPath === '/' && !item.href.includes('#') : currentPath === base || currentPath.startsWith(`${base}/`));
             return (
-              <li>
+              <li style={`--i:${i}`}>
                 <a
                   href={item.href}
                   class="site-nav__link"
@@ -114,7 +114,7 @@ const social = settings.social;
 
 <script>
   import { initNav } from '@/scripts/nav';
-  initNav();
+  document.addEventListener('astro:page-load', initNav);
 </script>
 
 <style>
@@ -148,6 +148,7 @@ const social = settings.social;
     width: clamp(7rem, 17vw, 20rem);
     height: auto;
     transition: transform var(--dur) var(--ease-out);
+    animation: fade-up-in 900ms var(--ease-out) both;
   }
   .header__logo-link:hover .header__logo {
     transform: scale(1.02) rotate(-0.6deg);
@@ -188,6 +189,8 @@ const social = settings.social;
     z-index: 3;
     pointer-events: none;
     filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
+    transform-origin: top center;
+    animation: sway 9s ease-in-out infinite;
   }
 
   /* ---------- overlay navigation ---------- */
@@ -240,6 +243,15 @@ const social = settings.social;
     align-items: center;
     gap: clamp(0.75rem, 2.5vh, 1.75rem);
     text-align: center;
+  }
+  .site-nav__list > li {
+    animation: fade-up-in 520ms var(--ease-out) both;
+    animation-delay: calc(80ms + var(--i, 0) * 70ms);
+  }
+  .site-nav__lockup,
+  .site-nav__aside {
+    animation: fade-up-in 700ms var(--ease-out) both;
+    animation-delay: 420ms;
   }
   .site-nav__link {
     font-family: var(--font-ui);

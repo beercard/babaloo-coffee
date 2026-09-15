@@ -1,8 +1,12 @@
 /** Full-screen navigation overlay: toggle, Escape to close, focus handling. */
+let escBound = false;
+
 export function initNav(): void {
   const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
   const nav = document.querySelector<HTMLElement>('[data-nav]');
-  if (!toggle || !nav) return;
+  if (!toggle || !nav || toggle.dataset.bound) return;
+  toggle.dataset.bound = 'true';
+  document.body.classList.remove('nav-open');
   const close = nav.querySelector<HTMLButtonElement>('[data-nav-close]');
 
   const open = () => {
@@ -26,7 +30,11 @@ export function initNav(): void {
     const link = (e.target as HTMLElement).closest('a');
     if (link) shut(false);
   });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !nav.hidden) shut();
-  });
+  if (!escBound) {
+    escBound = true;
+    document.addEventListener('keydown', (e) => {
+      const openNav = document.querySelector<HTMLElement>('[data-nav]:not([hidden])');
+      if (e.key === 'Escape' && openNav) document.querySelector<HTMLButtonElement>('[data-nav-toggle]')?.click();
+    });
+  }
 }

@@ -13,10 +13,8 @@ Cada **página** de la web es una entrada del panel y dentro están **sus seccio
 PÁGINAS
  ├── Página de inicio      → Fotos del hero · Franja de iconos · Fila de enlaces · Texto de bienvenida · Locales y horarios · (secciones opcionales)
  ├── Página Menú           → texto de arriba del menú
- ├── Página About          → 1 Título y fotos enmarcadas · 2 Texto · 3 Únete al equipo · 4 Contacto
- ├── Página Galería        → todas las fotos de la galería, en orden
- ├── Página Contacto       → título y texto
- └── Página Únete al equipo→ texto, foto, puestos y niveles de experiencia
+ ├── Página About          → 1 Título y fotos enmarcadas · 2 Texto · 3 Únete al equipo (foto + formulario) · 4 Contacto
+ └── Página Contacto       → título y texto
 MENÚ
  ├── Productos             → cada bebida o plato: nombre, descripción, precio, foto, etiquetas
  └── Categorías            → Coffee, Matcha & non-coffee, Bites… y sus secciones Hot / Iced
@@ -28,7 +26,7 @@ AJUSTES (solo super admin)
  ├── Ajustes del sitio · SEO por defecto · Usuarios
 ```
 
-Las cajas **SEO** de cada página y todo el grupo *Ajustes* solo las ve el super admin.
+Las cajas **SEO** de cada página y todo el grupo *Ajustes* solo las ve el super admin. Las URLs antiguas `/gallery` y `/join-our-team` redirigen a la portada y a About.
 
 ---
 
@@ -73,8 +71,8 @@ Cada salto de línea se respeta tal cual.
 ### Fotos enmarcadas de About
 **Página About** → pestaña **1 · Título y fotos enmarcadas** → tres fotos (carpeta *Home · Locations* o *About · Team*).
 
-### Galería
-**Página Galería** → **Fotos**: añade (carpeta *Gallery*), quita o arrastra para reordenar. La portada muestra las primeras si la sección "Vista previa de la galería" está activa.
+### Galería de fotos (sección opcional de la portada)
+**Página de inicio** → sección **Galería de fotos**: marca *Mostrar esta sección*, añade fotos (carpeta *Gallery*), quita o arrastra para reordenar. Si la sección está oculta, la web no muestra galería.
 
 ### Leer los mensajes de los formularios
 **Mensajes**. Cada mensaje tiene un estado (New / Replied / Archived).

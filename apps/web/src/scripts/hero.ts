@@ -7,7 +7,8 @@
  */
 export function initHero(): void {
   const hero = document.querySelector<HTMLElement>('[data-hero]');
-  if (!hero) return;
+  if (!hero || hero.dataset.bound) return;
+  hero.dataset.bound = 'true';
   const slides = Array.from(hero.querySelectorAll<HTMLElement>('[data-slide]'));
   if (slides.length < 2) return;
 
@@ -89,6 +90,8 @@ export function initHero(): void {
   );
 
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  // Stop the timer when navigating away (client-side navigation keeps this module alive).
+  document.addEventListener('astro:before-swap', stop, { once: true });
 
   const boot = () => {
     hydrate();

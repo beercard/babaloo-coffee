@@ -27,6 +27,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import Analytics from '@/components/seo/Analytics.astro';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   seo: SEOMeta;
@@ -75,6 +76,7 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
     <meta name="generator" content={Astro.generator} />
     <JsonLd data={ld} />
     <Analytics />
+    <ClientRouter fallback="none" />
   </head>
   <body class={bodyClass}>
     <a href="#main" class="skip-link">Skip to content</a>
@@ -92,7 +94,7 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
     <Footer settings={settings} />
     <script>
       import { initReveal } from '@/scripts/reveal';
-      initReveal();
+      document.addEventListener('astro:page-load', initReveal);
     </script>
   </body>
 </html>

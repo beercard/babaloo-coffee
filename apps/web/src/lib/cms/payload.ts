@@ -10,11 +10,10 @@ import { deriveFromPages } from './derive';
 import type {
   AboutPage,
   ContactPage,
-  GalleryPage,
+  GalleryImage,
   HomeSection,
   Homepage,
   ImageRef,
-  JoinPage,
   Link,
   Location,
   MenuData,
@@ -225,7 +224,7 @@ function section(block: Json, index: number): HomeSection | undefined {
         limit: num(block.limit) ?? 4,
       };
     case 'gallery':
-      return { ...base, type: 'gallery', title: str(block.title), limit: num(block.limit) ?? 6, cta: link(block.cta) };
+      return { ...base, type: 'gallery', title: str(block.title), images: galleryImages(block.images), limit: num(block.limit) ?? 12, cta: link(block.cta) };
     case 'testimonials':
       return {
         ...base,
@@ -336,7 +335,7 @@ function menu(categories: Json[], items: Json[]): MenuData {
   };
 }
 
-function galleryImages(v: unknown): GalleryPage['images'] {
+function galleryImages(v: unknown): GalleryImage[] {
   return Array.isArray(v)
     ? (v as Json[])
         .map((g, i) => {
@@ -368,8 +367,6 @@ export async function loadPayload(): Promise<SiteContent> {
     menuDoc,
     aboutDoc,
     contactDoc,
-    joinDoc,
-    galleryDoc,
     categories,
     items,
   ] = await Promise.all([
@@ -379,8 +376,6 @@ export async function loadPayload(): Promise<SiteContent> {
     get('globals/menu-page?depth=2'),
     get('globals/about-page?depth=2'),
     get('globals/contact-page?depth=2'),
-    get('globals/join-page?depth=2'),
-    get('globals/gallery-page?depth=2'),
     getAll('menu-categories', 'where[active][equals]=true'),
     getAll('menu-items', 'where[available][equals]=true'),
   ]);
@@ -401,25 +396,30 @@ export async function loadPayload(): Promise<SiteContent> {
     text: str(aboutDoc.text) ?? '',
     showTeamSection: bool(aboutDoc.showTeamSection, true),
     teamImage: image(aboutDoc.teamImage),
+    join: {
+      title: str((aboutDoc.join as Json | undefined)?.title) ?? 'Join our team',
+      text: str((aboutDoc.join as Json | undefined)?.text),
+      positions: Array.isArray((aboutDoc.join as Json | undefined)?.positions) ? ((aboutDoc.join as Json).positions as Json[]).map((p) => str(p.label) ?? '').filter(Boolean) : [],
+      experienceLevels: Array.isArray((aboutDoc.join as Json | undefined)?.experienceLevels) ? ((aboutDoc.join as Json).experienceLevels as Json[]).map((p) => str(p.label) ?? '').filter(Boolean) : [],
+    },
     showContactSection: bool(aboutDoc.showContactSection, true),
     seo: seo(aboutDoc.seo),
   };
-  const contactPage: ContactPage = { title: str(contactDoc.title) ?? 'Contact us', text: str(contactDoc.text), seo: seo(contactDoc.seo) };
-  const joinPage: JoinPage = {
-    title: str(joinDoc.title) ?? 'Join our team',
-    text: str(joinDoc.text),
-    positions: Array.isArray(joinDoc.positions) ? (joinDoc.positions as Json[]).map((p) => str(p.label) ?? '').filter(Boolean) : [],
-    experienceLevels: Array.isArray(joinDoc.experienceLevels)
-      ? (joinDoc.experienceLevels as Json[]).map((p) => str(p.label) ?? '').filter(Boolean)
-      : [],
-    image: image(joinDoc.image),
-    seo: seo(joinDoc.seo),
-  };
-  const galleryPage: GalleryPage = {
-    title: str(galleryDoc.title) ?? 'Gallery',
-    text: str(galleryDoc.text),
-    images: galleryImages(galleryDoc.images),
-    seo: seo(galleryDoc.seo),
+  const details = (contactDoc.details ?? {}) as Json;
+  const contactPage: ContactPage = {
+    title: str(contactDoc.title) ?? 'Contact us',
+    text: str(contactDoc.text),
+    details: {
+      email: str(details.email),
+      phone: str(details.phone),
+      locationName: str(details.locationName),
+      address: str(details.address),
+      hours: Array.isArray(details.hours) ? (details.hours as Json[]).map((h) => ({ days: str(h.days) ?? '', hours: str(h.hours) ?? '' })) : [],
+      mapUrl: str(details.mapUrl),
+      mapLabel: str(details.mapLabel) ?? 'map',
+      showSocial: bool(details.showSocial, true),
+    },
+    seo: seo(contactDoc.seo),
   };
   const home = homepage(homeDoc);
 
@@ -430,9 +430,7 @@ export async function loadPayload(): Promise<SiteContent> {
     menuPage,
     aboutPage,
     contactPage,
-    joinPage,
-    galleryPage,
     menu: menu(categories, items),
-    ...deriveFromPages(home, galleryPage),
+    ...deriveFromPages(home),
   };
 }

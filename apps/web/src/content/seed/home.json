@@ -242,11 +242,138 @@
       "id": "gallery",
       "type": "gallery",
       "enabled": false,
-      "limit": 6,
-      "cta": {
-        "label": "Gallery",
-        "href": "/gallery"
-      }
+      "limit": 12,
+      "images": [
+        {
+          "image": {
+            "src": "photos/gallery-01.jpg",
+            "alt": "Matcha in a stoneware cup on a saucer, morning light",
+            "width": 1067,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-02.jpg",
+            "alt": "Latte in a stoneware cup on a sunlit table",
+            "width": 1144,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-03.jpg",
+            "alt": "A guest holding a cappuccino in both hands",
+            "width": 1146,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-04.jpg",
+            "alt": "Barista at the Babaloo counter",
+            "width": 1204,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-05.jpg",
+            "alt": "Cappuccino with latte art in a stoneware cup",
+            "width": 1124,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-06.jpg",
+            "alt": "Pastries on the Babaloo counter",
+            "width": 1067,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-07.jpg",
+            "alt": "Iced drink in a Babaloo cup on a stone table",
+            "width": 1067,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-08.jpg",
+            "alt": "Detail of the Babaloo bar",
+            "width": 1067,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-09.jpg",
+            "alt": "A guest walking past the Babaloo wall in warm light",
+            "width": 1067,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-10.jpg",
+            "alt": "Babaloo pastry box with a handle",
+            "width": 1151,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-11.jpg",
+            "alt": "Whisking ceremonial matcha in a stoneware bowl",
+            "width": 1167,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-12.jpg",
+            "alt": "Babaloo to-go cup on a stone counter",
+            "width": 1101,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-13.jpg",
+            "alt": "Matcha poured over strawberry puree",
+            "width": 1098,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-14.jpg",
+            "alt": "Hands whisking matcha",
+            "width": 1114,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-15.jpg",
+            "alt": "A guest sipping a Babaloo drink",
+            "width": 1067,
+            "height": 1600
+          }
+        },
+        {
+          "image": {
+            "src": "photos/gallery-16.jpg",
+            "alt": "Detail of the Babaloo counter",
+            "width": 1200,
+            "height": 1600
+          }
+        }
+      ],
+      "title": "gallery"
     },
     {
       "id": "testimonials",

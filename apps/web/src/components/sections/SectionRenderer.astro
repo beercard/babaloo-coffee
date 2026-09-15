@@ -4,7 +4,7 @@
  * Adding a new block type = one entry here + one block in apps/cms.
  */
 import type { HomeSection, SiteContent } from '@/lib/cms/types';
-import { featuredItems, findGallery } from '@/lib/cms';
+import { featuredItems } from '@/lib/cms';
 import Hero from './Hero.astro';
 import IconStrip from './IconStrip.astro';
 import NavRow from './NavRow.astro';
@@ -44,10 +44,8 @@ const enabled = sections.filter((s) => s.enabled);
         return (
           <FeaturedMenu items={featuredItems(content.menu.items, section.limit)} title={section.title} text={section.text} cta={section.cta} currency={content.menu.currency} id={section.anchor ?? 'featured'} />
         );
-      case 'gallery': {
-        const gallery = findGallery(content.galleries, 'main');
-        return gallery ? <GalleryGrid gallery={gallery} title={section.title} limit={section.limit} cta={section.cta} id={section.anchor ?? 'gallery'} /> : null;
-      }
+      case 'gallery':
+        return section.images.length ? <GalleryGrid gallery={{ id: section.id, name: section.title ?? 'Gallery', slug: section.id, images: section.images }} title={section.title} limit={section.limit} cta={section.cta} id={section.anchor ?? 'gallery'} /> : null;
       case 'testimonials':
         return <Testimonials items={section.items} title={section.title} id={section.anchor ?? 'testimonials'} />;
       case 'cta':

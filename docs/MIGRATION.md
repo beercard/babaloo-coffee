@@ -23,8 +23,8 @@ Textos, logo, iconos, marcos y estructura visual provienen del **PDF**, no del W
 | `/drinks/` | `/menu` | 301 |
 | `/food/` | `/menu#food-and-sweets` | 301 |
 | `/hours/` | `/#locations` | 301 (sección de locales en la portada, como pide el diseño) |
-| `/gallery/` | `/gallery` | 301 (sólo se quita la barra final) |
-| `/join-our-team/` | `/join-our-team` | 301 (barra final) |
+| `/gallery/` | `/` | 301 (la galería es una sección opcional de la portada) |
+| `/join-our-team/` | `/about#join-our-team` | 301 (el formulario vive en About) |
 | `/contact-us/` | `/contact` | 301 |
 | — | `/about` | nueva (pantalla 3 del PDF) |
 
