@@ -53,15 +53,15 @@
   --radius-pill: 999px;
   --radius-field: 0.625rem;
   /* Scalloped form-field outline from the PDF (border-image tile; source: src/assets/brand/field-frame.svg) */
-  --field-frame: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cpath d='M8,8 A4,4 0 0 1 16,8 A4,4 0 0 1 24,8 A4,4 0 0 1 32,8 A4,4 0 0 1 40,8 A4,4 0 0 1 48,8 A4,4 0 0 1 56,8 A4,4 0 0 1 64,8 A4,4 0 0 1 64,16 A4,4 0 0 1 64,24 A4,4 0 0 1 64,32 A4,4 0 0 1 64,40 A4,4 0 0 1 64,48 A4,4 0 0 1 64,56 A4,4 0 0 1 64,64 A4,4 0 0 1 56,64 A4,4 0 0 1 48,64 A4,4 0 0 1 40,64 A4,4 0 0 1 32,64 A4,4 0 0 1 24,64 A4,4 0 0 1 16,64 A4,4 0 0 1 8,64 A4,4 0 0 1 8,56 A4,4 0 0 1 8,48 A4,4 0 0 1 8,40 A4,4 0 0 1 8,32 A4,4 0 0 1 8,24 A4,4 0 0 1 8,16 A4,4 0 0 1 8,8 Z' fill='none' stroke='%233c1a1e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --field-frame: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M15,10 A5,5 0 0 1 25,10 A5,5 0 0 1 35,10 A5,5 0 0 1 45,10 L75,10 A5,5 0 0 1 85,10 A5,5 0 0 1 95,10 A5,5 0 0 1 105,10 A5,5 0 0 1 110,15 A5,5 0 0 1 110,25 A5,5 0 0 1 110,35 A5,5 0 0 1 110,45 L110,75 A5,5 0 0 1 110,85 A5,5 0 0 1 110,95 A5,5 0 0 1 110,105 A5,5 0 0 1 105,110 A5,5 0 0 1 95,110 A5,5 0 0 1 85,110 A5,5 0 0 1 75,110 L45,110 A5,5 0 0 1 35,110 A5,5 0 0 1 25,110 A5,5 0 0 1 15,110 A5,5 0 0 1 10,105 A5,5 0 0 1 10,95 A5,5 0 0 1 10,85 A5,5 0 0 1 10,75 L10,45 A5,5 0 0 1 10,35 A5,5 0 0 1 10,25 A5,5 0 0 1 10,15 A5,5 0 0 1 15,10 Z' fill='none' stroke='%233c1a1e' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E");
   --shadow-frame: 0 18px 40px -18px rgba(60, 26, 30, 0.45);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --dur: 400ms;
   --dur-slow: 1200ms;
 
   /* Header proportions (PDF: 300px header on 1920, reduced ~30% for screens) */
-  --header-h: clamp(4.5rem, 9.5vw, 11.5rem);
-  --curtain-h: clamp(1.5rem, 4.4vw, 5.5rem); /* half the curtain image height, scales with the viewport */
+  --header-h: clamp(3.75rem, 6.4vw, 7.25rem); /* sticky: kept low so it never crowds the page */
+  --curtain-h: clamp(1.25rem, 3.6vw, 4.25rem); /* half the curtain image height, scales with the viewport */
   --strip-h: clamp(3.5rem, 6.5vw, 7.5rem);
 
   color-scheme: light;

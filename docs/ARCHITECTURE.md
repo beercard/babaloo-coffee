@@ -23,7 +23,7 @@ Documento de diseño técnico. Se escribió **antes** de generar código, a part
 | `--color-concrete` | textura `concrete.jpg` (media `#a39c91`) | Footer, contacto, panel menú |
 | `--color-sage` | `#d0cebf` | Panel alterno de foto en menú |
 | Display / logo | Logo vectorial (SVG extraído del PDF) | Header, footer |
-| Script | *Jimmy Script Light* (comercial) → reemplazo libre **Mrs Saint Delafield** | Nombres de locales, intro del menú, labels de formularios |
+| Script | **Jimmy Script** (licencia del cliente, `public/fonts/jimmy-script.woff2`; respaldo Mrs Saint Delafield) | Nombres de locales, intro del menú, labels y botones de formularios |
 | Cuerpo | **Lato** Italic 46px / Bold Italic 60px / Regular | Textos, títulos de menú |
 | UI | **Poppins** Italic 46px (nav), Bold 46px (títulos de formulario, botones), Light Italic 46px (descripciones) | Nav, formularios, descripciones |
 

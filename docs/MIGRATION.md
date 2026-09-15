@@ -40,4 +40,4 @@ Marcados porque no existían en el WordPress o parecen erróneos:
 
 ## Fuentes tipográficas
 
-El PDF usa **Jimmy Script Light** (comercial). Se sustituyó por **Mrs Saint Delafield** (Google Fonts, licencia OFL), de trazo fino similar. Si el cliente posee licencia web de Jimmy Script, basta con copiar el archivo como `apps/web/public/fonts/jimmy-script.woff2` (también vale `.woff`, `.otf` o `.ttf`): el layout lo detecta en el build, añade el `@font-face` y el preload, y `--font-script` ya la lista como primera opción. Sin el archivo se usa Mrs Saint Delafield.
+El PDF usa **Jimmy Script** (comercial). El cliente aportó la licencia: el archivo fuente está en `apps/web/src/assets/fonts/JimmyScript-Rg.otf` y se sirve convertido a WOFF2 desde `apps/web/public/fonts/jimmy-script.woff2` (el layout detecta cualquier `jimmy-script*.woff2|woff|otf|ttf` en esa carpeta y añade el `@font-face` y el preload). Si se quita el archivo, el sitio vuelve automáticamente a **Mrs Saint Delafield** (Google Fonts, OFL), que sigue como respaldo en `--font-script`.

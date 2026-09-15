@@ -67,10 +67,10 @@ const common = {
 </div>
 
 <style>
-  /* PDF: cream box with a scalloped (ticket-edge) outline, label hand-written inside. */
+  /* PDF: outline with rounded, scalloped corners and straight sides; label hand-written inside. */
   .field {
     position: relative;
-    --frame-w: 16px; /* border-image area; the scalloped line sits ~6px inside it */
+    --frame-w: 16px; /* border box; the frame image is drawn 30px wide (tile slice 50 × 0.6) so bumps stay ~3px */
   }
   .field__control {
     width: 100%;
@@ -80,7 +80,7 @@ const common = {
     background: transparent;
     background-clip: padding-box;
     border: var(--frame-w) solid transparent;
-    border-image: var(--field-frame) 20 / var(--frame-w) round;
+    border-image: var(--field-frame) 50 / 30px round;
     border-radius: 1rem;
     font-family: var(--font-ui);
     font-size: var(--text-body-sm);

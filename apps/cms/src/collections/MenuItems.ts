@@ -79,7 +79,10 @@ export const MenuItems: CollectionConfig = {
         { label: 'Vegan', value: 'Vegan' },
         { label: 'Gluten free', value: 'Gluten free' },
         { label: 'Signature', value: 'Signature' },
-        { label: 'All locations', value: 'All locations' },
+        // Where the item is available (one badge per location)
+        { label: 'Rea Farms', value: 'Rea Farms' },
+        { label: 'South End', value: 'South End' },
+        { label: 'Lake Norman', value: 'Lake Norman' },
       ],
       admin: { position: 'sidebar' },
     },

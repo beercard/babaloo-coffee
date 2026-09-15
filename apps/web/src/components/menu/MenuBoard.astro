@@ -255,11 +255,15 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     padding: clamp(1rem, 2vw, 2rem) var(--gutter) clamp(3rem, 6vw, 6rem) clamp(1rem, 1.5vw, 1.75rem);
   }
   @media (min-width: 900px) {
-    /* Closed, the four categories sit vertically centred next to the photo; open, the list grows. */
+    /* Closed, the four categories sit vertically centred next to the photo; once one is open the
+       list starts at the top so growing content never shifts the headings. */
     .board__list {
       min-height: var(--panel-h);
       display: flex;
       flex-direction: column;
+      justify-content: flex-start;
+    }
+    .board__list:not(:has(details[open])) {
       justify-content: center;
     }
   }

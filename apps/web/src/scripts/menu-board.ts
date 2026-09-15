@@ -43,6 +43,24 @@ export function initMenuBoard(): void {
 
   buttons.forEach((btn) => btn.addEventListener('click', () => select(btn)));
 
+  // Accordion: opening a category closes the others. Closing a taller one above shifts the page
+  // up, so compensate the scroll and keep the clicked heading exactly where the visitor saw it.
+  cats.forEach((cat) => {
+    const summary = cat.querySelector<HTMLElement>(':scope > summary');
+    summary?.addEventListener('click', () => {
+      if (cat.open) return;
+      const top = summary.getBoundingClientRect().top;
+      cats.forEach((other) => other !== cat && other.open && (other.open = false));
+      // Measure again once this category has opened (the list may re-align), then correct the scroll.
+      const fix = () => {
+        const delta = summary.getBoundingClientRect().top - top;
+        if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior });
+      };
+      fix();
+      window.setTimeout(fix, 0);
+    });
+  });
+
   // Smooth open / close: animate the panel height with the Web Animations API
   // (details has no native transition). Closing waits for the animation.
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -75,7 +93,7 @@ export function initMenuBoard(): void {
   cats.forEach((cat) => {
     cat.addEventListener('toggle', () => {
       if (!cat.open) return;
-      // Accordion: close siblings.
+      // Accordion (deep links, keyboard): close siblings.
       cats.forEach((other) => other !== cat && other.open && (other.open = false));
       if (panel) panel.dataset.tone = cat.dataset.tone ?? '0';
       const pressed = cat.querySelector<HTMLButtonElement>('[data-board-item][aria-pressed="true"]');

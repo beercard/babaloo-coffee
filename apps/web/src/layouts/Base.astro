@@ -33,15 +33,16 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Optional licensed script font: drop `jimmy-script.woff2` (or .woff/.otf/.ttf) into
- * apps/web/public/fonts and it is served with @font-face + preload; otherwise the
- * free look-alike (Mrs Saint Delafield) is used.
+ * Licensed script font: any `jimmy-script*.woff2|woff|otf|ttf` in apps/web/public/fonts is
+ * served with @font-face + preload (woff2 preferred); without it the free look-alike
+ * (Mrs Saint Delafield) is used. Source OTF: src/assets/fonts.
  */
 const FONT_FORMATS: Record<string, string> = { woff2: 'woff2', woff: 'woff', otf: 'opentype', ttf: 'truetype' };
-const jimmyFile = Object.keys(FONT_FORMATS)
-  .map((ext) => `jimmy-script.${ext}`)
-  .find((f) => fs.existsSync(fileURLToPath(new URL(`../../public/fonts/${f}`, import.meta.url))));
-const jimmyFormat = jimmyFile ? FONT_FORMATS[jimmyFile.split('.').pop() as string] : undefined;
+const fontsDir = fileURLToPath(new URL('../../public/fonts/', import.meta.url));
+const jimmyFile = (fs.existsSync(fontsDir) ? fs.readdirSync(fontsDir) : [])
+  .filter((f) => /^jimmy[-_ ]?script.*\.(woff2|woff|otf|ttf)$/i.test(f))
+  .sort((a, b) => Object.keys(FONT_FORMATS).indexOf(a.split('.').pop()!.toLowerCase()) - Object.keys(FONT_FORMATS).indexOf(b.split('.').pop()!.toLowerCase()))[0];
+const jimmyFormat = jimmyFile ? FONT_FORMATS[jimmyFile.split('.').pop()!.toLowerCase()] : undefined;
 
 interface Props {
   seo: SEOMeta;

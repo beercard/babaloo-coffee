@@ -48,7 +48,7 @@ Las cajas **SEO** de cada página y todo el grupo *Ajustes* solo las ve el super
 ### Añadir un producto nuevo
 **Menú → Productos → Crear**. Rellena nombre, categoría/sección (por ejemplo *Coffee → Iced*), precio, foto y guarda.
 - **Orden**: número para ordenar dentro de su sección (1 sale primero).
-- **Etiquetas**: *New*, *Popular*, *Seasonal*, *Signature*, *All locations*… se ven junto al nombre.
+- **Etiquetas**: *New*, *Popular*, *Seasonal*, *Signature*… se ven junto al nombre. Las etiquetas de local (*Rea Farms*, *South End*, *Lake Norman*) indican en qué locales está disponible; podés marcar varias.
 - **Destacado**: lo muestra en la portada si esa sección está activa.
 - Desmarca **Disponible** para ocultarlo temporalmente sin borrarlo.
 
