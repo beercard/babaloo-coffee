@@ -273,6 +273,44 @@ select,
   color: var(--theme-elevation-600);
 }
 
+/* ---------- top-bar actions (account + log out next to the avatar) ---------- */
+.bb-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.5rem;
+}
+.bb-header-actions__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--theme-elevation-150);
+  background: #fffdfa;
+  color: var(--bb-ink);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.bb-header-actions__link:hover {
+  border-color: var(--bb-bark);
+}
+.bb-header-actions__link--logout {
+  background: var(--bb-bark);
+  border-color: var(--bb-bark);
+  color: var(--bb-cream);
+}
+.bb-header-actions__link--logout:hover {
+  background: var(--bb-ink);
+}
+@media (max-width: 640px) {
+  .bb-header-actions__link:not(.bb-header-actions__link--logout) {
+    display: none;
+  }
+}
+
 /* ---------- login ---------- */
 .login .template-minimal__wrap {
   background: #fffdfa;

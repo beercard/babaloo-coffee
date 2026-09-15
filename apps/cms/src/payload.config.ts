@@ -40,6 +40,7 @@ export default buildConfig({
         dashboard: { Component: '/components/Dashboard#Dashboard' },
       },
       afterNavLinks: ['/components/NavFooter#NavFooter'],
+      actions: ['/components/HeaderActions#HeaderActions'],
     },
     // Sidebar order: groups are listed in the order collections/globals appear.
   },
