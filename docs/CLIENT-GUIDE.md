@@ -59,7 +59,7 @@ SETTINGS
 Para un local nuevo: *Create new*, sube la foto que irá dentro del marco, escribe el nombre manuscrito (por ejemplo `rea farms`) y elige **Coming soon** hasta que abra.
 
 ### Cambiar la foto grande de la portada (hero)
-**Home → Home page** → sección **Hero photos** → cambia o añade fotos. Se van alternando solas cada 5 segundos.
+**Home → Home page** → sección **Hero photos** → cambia, añade o arrastra fotos para reordenarlas. Se alternan solas cada 5 segundos (ajustable en *Seconds per photo*) y el visitante puede pasar con las flechas, los puntos o deslizando en el móvil.
 
 ### Cambiar el texto de "About"
 **Pages → About page** → **Text**. Cada salto de línea se respeta tal cual. Lo mismo para el texto de bienvenida de la portada en **Home page → Intro text**.
