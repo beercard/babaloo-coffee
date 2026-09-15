@@ -443,30 +443,30 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     display: inline-block;
     vertical-align: middle;
     margin-left: 0.5em;
-    padding: 0.1em 0.55em 0.15em;
+    padding: 0.18em 0.6em 0.2em;
     border-radius: var(--radius-pill);
     background: var(--bark);
     color: var(--cream-bright);
+    /* Same small uppercase pill for every label (Signature, Popular, locations…). */
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-style: normal;
+    font-size: max(0.36em, 0.62rem); /* never below ~10px on phones */
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: translateY(-0.15em);
   }
   /* Location badges: one colour per café so they read at a glance next to Signature / Popular. */
   .board__tag[data-tag='rea-farms'] {
     background: #5d6b3d; /* olive */
-    color: var(--cream-bright);
   }
   .board__tag[data-tag='south-end'] {
     background: #8a4b2f; /* terracotta */
-    color: var(--cream-bright);
   }
   .board__tag[data-tag='lake-norman'] {
     background: #3f6273; /* lake blue */
-    color: var(--cream-bright);
-    font-family: var(--font-ui);
-    font-weight: 700;
-    font-style: normal;
-    font-size: 0.42em;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transform: translateY(-0.15em);
   }
   .board__price {
     font-family: var(--font-body);
