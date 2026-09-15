@@ -8,6 +8,7 @@ import type { SiteSettings } from '@/lib/cms/types';
 import { isExternal } from '@/utils/format';
 import Section from '@/components/ui/Section.astro';
 import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
 import logoFooter from '@/assets/brand/logo-footer.png';
 import SocialIcon from '@/components/ui/SocialIcon.astro';
 
@@ -23,7 +24,9 @@ const address = settings.address;
   <h2 id="footer-heading" class="visually-hidden">{settings.name}</h2>
   <div class="container footer__inner">
     <a href="/" class="footer__lockup" aria-label={`${settings.name} — home`}>
-      <Image src={logoFooter} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720, 944]} sizes="(min-width: 1200px) 45rem, (min-width: 640px) 38vw, 80vw" format="webp" quality={82} class="footer__logo" loading="lazy" />
+      <Icon name="dog-poodle" class="footer__dog" />
+      <Image src={logoFooter} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720, 944]} sizes="(min-width: 1200px) 24rem, (min-width: 640px) 20vw, 44vw" format="webp" quality={82} class="footer__logo" loading="lazy" />
+      <Icon name="dog-basenji" class="footer__dog footer__dog--right" />
     </a>
 
     {
@@ -88,14 +91,28 @@ const address = settings.address;
     gap: clamp(1.75rem, 4vw, 3.5rem);
     text-align: center;
   }
+  /* PDF lockup ≈ 722×305 on 1920: dog · logo · dog */
   .footer__lockup {
-    display: block;
-    /* PDF lockup ≈ 720px on 1920 */
-    width: clamp(15rem, 38vw, 45rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2%;
+    width: clamp(16rem, 40vw, 47rem);
+    color: var(--ink);
+  }
+  .footer__dog {
+    width: 26%;
+    aspect-ratio: 197 / 305;
+    height: auto;
+    flex: none;
+  }
+  .footer__dog--right {
+    aspect-ratio: 188 / 287;
   }
   .footer__logo {
-    width: 100%;
+    width: 44%;
     height: auto;
+    flex: none;
   }
   .footer__nav {
     display: flex;
