@@ -2,12 +2,13 @@ import type { CollectionConfig } from 'payload';
 import { editorContentDeletable } from '../access/roles';
 import { imageField, slugField } from '../fields';
 import { triggerDeploy } from '../hooks/triggerDeploy';
+import { t } from '../fields/i18n';
 
 export const Galleries: CollectionConfig = {
   slug: 'galleries',
-  labels: { singular: 'Gallery', plural: 'Galleries' },
+  labels: { singular: t('Gallery', 'Galería'), plural: t('Galleries', 'Galerías') },
   admin: {
-    group: 'Media',
+    group: t('Media', 'Fotos'),
     useAsTitle: 'name',
     description: 'Photo sets used on the website. "Gallery" is the /gallery page; "About — framed photos" fills the three gold frames on the About page. Drag rows to reorder.',
   },
@@ -19,7 +20,7 @@ export const Galleries: CollectionConfig = {
     {
       name: 'images',
       type: 'array',
-      label: 'Photos',
+      label: t('Photos', 'Fotos'),
       labels: { singular: 'Photo', plural: 'Photos' },
       fields: [
         imageField('image', 'Photo', true),

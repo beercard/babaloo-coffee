@@ -3,15 +3,16 @@
  * apps/web/src/lib/cms/types.ts so the API needs almost no mapping.
  */
 import type { Field, GroupField } from 'payload';
+import { t } from './i18n';
 
 export const orderField = (): Field => ({
   name: 'order',
   type: 'number',
-  label: 'Order',
+  label: t('Order', 'Orden'),
   defaultValue: 0,
   admin: {
     position: 'sidebar',
-    description: 'Lower numbers show first.',
+    description: t('Lower numbers show first.', 'Los números más bajos salen primero.'),
     step: 1,
   },
 });
@@ -41,7 +42,7 @@ export const slugField = (from = 'name'): Field => ({
   },
 });
 
-export const imageField = (name = 'image', label = 'Image', required = false): Field => ({
+export const imageField = (name = 'image', label: string | Record<string, string> = t('Image', 'Imagen'), required = false): Field => ({
   name,
   type: 'upload',
   relationTo: 'media',
@@ -71,7 +72,7 @@ export const seoGroup = (): GroupField => ({
   name: 'seo',
   type: 'group',
   label: 'SEO',
-  admin: { description: 'Leave a field empty to use the site-wide default (Settings → SEO).' },
+  admin: { description: t('Leave a field empty to use the site-wide default (Settings → SEO).', 'Deja un campo vacío para usar el valor por defecto del sitio (Ajustes → SEO).') },
   fields: [
     { name: 'title', type: 'text', label: 'SEO title', maxLength: 70 },
     { name: 'description', type: 'textarea', label: 'Meta description', maxLength: 170 },
@@ -125,7 +126,7 @@ export const addressGroup = (): GroupField => ({
   ],
 });
 
-export const activeField = (name = 'active', label = 'Visible on the website'): Field => ({
+export const activeField = (name = 'active', label: string | Record<string, string> = t('Visible on the website', 'Visible en la web')): Field => ({
   name,
   type: 'checkbox',
   label,

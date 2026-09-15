@@ -4,11 +4,12 @@
  */
 import type { Block, Field } from 'payload';
 import { imageField, linkGroup } from '../fields';
+import { t } from '../fields/i18n';
 
 const enabled: Field = {
   name: 'enabled',
   type: 'checkbox',
-  label: 'Show this section',
+  label: t('Show this section', 'Mostrar esta sección'),
   defaultValue: true,
 };
 const anchor: Field = {
@@ -27,13 +28,13 @@ const background = (options: string[]): Field => ({
 
 export const HeroBlock: Block = {
   slug: 'hero',
-  labels: { singular: 'Hero photos', plural: 'Hero photos' },
+  labels: { singular: t('Hero photos', 'Fotos del hero'), plural: t('Hero photos', 'Fotos del hero') },
   fields: [
     enabled,
     {
       name: 'slides',
       type: 'array',
-      label: 'Photos (they fade from one to the next)',
+      label: t('Photos (they fade from one to the next)', 'Fotos (se alternan con fundido)'),
       minRows: 1,
       fields: [
         imageField('image', 'Photo', true),
@@ -70,11 +71,11 @@ export const NavRowBlock: Block = {
 
 export const IntroBlock: Block = {
   slug: 'intro',
-  labels: { singular: 'Intro text', plural: 'Intro text' },
+  labels: { singular: t('Intro text', 'Texto de bienvenida'), plural: t('Intro text', 'Texto de bienvenida') },
   fields: [
     enabled,
     { name: 'title', type: 'text', label: 'Title (optional)' },
-    { name: 'text', type: 'textarea', label: 'Text', required: true, admin: { description: 'Each line break is kept, as in the design.' } },
+    { name: 'text', type: 'textarea', label: t('Text', 'Texto'), required: true, admin: { description: t('Each line break is kept, as in the design.', 'Cada salto de línea se respeta, como en el diseño.') } },
     linkGroup('cta', 'Button (optional)'),
     anchor,
   ],
@@ -82,7 +83,7 @@ export const IntroBlock: Block = {
 
 export const LocationsBlock: Block = {
   slug: 'locations',
-  labels: { singular: 'Locations (gold frames)', plural: 'Locations' },
+  labels: { singular: t('Locations (gold frames)', 'Locales (marcos dorados)'), plural: t('Locations', 'Locales') },
   fields: [
     enabled,
     { name: 'title', type: 'text', label: 'Title (hidden, for screen readers)', defaultValue: 'Locations' },

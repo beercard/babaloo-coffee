@@ -11,6 +11,7 @@ import Logo from '@/assets/brand/logo-wordmark.svg';
 import MenuIcon from '@/assets/brand/menu-toggle.svg';
 import Icon from '@/components/ui/Icon.astro';
 import wood from '@/assets/textures/wood.jpg';
+import logoWhite from '@/assets/brand/babaloo-logo-white.png';
 import curtain from '@/assets/textures/curtain.png';
 
 interface Props {
@@ -81,8 +82,12 @@ const social = settings.social;
           })
         }
       </ul>
-      <div class="site-nav__aside">
+      <div class="site-nav__lockup">
         <Icon name="dog-poodle" class="site-nav__dog" />
+        <Image src={logoWhite} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720]} sizes="(min-width: 900px) 22rem, 44vw" format="webp" quality={82} class="site-nav__logo" loading="lazy" />
+        <Icon name="dog-basenji" class="site-nav__dog site-nav__dog--right" />
+      </div>
+      <div class="site-nav__aside">
         <div class="site-nav__meta">
           {settings.email && <a href={`mailto:${settings.email}`}>{settings.email}</a>}
           {settings.phone && <a href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`}>{settings.phone}</a>}
@@ -100,7 +105,6 @@ const social = settings.social;
             )
           }
         </div>
-        <Icon name="dog-basenji" class="site-nav__dog site-nav__dog--right" />
       </div>
     </div>
   </nav>
@@ -178,7 +182,9 @@ const social = settings.social;
     right: 0;
     top: 100%;
     width: 100%;
-    height: auto;
+    height: var(--curtain-h);
+    object-fit: cover;
+    object-position: center bottom; /* keeps the ruffled edge, crops the top */
     z-index: 3;
     pointer-events: none;
     filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
@@ -214,8 +220,8 @@ const social = settings.social;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: clamp(2rem, 6vh, 5rem);
-    padding-block: clamp(4rem, 10vh, 7rem);
+    gap: clamp(1.5rem, 4vh, 3rem);
+    padding-block: clamp(4rem, 8vh, 6rem);
   }
   .site-nav__close {
     position: absolute;
@@ -251,6 +257,19 @@ const social = settings.social;
   .site-nav__link[aria-current='page'] {
     border-bottom-color: currentColor;
   }
+  .site-nav__lockup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2%;
+    width: clamp(14rem, 34vw, 36rem);
+    margin-inline: auto;
+  }
+  .site-nav__logo {
+    width: 44%;
+    height: auto;
+    flex: none;
+  }
   .site-nav__aside {
     display: flex;
     align-items: flex-end;
@@ -261,10 +280,11 @@ const social = settings.social;
     font-size: var(--text-small);
   }
   .site-nav__dog {
-    width: clamp(3.5rem, 8vw, 7rem);
+    width: 26%;
     aspect-ratio: 197 / 305;
     height: auto;
-    opacity: 0.9;
+    flex: none;
+    opacity: 0.95;
   }
   .site-nav__dog--right {
     aspect-ratio: 188 / 287;

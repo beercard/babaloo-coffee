@@ -235,6 +235,44 @@ select,
   border-radius: 4px;
 }
 
+/* ---------- sidebar footer (account + log out) ---------- */
+.bb-navfooter {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--theme-elevation-150);
+  display: grid;
+  gap: 0.35rem;
+}
+.bb-navfooter__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--style-radius-s);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--bb-ink);
+  border: 1px solid var(--theme-elevation-150);
+  background: #fffdfa;
+}
+.bb-navfooter__link:hover {
+  border-color: var(--bb-bark);
+}
+.bb-navfooter__link--logout {
+  background: var(--bb-bark);
+  color: var(--bb-cream);
+  border-color: var(--bb-bark);
+}
+.bb-navfooter__link--logout:hover {
+  background: var(--bb-ink);
+}
+.bb-dashboard__lang {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--theme-elevation-600);
+}
+
 /* ---------- login ---------- */
 .login .template-minimal__wrap {
   background: #fffdfa;

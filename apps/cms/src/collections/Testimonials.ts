@@ -2,12 +2,13 @@ import type { CollectionConfig } from 'payload';
 import { editorContentDeletable } from '../access/roles';
 import { activeField, orderField } from '../fields';
 import { triggerDeploy } from '../hooks/triggerDeploy';
+import { t } from '../fields/i18n';
 
 export const Testimonials: CollectionConfig = {
   slug: 'testimonials',
-  labels: { singular: 'Testimonial', plural: 'Testimonials' },
+  labels: { singular: t('Testimonial', 'Testimonio'), plural: t('Testimonials', 'Testimonios') },
   admin: {
-    group: 'Home',
+    group: t('Home', 'Portada'),
     useAsTitle: 'author',
     defaultColumns: ['author', 'quote', 'active', 'order'],
     description: 'Guest quotes. Shown on the home page when the "Testimonials" section is enabled.',

@@ -32,9 +32,8 @@ Textos, logo, iconos, marcos y estructura visual provienen del **PDF**, no del W
 
 Marcados porque no existían en el WordPress o parecen erróneos:
 
-- **Italiano — $5** en el WP (un sándwich con capicola y prosciutto al lado de un Cubano de $14). Probablemente $15. Se migró tal cual.
-- **Latte Tiramisu ($7.50)**, **Matcha Tiramisu ($8)** y **Pavé ($7)** aparecen en el PDF pero no en el WP: los precios son provisionales.
-- **Pan de bono** tenía como descripción "Matcha (ceremonial grade)" en el WP (error de copia); se dejó sin descripción.
+- Menú e importes replicados de la carta online de Toast (septiembre 2026), incluidos los ítems de temporada y la categoría *Merch*. Revisar que siga vigente al lanzar.
+- Teléfono (704) 817-7261 tomado de Toast.
 - Locales 2 y 3 se muestran como *Coming soon* sin nombre (indicación del cliente). Añadir nombre, dirección y horario cuando abran; el campo *Hand-written name* dibuja el nombre sobre la foto como en el PDF.
 - Teléfono: no había en el WP. Añadirlo en *Site settings* para que aparezca en Google.
 - Coordenadas del local (JSON-LD): aproximadas al 1425 Winnifred St; ajustar en *Locations → Coordinates*.

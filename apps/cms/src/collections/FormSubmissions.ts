@@ -1,11 +1,12 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isEditorOrAdmin } from '../access/roles';
+import { t } from '../fields/i18n';
 
 export const FormSubmissions: CollectionConfig = {
   slug: 'form-submissions',
-  labels: { singular: 'Message', plural: 'Inbox' },
+  labels: { singular: t('Message', 'Mensaje'), plural: t('Inbox', 'Mensajes') },
   admin: {
-    group: 'Messages',
+    group: t('Messages', 'Mensajes'),
     useAsTitle: 'summary',
     defaultColumns: ['summary', 'form', 'status', 'createdAt'],
     description: 'Messages sent from the Contact and Join our team forms.',

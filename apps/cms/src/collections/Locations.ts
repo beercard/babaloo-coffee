@@ -2,14 +2,15 @@ import type { CollectionConfig } from 'payload';
 import { editorContent } from '../access/roles';
 import { addressGroup, imageField, orderField, slugField } from '../fields';
 import { triggerDeploy } from '../hooks/triggerDeploy';
+import { t } from '../fields/i18n';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export const Locations: CollectionConfig = {
   slug: 'locations',
-  labels: { singular: 'Location', plural: 'Locations' },
+  labels: { singular: t('Location', 'Local'), plural: t('Locations', 'Locales') },
   admin: {
-    group: 'Home',
+    group: t('Home', 'Portada'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'status', 'order'],
     description: 'The framed photos on the home page. Add a new location here and it appears automatically.',
@@ -20,11 +21,11 @@ export const Locations: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'name', type: 'text', required: true, label: 'Name', admin: { width: '50%' } },
+        { name: 'name', type: 'text', required: true, label: t('Name', 'Nombre'), admin: { width: '50%' } },
         {
           name: 'scriptName',
           type: 'text',
-          label: 'Hand-written name over the photo',
+          label: t('Hand-written name over the photo', 'Nombre manuscrito sobre la foto'),
           admin: { width: '50%', description: 'e.g. "rea farms". Leave empty for none.' },
         },
       ],
@@ -35,13 +36,13 @@ export const Locations: CollectionConfig = {
       required: true,
       defaultValue: 'open',
       options: [
-        { label: 'Open', value: 'open' },
-        { label: 'Coming soon', value: 'coming-soon' },
-        { label: 'Closed (hidden)', value: 'closed' },
+        { label: t('Open', 'Abierto'), value: 'open' },
+        { label: t('Coming soon', 'Próximamente'), value: 'coming-soon' },
+        { label: t('Closed (hidden)', 'Cerrado (oculto)'), value: 'closed' },
       ],
       admin: { position: 'sidebar' },
     },
-    imageField('image', 'Photo inside the frame'),
+    imageField('image', t('Photo inside the frame', 'Foto dentro del marco')),
     addressGroup(),
     {
       type: 'row',
@@ -53,7 +54,7 @@ export const Locations: CollectionConfig = {
     {
       name: 'hoursDisplay',
       type: 'array',
-      label: 'Opening hours (as shown on the site)',
+      label: t('Opening hours (as shown on the site)', 'Horario (tal como se muestra en la web)'),
       labels: { singular: 'Line', plural: 'Lines' },
       fields: [
         {
@@ -68,7 +69,7 @@ export const Locations: CollectionConfig = {
     {
       name: 'hoursSpec',
       type: 'array',
-      label: 'Opening hours for Google (structured data)',
+      label: t('Opening hours for Google (structured data)', 'Horario para Google (datos estructurados)'),
       labels: { singular: 'Rule', plural: 'Rules' },
       admin: { description: 'Same information in a format search engines understand. 24h times, e.g. 07:00 and 16:00.' },
       fields: [
@@ -89,7 +90,7 @@ export const Locations: CollectionConfig = {
         },
       ],
     },
-    { name: 'mapUrl', type: 'text', label: 'Google Maps link' },
+    { name: 'mapUrl', type: 'text', label: t('Google Maps link', 'Enlace de Google Maps') },
     {
       name: 'geo',
       type: 'group',

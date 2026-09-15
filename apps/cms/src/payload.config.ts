@@ -4,6 +4,8 @@ import { buildConfig } from 'payload';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import sharp from 'sharp';
+import { en } from '@payloadcms/translations/languages/en';
+import { es } from '@payloadcms/translations/languages/es';
 
 import { Users } from './collections/Users';
 import { Media } from './collections/Media';
@@ -40,12 +42,17 @@ export default buildConfig({
       views: {
         dashboard: { Component: '/components/Dashboard#Dashboard' },
       },
+      afterNavLinks: ['/components/NavFooter#NavFooter'],
     },
     // Sidebar order: groups are listed in the order collections/globals appear.
   },
   // Order here = order of the groups in the admin sidebar: Home · Menu · Media · Settings (· Pages from globals).
   collections: [Locations, Testimonials, MenuItems, MenuCategories, Media, Galleries, FormSubmissions, Users],
   globals,
+  i18n: {
+    supportedLanguages: { en, es },
+    fallbackLanguage: 'en',
+  },
   endpoints: [formsSubmit, formsSubmitOptions],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

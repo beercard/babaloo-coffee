@@ -37,6 +37,35 @@ export function initMenuBoard(): void {
 
   buttons.forEach((btn) => btn.addEventListener('click', () => select(btn)));
 
+  // Smooth open / close: animate the panel height with the Web Animations API
+  // (details has no native transition). Closing waits for the animation.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DUR = 380;
+  const animating = new WeakSet<HTMLDetailsElement>();
+  board.querySelectorAll<HTMLDetailsElement>('details').forEach((d) => {
+    const summary = d.querySelector<HTMLElement>(':scope > summary');
+    const panel = d.querySelector<HTMLElement>(':scope > [data-board-panel]');
+    if (!summary || !panel || reduced) return;
+    summary.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (animating.has(d)) return;
+      animating.add(d);
+      if (d.open) {
+        const h = panel.offsetHeight;
+        const anim = panel.animate([{ height: `${h}px`, opacity: 1 }, { height: '0px', opacity: 0 }], { duration: DUR, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+        anim.onfinish = () => {
+          d.open = false;
+          animating.delete(d);
+        };
+      } else {
+        d.open = true;
+        const h = panel.offsetHeight;
+        const anim = panel.animate([{ height: '0px', opacity: 0 }, { height: `${h}px`, opacity: 1 }], { duration: DUR, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+        anim.onfinish = () => animating.delete(d);
+      }
+    });
+  });
+
   cats.forEach((cat) => {
     cat.addEventListener('toggle', () => {
       if (!cat.open) return;

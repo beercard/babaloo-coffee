@@ -1,11 +1,12 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isAdminField } from '../access/roles';
+import { t } from '../fields/i18n';
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
-    group: 'Settings',
+    group: t('Settings', 'Ajustes'),
     hidden: ({ user }) => (user as { role?: string } | null)?.role !== 'admin',
     description: 'Super admins manage everything (including users). Editors edit content only.',
   },
@@ -20,8 +21,9 @@ export const Users: CollectionConfig = {
     delete: isAdmin,
     admin: ({ req }) => Boolean(req.user),
   },
+  labels: { singular: t('User', 'Usuario'), plural: t('Users', 'Usuarios') },
   fields: [
-    { name: 'name', type: 'text', label: 'Name' },
+    { name: 'name', type: 'text', label: t('Name', 'Nombre') },
     {
       name: 'role',
       type: 'select',

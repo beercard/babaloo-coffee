@@ -16,6 +16,8 @@ const remotePatterns = cmsUrl
 export default defineConfig({
   site,
   output: 'static',
+  // Optimised images are cached here between builds (Vercel / Actions restore node_modules).
+  cacheDir: './node_modules/.astro',
   trailingSlash: 'never',
   build: {
     format: 'directory',
