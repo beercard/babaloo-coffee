@@ -50,6 +50,9 @@ function subKind(slug: string): SubKind {
   return 'other';
 }
 
+/** Slug for a label, used to colour location badges (rea-farms · south-end · lake-norman). */
+const tagSlug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
 /** Which id should the panel show for a given item (its own image or its category's). */
 function visualFor(itemId: string, image: unknown, categoryId: string, topId: string): string | undefined {
   if (image) return itemId;
@@ -96,7 +99,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
                       <span class="board__item-name">
                         {item.name}
                         {item.tags.map((t) => (
-                          <span class="board__tag">{t}</span>
+                          <span class="board__tag" data-tag={tagSlug(t)}>{t}</span>
                         ))}
                       </span>
                       {price && <span class="board__price">{price}</span>}
@@ -136,7 +139,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
                         <span class="board__item-name">
                           {item.name}
                           {item.tags.map((t) => (
-                            <span class="board__tag">{t}</span>
+                            <span class="board__tag" data-tag={tagSlug(t)}>{t}</span>
                           ))}
                         </span>
                         {price && <span class="board__price">{price}</span>}
@@ -443,6 +446,19 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     padding: 0.1em 0.55em 0.15em;
     border-radius: var(--radius-pill);
     background: var(--bark);
+    color: var(--cream-bright);
+  }
+  /* Location badges: one colour per café so they read at a glance next to Signature / Popular. */
+  .board__tag[data-tag='rea-farms'] {
+    background: #5d6b3d; /* olive */
+    color: var(--cream-bright);
+  }
+  .board__tag[data-tag='south-end'] {
+    background: #8a4b2f; /* terracotta */
+    color: var(--cream-bright);
+  }
+  .board__tag[data-tag='lake-norman'] {
+    background: #3f6273; /* lake blue */
     color: var(--cream-bright);
     font-family: var(--font-ui);
     font-weight: 700;
