@@ -12,7 +12,7 @@ import { t } from '../fields/i18n';
 
 const globalAccess = { read: publicRead, update: isEditorOrAdmin };
 const adminOnlyAccess = { read: publicRead, update: isAdmin };
-const adminOnly = ({ user }: { user?: { role?: string } | null }) => user?.role !== 'admin';
+const adminOnly = ({ user }: { user?: { role?: string | null } | null }) => user?.role !== 'admin';
 const hooks = { afterChange: [triggerDeployGlobal] };
 const PAGES = t('Pages', 'Páginas');
 

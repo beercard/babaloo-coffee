@@ -7,6 +7,7 @@
  *   npm run seed --workspace apps/cms                 # only adds what is missing
  *   SEED_FORCE=1 npm run seed --workspace apps/cms    # re-seeds menu + pages, re-uploads photos
  *   SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD            # first admin user (created if no users exist)
+ *   SEED_EDITOR_EMAIL / SEED_EDITOR_PASSWORD          # client editor account (created or password updated)
  */
 import 'dotenv/config';
 import path from 'path';
@@ -50,6 +51,30 @@ async function main() {
     payload.logger.info(`[seed] admin user created: ${email} — change the password after first login`);
   }
 
+  // ---------- editor user (client account) ----------
+  // SEED_EDITOR_EMAIL / SEED_EDITOR_PASSWORD create the client's editor account, or update its
+  // password if it already exists. SEED_EDITOR_REPLACES=<old email> renames that account instead
+  // (keeps its id, so nothing else changes).
+  if (process.env.SEED_EDITOR_EMAIL && process.env.SEED_EDITOR_PASSWORD) {
+    const email = process.env.SEED_EDITOR_EMAIL.trim().toLowerCase();
+    const password = process.env.SEED_EDITOR_PASSWORD;
+    const name = process.env.SEED_EDITOR_NAME ?? 'Babaloo';
+    const byEmail = async (e: string) => (await payload.find({ collection: 'users', where: { email: { equals: e } }, limit: 1, depth: 0 })).docs[0];
+    const existing = await byEmail(email);
+    const replaces = process.env.SEED_EDITOR_REPLACES?.trim().toLowerCase();
+    const old = !existing && replaces ? await byEmail(replaces) : undefined;
+    if (existing) {
+      await payload.update({ collection: 'users', id: existing.id, data: { password, name, role: 'editor', loginAttempts: 0, lockUntil: null } as never });
+      payload.logger.info(`[seed] editor user updated: ${email}`);
+    } else if (old) {
+      await payload.update({ collection: 'users', id: old.id, data: { email, password, name, role: 'editor', loginAttempts: 0, lockUntil: null } as never });
+      payload.logger.info(`[seed] editor user ${replaces} replaced by ${email}`);
+    } else {
+      await payload.create({ collection: 'users', data: { email, password, name, role: 'editor' } });
+      payload.logger.info(`[seed] editor user created: ${email}`);
+    }
+  }
+
   // ---------- folders (one per page / section) ----------
   const folderIds = new Map<string, number>();
   const folder = async (name: string): Promise<number> => {
@@ -77,8 +102,10 @@ async function main() {
     const existing = await payload.find({ collection: 'media', where: { filename: { equals: path.basename(file) } }, limit: 1 });
     if (existing.docs[0]) {
       const id = existing.docs[0].id as number;
+      // With Vercel Blob there is no local file to check; only re-upload when forced.
       const onDisk = path.join(process.env.MEDIA_DIR ?? path.resolve(process.cwd(), 'media'), existing.docs[0].filename ?? '');
-      if (!fs.existsSync(onDisk) || force) {
+      const fileMissing = process.env.BLOB_READ_WRITE_TOKEN ? false : !fs.existsSync(onDisk);
+      if (fileMissing || force) {
         // Re-upload the file (keeps the same id, so every reference stays valid).
         await payload.update({ collection: 'media', id, data: { alt: ref.alt, caption: ref.caption, folder: folderId } as never, filePath: file, overwriteExistingFiles: true });
       } else if (!existing.docs[0].folder) {

@@ -8,9 +8,11 @@ const site = env.SITE_URL || 'https://babaloocoffeeclub.com';
 const cmsUrl = env.PAYLOAD_URL || env.PUBLIC_CMS_URL || '';
 
 /** Hosts allowed as remote image sources (the CMS media host). */
-const remotePatterns = cmsUrl
-  ? [{ protocol: new URL(cmsUrl).protocol.replace(':', ''), hostname: new URL(cmsUrl).hostname }]
-  : [];
+const remotePatterns = [
+  ...(cmsUrl ? [{ protocol: new URL(cmsUrl).protocol.replace(':', ''), hostname: new URL(cmsUrl).hostname }] : []),
+  // CMS on Vercel: uploads are served from Vercel Blob.
+  { protocol: 'https', hostname: '**.public.blob.vercel-storage.com' },
+];
 
 // https://astro.build/config
 export default defineConfig({

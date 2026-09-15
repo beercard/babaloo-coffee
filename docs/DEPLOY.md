@@ -50,7 +50,7 @@ El deploy Git de hPanel sólo clona, no ejecuta `npm run build`. Si quieres usar
 
 ## 2. CMS (Payload)
 
-Necesita Node 22 y disco persistente (SQLite + `media/`). Opciones:
+Necesita Node 22 y, salvo en Vercel (Turso + Blob), disco persistente (SQLite + `media/`). Opciones:
 
 ### Hostinger VPS (Docker)
 
@@ -69,6 +69,45 @@ cms.babaloocoffeeclub.com {
 ```
 
 Volúmenes `cms-data` (base de datos) y `cms-media` (fotos): inclúyelos en las copias de seguridad.
+
+### Vercel (demo para el cliente, o producción en plan Pro)
+
+Vercel no tiene disco persistente, así que la base de datos va a **Turso** (SQLite remoto) y las fotos a **Vercel Blob**. El código ya lo soporta: basta con las variables de entorno.
+
+1. **Turso** (plan gratuito): crea una base y un token.
+   ```bash
+   turso db create babaloo-cms
+   turso db show babaloo-cms --url        # libsql://babaloo-cms-<org>.turso.io
+   turso db tokens create babaloo-cms     # DATABASE_AUTH_TOKEN
+   ```
+2. **Vercel → Storage → Create → Blob**: crea el store `babaloo-media` y copia `BLOB_READ_WRITE_TOKEN`.
+3. **Vercel → Add New Project** desde el repo. *Root Directory* = `apps/cms` (deja activado "Include files outside the root directory"). Variables de entorno:
+
+   | Variable | Valor |
+   |---|---|
+   | `PAYLOAD_SECRET` | `openssl rand -hex 32` |
+   | `DATABASE_URL` | `libsql://babaloo-cms-<org>.turso.io` |
+   | `DATABASE_AUTH_TOKEN` | token de Turso |
+   | `BLOB_READ_WRITE_TOKEN` | token del store Blob |
+   | `PAYLOAD_PUBLIC_SERVER_URL` | `https://babaloo-cms.vercel.app` (la URL que te asigne Vercel) |
+   | `SITE_URL` | `https://<sitio>.vercel.app,https://babaloocoffeeclub.com` |
+   | `DEPLOY_HOOK_URL` | Deploy Hook del proyecto **web** (Settings → Git → Deploy Hooks); sin token |
+   | `SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD` | cuenta editor del cliente (solo la usa el seed) |
+
+   `apps/cms/vercel.json` ya fija el `installCommand`/`buildCommand` del monorepo.
+4. **Carga inicial desde tu máquina** (crea las tablas en Turso, sube las fotos a Blob y carga menú, páginas y usuarios):
+   ```bash
+   cd apps/cms
+   DATABASE_URL=libsql://… DATABASE_AUTH_TOKEN=… BLOB_READ_WRITE_TOKEN=… DB_PUSH=1    SEED_ADMIN_EMAIL=… SEED_ADMIN_PASSWORD=… SEED_EDITOR_EMAIL=… SEED_EDITOR_PASSWORD=… npm run seed
+   ```
+   (o pon esas variables en `apps/cms/.env` y ejecuta `npm run seed`). Se puede repetir: solo añade lo que falta.
+5. Deploy. Entra en `https://babaloo-cms.vercel.app/admin`.
+6. En el proyecto **web** de Vercel añade `PAYLOAD_URL` y `PUBLIC_CMS_URL` = URL del CMS y vuelve a desplegar: el sitio pasa a construirse con el contenido del CMS y cada guardado dispara un rebuild.
+
+Notas:
+- El plan Hobby de Vercel es solo para uso no comercial: sirve para la demo; para producción usa Pro o el VPS.
+- Para cambios de esquema en producción (campos nuevos), vuelve a correr el seed con `DB_PUSH=1` desde local o genera migraciones (`npm run payload migrate:create`).
+- El límite de intentos de login es en memoria por instancia; en Vercel sigue funcionando por función, pero no es global.
 
 ### Railway / Render / Fly.io
 

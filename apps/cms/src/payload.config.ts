@@ -2,6 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { buildConfig } from 'payload';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import sharp from 'sharp';
 import { en } from '@payloadcms/translations/languages/en';
@@ -21,6 +22,16 @@ const siteUrls = (process.env.SITE_URL ?? 'http://localhost:4321')
   .split(',')
   .map((s) => s.trim().replace(/\/$/, ''))
   .filter(Boolean);
+
+/**
+ * Serverless hosting (Vercel) has no persistent disk, so there:
+ *  - the SQLite database lives in Turso (DATABASE_URL=libsql://… + DATABASE_AUTH_TOKEN)
+ *  - uploads go to Vercel Blob (BLOB_READ_WRITE_TOKEN). Without the token, files stay in apps/cms/media.
+ * Schema sync: `push` runs in dev (and when DB_PUSH=1), so seeding from a dev machine against Turso
+ * creates the tables; in production the schema is expected to exist already.
+ */
+const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+const dbPush = process.env.DB_PUSH ? process.env.DB_PUSH === '1' : process.env.NODE_ENV !== 'production';
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || undefined,
@@ -62,9 +73,18 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: sqliteAdapter({
-    client: { url: process.env.DATABASE_URL || 'file:./babaloo.db' },
-    push: process.env.NODE_ENV !== 'production',
+    client: { url: process.env.DATABASE_URL || 'file:./babaloo.db', authToken: process.env.DATABASE_AUTH_TOKEN || undefined },
+    push: dbPush,
   }),
+  plugins: [
+    vercelBlobStorage({
+      enabled: Boolean(blobToken),
+      token: blobToken,
+      collections: { media: true },
+      addRandomSuffix: false,
+      cacheControlMaxAge: 60 * 60 * 24 * 365,
+    }),
+  ],
   sharp,
   cors: siteUrls,
   csrf: siteUrls,

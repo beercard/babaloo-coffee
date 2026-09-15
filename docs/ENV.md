@@ -24,6 +24,9 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 |---|---|---|
 | `PAYLOAD_SECRET` | sí | Cadena aleatoria larga (`openssl rand -hex 32`). Firma sesiones. |
 | `DATABASE_URL` | sí | SQLite: `file:./babaloo.db` (en Docker `file:/app/apps/cms/data/babaloo.db`). |
+| `DATABASE_AUTH_TOKEN` | con Turso | Token de la base Turso (`turso db tokens create <db>`). |
+| `DB_PUSH` | no | `1` fuerza la sincronización del esquema (por defecto solo en dev). |
+| `BLOB_READ_WRITE_TOKEN` | en Vercel | Token del store de Vercel Blob; con él las fotos se suben a Blob en vez de `apps/cms/media`. |
 | `PAYLOAD_PUBLIC_SERVER_URL` | sí (prod) | URL pública del CMS, p. ej. `https://cms.babaloocoffeeclub.com`. |
 | `SITE_URL` | sí (prod) | Orígenes permitidos (CORS/CSRF) separados por coma: `https://babaloocoffeeclub.com,http://localhost:4321`. |
 | `DEPLOY_HOOK_URL` | recomendado | Webhook que reconstruye el sitio al guardar contenido. GitHub: `https://api.github.com/repos/<owner>/<repo>/dispatches`. |
@@ -36,6 +39,7 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `LOGIN_RATE_LIMIT` / `LOGIN_RATE_WINDOW_MS` | no | Intentos de login por IP y ventana (default 10 / 15 min). Payload además bloquea la cuenta 15 min tras 5 fallos. |
 | `ADMIN_ALLOWED_IPS` | no | Lista de IPs (coma) que pueden abrir `/admin`; vacío = todas. |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | sólo seed | Primer usuario admin. |
+| `SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD` / `SEED_EDITOR_NAME` | sólo seed | Cuenta editor del cliente: se crea o se le actualiza la contraseña en cada seed. `SEED_EDITOR_REPLACES=<email viejo>` renombra una cuenta existente. |
 
 ## GitHub Actions (Settings → Secrets and variables → Actions)
 
