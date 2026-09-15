@@ -24,7 +24,7 @@ interface Props {
 }
 const { menu, showPrices = true } = Astro.props;
 const tree = buildMenuTree(menu.categories, menu.items);
-const texture = await getImage({ src: concrete, width: 480, format: 'webp', quality: 55 });
+const texture = await getImage({ src: concrete, width: 720, format: 'webp', quality: 55 });
 
 /** Every image that can appear in the panel, keyed by id (items + categories). */
 const visuals = new Map<string, { image: NonNullable<MenuData['items'][number]['image']>; label: string }>();
@@ -195,7 +195,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     z-index: 2;
     background-color: var(--concrete-light);
     background-image: var(--texture);
-    background-size: 480px auto;
+    background-size: 720px auto;
     transition: background-color 600ms ease;
     /* Panel height (set on .board) so the photo and the list can be sized against it reliably. */
     height: var(--panel-h);

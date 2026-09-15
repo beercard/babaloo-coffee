@@ -57,7 +57,7 @@ interface Props {
 }
 
 const { seo, title, isHome = false, schema = [], bodyClass, background = 'cream' } = Astro.props;
-const pageTexture = background === 'concrete' ? await getImage({ src: concreteTexture, width: 480, format: 'webp', quality: 55 }) : undefined;
+const pageTexture = background === 'concrete' ? await getImage({ src: concreteTexture, width: 720, format: 'webp', quality: 55 }) : undefined;
 const content: SiteContent = await getContent();
 const { settings, seoDefaults, locations } = content;
 const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';

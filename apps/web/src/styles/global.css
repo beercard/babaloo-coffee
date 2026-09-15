@@ -137,7 +137,7 @@ textarea {
 .page--concrete {
   background-color: var(--concrete);
   background-image: var(--texture);
-  background-size: 480px auto;
+  background-size: 720px auto;
   background-repeat: repeat;
   background-position: center top;
 }
