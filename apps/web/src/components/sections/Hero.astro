@@ -112,14 +112,8 @@ const multiple = slides.length > 1;
     opacity: 1;
     z-index: 1;
   }
-  /* slow Ken Burns on the visible photo; restarts on every change */
   .hero__slide.is-active :global(.hero__img) {
-    animation: kenburns 9s ease-out both;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hero__slide.is-active :global(.hero__img) {
-      animation: none;
-    }
+    animation: none;
   }
   .hero__slide :global(picture),
   :global(.hero__img) {

@@ -37,11 +37,18 @@ const { image, label, sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw
     width: 100%;
     aspect-ratio: 803 / 636;
     filter: drop-shadow(var(--shadow-frame));
-    transition: transform 600ms var(--ease-out), filter 600ms var(--ease-out);
+    transition: filter 700ms var(--ease-out);
   }
+  /* on hover the photo breathes gently inside the still frame and the gold warms up */
   .frame:hover {
-    transform: translateY(-6px) rotate(-0.6deg);
-    filter: drop-shadow(0 28px 44px -20px rgba(60, 26, 30, 0.55));
+    filter: drop-shadow(var(--shadow-frame)) drop-shadow(0 0 18px rgba(201, 162, 74, 0.35));
+  }
+  .frame__photo :global(picture),
+  :global(.frame__img) {
+    transition: transform 1400ms var(--ease-out);
+  }
+  .frame:hover :global(.frame__img) {
+    transform: scale(1.05);
   }
   .frame__label {
     animation: fade-up-in 1.1s var(--ease-out) 300ms both;

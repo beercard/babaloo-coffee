@@ -471,16 +471,11 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     transition: color var(--dur);
   }
   .board__item-btn {
-    transition:
-      color var(--dur),
-      transform var(--dur) var(--ease-out);
+    transition: color var(--dur);
   }
   .board__item-btn:hover,
   .board__item-btn[aria-pressed='true'] {
     color: var(--bark);
-  }
-  .board__item-btn:hover {
-    transform: translateX(4px);
   }
   .board__cat {
     animation: fade-up-in 700ms var(--ease-out) both;
@@ -489,9 +484,11 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   .board__cat:nth-of-type(3) { animation-delay: 180ms; }
   .board__cat:nth-of-type(4) { animation-delay: 270ms; }
   .board__cat:nth-of-type(5) { animation-delay: 360ms; }
+  .board__item-btn:hover .board__item-name,
   .board__item-btn[aria-pressed='true'] .board__item-name {
     text-decoration: underline;
     text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.14em;
   }
   .board__tag {
     display: inline-block;
