@@ -9,15 +9,15 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Canvas behind the page: wood at the top (phone status bar / overscroll matches the header),
-     concrete at the bottom (matches the footer). */
-  background: linear-gradient(#58473a 50%, #a39c91 50%) fixed;
+  background: #58473a;
   /* Anchors land below the sticky header + curtain. */
   scroll-padding-top: calc(var(--header-h) + var(--curtain-h));
 }
 body {
   margin: 0;
-  background: var(--cream);
+  /* Wood on <body>: iOS Safari tints its toolbars from the body colour (theme-color is not always
+     honoured), so the browser chrome matches the header. Page surfaces are painted on <main>. */
+  background: #58473a;
   color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
@@ -136,7 +136,14 @@ textarea {
   letter-spacing: 0.01em;
 }
 
+main {
+  background: var(--cream);
+}
+
 /* ---------- Page-wide concrete (contact page): one texture under every band and the footer ---------- */
+body.page--concrete main {
+  background: transparent;
+}
 .page--concrete {
   background-color: var(--concrete);
   background-image: var(--texture);
