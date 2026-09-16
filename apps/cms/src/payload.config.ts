@@ -23,7 +23,9 @@ import { formsStatus, formsSubmit, formsSubmitOptions, formsTest } from './endpo
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const siteUrls = (process.env.SITE_URL ?? 'http://localhost:4321')
+// Website origins allowed to call the CMS (the preview site included).
+const siteUrls = [process.env.SITE_URL ?? 'http://localhost:4321', process.env.PREVIEW_URL ?? '']
+  .join(',')
   .split(',')
   .map((s) => s.trim().replace(/\/$/, ''))
   .filter(Boolean);

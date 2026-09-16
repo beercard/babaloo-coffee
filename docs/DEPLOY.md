@@ -113,7 +113,7 @@ Notas:
 
 Permite ver los borradores antes de publicarlos (botón **Preview** del panel).
 
-1. Vercel → **Add New Project** con el mismo repo, nombre `babaloo-preview`, *Root Directory* = `apps/web` (igual que el sitio).
+1. Vercel → **Add New Project** con el mismo repo, nombre `babaloo-preview`, con la misma *Root Directory* que el proyecto web `babaloo-coffee` (la raíz del repo, que usa el `vercel.json` de la raíz).
 2. Variables del proyecto preview: `PAYLOAD_URL` y `PUBLIC_CMS_URL` = URL del CMS, `SITE_URL` = URL del preview, `PAYLOAD_DRAFTS=1`, `PAYLOAD_PREVIEW_SECRET=<cadena aleatoria>`.
 3. Settings → Git → **Deploy Hooks** del proyecto preview → crear uno (rama `main`).
 4. En el proyecto **CMS**: `PREVIEW_URL=https://babaloo-preview.vercel.app`, `PREVIEW_DEPLOY_HOOK_URL=<hook del paso 3>`, `PREVIEW_SECRET=<la misma cadena>`, y agrega la URL del preview a `SITE_URL`. Redeploy del CMS.
