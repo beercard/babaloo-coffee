@@ -8,6 +8,7 @@
 #   PAYLOAD_URL                              https://cms.babaloocoffeeclub.com
 #   PAYLOAD_PREVIEW_SECRET                   same value as PREVIEW_SECRET on the CMS (preview only)
 # Repository variables (… → Variables):
+#   DEPLOY_LIVE       true — switch that enables uploads to the live site (leave unset until launch)
 #   SITE_URL          https://babaloocoffeeclub.com
 #   FTP_SERVER_DIR    /public_html/                     (default)
 #   FTP_PROTOCOL      ftps                              (default; use ftp if FTPS is not available)
@@ -39,9 +40,10 @@ on:
 jobs:
   live:
     if: >-
+      vars.DEPLOY_LIVE == 'true' && (
       github.event_name == 'push' ||
       (github.event_name == 'repository_dispatch' && github.event.action == 'cms-publish') ||
-      (github.event_name == 'workflow_dispatch' && inputs.target != 'preview')
+      (github.event_name == 'workflow_dispatch' && inputs.target != 'preview'))
     uses: ./.github/workflows/build-site.yml
     with:
       site: live

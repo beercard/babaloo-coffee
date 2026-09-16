@@ -1,5 +1,7 @@
 # Deploy
 
+> Plan elegido para producción: todo en Hostinger (web, vista previa y CMS) con fotos en Cloudflare R2. Paso a paso en [HOSTINGER.md](HOSTINGER.md).
+
 ```
                  ┌──────────────────────────┐
   git push ─────▶│ GitHub Actions           │──FTPS──▶ Hostinger /public_html  (sitio estático)

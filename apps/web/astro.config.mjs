@@ -12,6 +12,9 @@ const remotePatterns = [
   ...(cmsUrl ? [{ protocol: new URL(cmsUrl).protocol.replace(':', ''), hostname: new URL(cmsUrl).hostname }] : []),
   // CMS on Vercel: uploads are served from Vercel Blob.
   { protocol: 'https', hostname: '**.public.blob.vercel-storage.com' },
+  // Uploads in Cloudflare R2 (public r2.dev URL) or a custom media domain (MEDIA_URL).
+  { protocol: 'https', hostname: '**.r2.dev' },
+  ...(env.MEDIA_URL ? [{ protocol: 'https', hostname: new URL(env.MEDIA_URL).hostname }] : []),
 ];
 
 // https://astro.build/config
