@@ -331,7 +331,6 @@ export interface FormSubmission {
 export interface Resume {
   id: number;
   applicant?: string | null;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -569,7 +568,6 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
  */
 export interface ResumesSelect<T extends boolean = true> {
   applicant?: T;
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
