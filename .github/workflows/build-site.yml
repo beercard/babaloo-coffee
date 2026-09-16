@@ -1,0 +1,80 @@
+# Reusable: builds the Astro site (live or preview) and uploads it to Hostinger over FTP.
+# Called by deploy-web.yml; see that file for the secrets and variables it needs.
+name: Build site
+
+on:
+  workflow_call:
+    inputs:
+      site:
+        description: live | preview
+        type: string
+        required: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-${{ inputs.site }}
+      cancel-in-progress: true
+    env:
+      LIVE: ${{ inputs.site == 'live' }}
+      HAS_FTP: ${{ secrets.FTP_SERVER != '' }}
+      SERVER_DIR: ${{ inputs.site == 'live' && (vars.FTP_SERVER_DIR || '/public_html/') || vars.FTP_PREVIEW_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --workspace apps/web --include-workspace-root
+
+      - name: Restore optimised-image cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: astro-images-${{ hashFiles('apps/web/src/assets/**') }}-${{ github.run_id }}-${{ inputs.site }}
+          restore-keys: |
+            astro-images-${{ hashFiles('apps/web/src/assets/**') }}-
+            astro-images-
+
+      - name: Build
+        working-directory: apps/web
+        env:
+          SITE_URL: ${{ inputs.site == 'live' && (vars.SITE_URL || 'https://babaloocoffeeclub.com') || vars.PREVIEW_SITE_URL }}
+          PAYLOAD_URL: ${{ secrets.PAYLOAD_URL }}
+          PUBLIC_CMS_URL: ${{ secrets.PAYLOAD_URL }}
+          PAYLOAD_API_KEY: ${{ secrets.PAYLOAD_API_KEY }}
+          PAYLOAD_DRAFTS: ${{ inputs.site == 'preview' && '1' || '' }}
+          PAYLOAD_PREVIEW_SECRET: ${{ inputs.site == 'preview' && secrets.PAYLOAD_PREVIEW_SECRET || '' }}
+          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_GTM_ID: ${{ inputs.site == 'live' && vars.PUBLIC_GTM_ID || '' }}
+          PUBLIC_GA4_ID: ${{ inputs.site == 'live' && vars.PUBLIC_GA4_ID || '' }}
+          PUBLIC_GADS_ID: ${{ inputs.site == 'live' && vars.PUBLIC_GADS_ID || '' }}
+          PUBLIC_META_PIXEL_ID: ${{ inputs.site == 'live' && vars.PUBLIC_META_PIXEL_ID || '' }}
+        run: npm run build
+
+      - name: Upload build artifact (for inspection)
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist-${{ inputs.site }}
+          path: apps/web/dist
+          retention-days: 3
+
+      - name: Deploy to Hostinger (FTP)
+        if: env.HAS_FTP == 'true' && env.SERVER_DIR != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: apps/web/dist/
+          server-dir: ${{ env.SERVER_DIR }}
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**

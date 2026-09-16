@@ -1,18 +1,20 @@
-# Builds the Astro site and uploads the static output to Hostinger over FTP/SFTP.
+# Publishes the website to Hostinger (the build itself is in build-site.yml).
 #
-# Triggers:
-#   - push to main (code changes)
-#   - repository_dispatch "cms-publish" (sent by Payload when content changes)
-#   - manual run
+# Live site  (public_html)       — push to main, "cms-publish" (sent by the CMS on publish), manual run
+# Preview site (drafts, noindex) — push to main, "cms-draft" (sent by the CMS on every save), manual run
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   FTP_SERVER      e.g. ftp.babaloocoffeeclub.com  (hPanel → Files → FTP accounts)
-#   FTP_USERNAME
-#   FTP_PASSWORD
-#   PAYLOAD_URL     public URL of the CMS, e.g. https://cms.babaloocoffeeclub.com
-# Optional secrets / variables:
-#   PAYLOAD_API_KEY, PUBLIC_GTM_ID, PUBLIC_GA4_ID, PUBLIC_GADS_ID, PUBLIC_META_PIXEL_ID
-#   FTP_SERVER_DIR  (variable) defaults to /public_html/
+# Repository secrets (Settings → Secrets and variables → Actions → Secrets):
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   hPanel → Files → FTP accounts
+#   PAYLOAD_URL                              https://cms.babaloocoffeeclub.com
+#   PAYLOAD_PREVIEW_SECRET                   same value as PREVIEW_SECRET on the CMS (preview only)
+# Repository variables (… → Variables):
+#   SITE_URL          https://babaloocoffeeclub.com
+#   FTP_SERVER_DIR    /public_html/                     (default)
+#   FTP_PROTOCOL      ftps                              (default; use ftp if FTPS is not available)
+#   PREVIEW_SITE_URL  https://preview.babaloocoffeeclub.com
+#   FTP_PREVIEW_DIR   folder of the preview subdomain as seen by the FTP account
+#                     (empty = the preview site is not built)
+#   PUBLIC_GTM_ID, PUBLIC_GA4_ID, PUBLIC_GADS_ID, PUBLIC_META_PIXEL_ID, PUBLIC_FORM_ENDPOINT (optional)
 name: Build & deploy website
 
 on:
@@ -23,70 +25,35 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/deploy-web.yml'
+      - '.github/workflows/build-site.yml'
   repository_dispatch:
-    types: [cms-publish]
+    types: [cms-publish, cms-draft]
   workflow_dispatch:
-
-concurrency:
-  group: deploy-web
-  cancel-in-progress: true
+    inputs:
+      target:
+        description: Which site to build
+        type: choice
+        options: [both, live, preview]
+        default: both
 
 jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
+  live:
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'cms-publish') ||
+      (github.event_name == 'workflow_dispatch' && inputs.target != 'preview')
+    uses: ./.github/workflows/build-site.yml
+    with:
+      site: live
+    secrets: inherit
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install
-        run: npm ci --workspace apps/web --include-workspace-root
-
-      - name: Restore optimised-image cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules/.astro
-          key: astro-images-${{ hashFiles('apps/web/src/assets/**') }}-${{ github.run_id }}
-          restore-keys: |
-            astro-images-${{ hashFiles('apps/web/src/assets/**') }}-
-            astro-images-
-
-      - name: Build
-        working-directory: apps/web
-        env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://babaloocoffeeclub.com' }}
-          PAYLOAD_URL: ${{ secrets.PAYLOAD_URL }}
-          PAYLOAD_API_KEY: ${{ secrets.PAYLOAD_API_KEY }}
-          PUBLIC_CMS_URL: ${{ secrets.PAYLOAD_URL }}
-          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
-          PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
-          PUBLIC_GA4_ID: ${{ vars.PUBLIC_GA4_ID }}
-          PUBLIC_GADS_ID: ${{ vars.PUBLIC_GADS_ID }}
-          PUBLIC_META_PIXEL_ID: ${{ vars.PUBLIC_META_PIXEL_ID }}
-        run: npm run build
-
-      - name: Upload build artifact (for inspection)
-        uses: actions/upload-artifact@v4
-        with:
-          name: site-dist
-          path: apps/web/dist
-          retention-days: 3
-
-      - name: Deploy to Hostinger (FTP)
-        if: ${{ secrets.FTP_SERVER != '' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
-          local-dir: apps/web/dist/
-          server-dir: ${{ vars.FTP_SERVER_DIR || '/public_html/' }}
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
+  preview:
+    if: >-
+      vars.FTP_PREVIEW_DIR != '' && (
+      github.event_name == 'push' ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'cms-draft') ||
+      (github.event_name == 'workflow_dispatch' && inputs.target != 'live'))
+    uses: ./.github/workflows/build-site.yml
+    with:
+      site: preview
+    secrets: inherit

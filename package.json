@@ -15,6 +15,7 @@
     "dev:cms": "npm run dev --workspace apps/cms",
     "build": "npm run build --workspace apps/web",
     "build:cms": "npm run build --workspace apps/cms",
+    "start:cms": "npm run start --workspace apps/cms",
     "preview": "npm run preview --workspace apps/web",
     "check": "npm run check --workspace apps/web && npm run typecheck --workspace apps/cms",
     "seed:cms": "npm run seed --workspace apps/cms"

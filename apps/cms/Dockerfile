@@ -19,6 +19,7 @@ COPY --from=deps /app/apps/cms/node_modules ./apps/cms/node_modules
 COPY . .
 WORKDIR /app/apps/cms
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_OUTPUT=standalone
 ENV PAYLOAD_SECRET=build-time-placeholder
 ENV DATABASE_URL=file:./build.db
 RUN npm run build

@@ -27,7 +27,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname, '../..'),
   },
-  output: 'standalone',
+  // Docker image uses the standalone bundle; Hostinger / Vercel run the regular `next start`.
+  output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
   async headers() {
     return [
       {

@@ -4,6 +4,8 @@
  *   DEPLOY_HOOK_URL          – live site build hook (Vercel/Netlify/Cloudflare, or GitHub repository_dispatch).
  *                              Called only when something is PUBLISHED (drafts never reach the live site).
  *   PREVIEW_DEPLOY_HOOK_URL  – optional preview site build hook, called on every save (drafts included).
+ *   PREVIEW_DEPLOY_HOOK_BODY – optional body for it (GitHub: {"event_type":"cms-draft"}). With a GitHub
+ *                              URL the DEPLOY_HOOK_TOKEN is reused unless PREVIEW_DEPLOY_HOOK_TOKEN is set.
  *   DEPLOY_HOOK_METHOD       – POST (default)
  *   DEPLOY_HOOK_TOKEN        – optional bearer token (GitHub: fine-grained PAT with "contents: write").
  *   DEPLOY_HOOK_BODY         – optional JSON body (GitHub: {"event_type":"cms-publish"})
@@ -24,11 +26,13 @@ function schedule(target: 'live' | 'preview', reason: string): void {
       timers.delete(target);
       try {
         const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/vnd.github+json' };
-        if (process.env.DEPLOY_HOOK_TOKEN && target === 'live') headers.Authorization = `Bearer ${process.env.DEPLOY_HOOK_TOKEN}`;
+        const token = target === 'live' ? process.env.DEPLOY_HOOK_TOKEN : process.env.PREVIEW_DEPLOY_HOOK_TOKEN || (url.includes('api.github.com') ? process.env.DEPLOY_HOOK_TOKEN : undefined);
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const body = target === 'live' ? process.env.DEPLOY_HOOK_BODY : process.env.PREVIEW_DEPLOY_HOOK_BODY;
         const res = await fetch(url, {
           method: process.env.DEPLOY_HOOK_METHOD ?? 'POST',
           headers,
-          body: (target === 'live' && process.env.DEPLOY_HOOK_BODY) || JSON.stringify({ event_type: 'cms-publish', client_payload: { reason, target } }),
+          body: body || JSON.stringify({ event_type: target === 'live' ? 'cms-publish' : 'cms-draft', client_payload: { reason, target } }),
         });
         console.info(`[deploy:${target}] hook called (${res.status}) — ${reason}`);
       } catch (err) {

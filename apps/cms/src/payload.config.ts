@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { buildConfig } from 'payload';
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob';
+import { s3Storage } from '@payloadcms/storage-s3';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import sharp from 'sharp';
@@ -39,6 +40,26 @@ const siteUrls = [process.env.SITE_URL ?? 'http://localhost:4321', process.env.P
  */
 // `BLOBB_…` is accepted too (the Vercel project keeps the store under that name).
 const blobToken = (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOBB_READ_WRITE_TOKEN || '').trim().replace(/^"|"$/g, '') || undefined;
+
+/**
+ * Where uploads live, in order of preference:
+ *  1. S3-compatible bucket (Cloudflare R2, AWS S3…) when S3_BUCKET is set — photos are served from
+ *     S3_PUBLIC_URL (the bucket's public domain); résumés stay private and are streamed by the CMS.
+ *  2. Vercel Blob when BLOB_READ_WRITE_TOKEN is set.
+ *  3. The server's disk (MEDIA_DIR / RESUMES_DIR) — use a folder outside the app so deploys keep it.
+ */
+const s3 = process.env.S3_BUCKET
+  ? {
+      bucket: process.env.S3_BUCKET,
+      publicUrl: process.env.S3_PUBLIC_URL?.trim().replace(/\/$/, ''),
+      config: {
+        endpoint: process.env.S3_ENDPOINT || undefined,
+        region: process.env.S3_REGION || 'auto',
+        forcePathStyle: true,
+        credentials: { accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '', secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '' },
+      },
+    }
+  : undefined;
 
 /** Outgoing email (form notifications) over SMTP, e.g. Hostinger: smtp.hostinger.com:465 with the info@ mailbox. */
 const smtp = process.env.SMTP_HOST
@@ -104,8 +125,19 @@ export default buildConfig({
     blocksAsJSON: true,
   }),
   plugins: [
+    s3Storage({
+      enabled: Boolean(s3),
+      bucket: s3?.bucket ?? '',
+      config: s3?.config ?? {},
+      collections: {
+        media: s3?.publicUrl
+          ? { prefix: 'media', disablePayloadAccessControl: true, generateFileURL: ({ filename, prefix }) => `${s3.publicUrl}/${prefix ? `${prefix}/` : ''}${filename}` }
+          : { prefix: 'media' },
+        resumes: { prefix: 'resumes' },
+      },
+    }),
     vercelBlobStorage({
-      enabled: Boolean(blobToken),
+      enabled: Boolean(blobToken) && !s3,
       token: blobToken,
       // Public photos are served straight from the Blob CDN (no token needed to read them).
       collections: { media: { disablePayloadAccessControl: true } },
@@ -114,7 +146,7 @@ export default buildConfig({
     }),
     // Résumés: unguessable blob paths (the store itself is public).
     vercelBlobStorage({
-      enabled: Boolean(blobToken),
+      enabled: Boolean(blobToken) && !s3,
       token: blobToken,
       collections: { resumes: { prefix: 'resumes' } },
       addRandomSuffix: true,
