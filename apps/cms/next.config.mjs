@@ -32,8 +32,12 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(dirname, '../..'),
   },
-  // Docker image uses the standalone bundle; Hostinger / Vercel run the regular `next start`.
-  output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
+  // Self-contained server in .next/standalone (Hostinger, Docker); flattened by scripts/flatten-standalone.mjs.
+  output: 'standalone',
+  // Native modules loaded with dynamic requires, which file tracing cannot follow.
+  outputFileTracingIncludes: {
+    '*': ['../../node_modules/@libsql/**/*', '../../node_modules/libsql/**/*', '../../node_modules/@img/**/*', '../../node_modules/sharp/**/*'],
+  },
   async headers() {
     return [
       {

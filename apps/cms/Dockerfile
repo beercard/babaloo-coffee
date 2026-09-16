@@ -19,7 +19,6 @@ COPY --from=deps /app/apps/cms/node_modules ./apps/cms/node_modules
 COPY . .
 WORKDIR /app/apps/cms
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_OUTPUT=standalone
 ENV PAYLOAD_SECRET=build-time-placeholder
 ENV DATABASE_URL=file:./build.db
 RUN npm run build
@@ -31,11 +30,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 WORKDIR /app
+# Flattened standalone output: server.js, .next (with static), public and node_modules together.
 COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/static ./apps/cms/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/public ./apps/cms/public
+ENV MEDIA_DIR=/app/apps/cms/media
 RUN mkdir -p /app/apps/cms/media /app/apps/cms/data && chown -R nextjs:nodejs /app/apps/cms/media /app/apps/cms/data
 USER nextjs
 EXPOSE 3000
-WORKDIR /app/apps/cms
+WORKDIR /app
 CMD ["node", "server.js"]
