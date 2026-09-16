@@ -26,6 +26,9 @@
     "@payloadcms/storage-vercel-blob": "3.89.0",
     "@payloadcms/translations": "3.89.0",
     "@payloadcms/ui": "3.89.0",
+    "@types/node": "^24.12.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "cross-env": "^10.1.0",
     "dotenv": "^16.4.7",
     "graphql": "^16.11.0",
@@ -33,13 +36,10 @@
     "payload": "3.89.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "sharp": "^0.35.4"
+    "sharp": "^0.35.4",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/node": "^24.12.3",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "tsx": "^4.22.4",
-    "typescript": "^5.9.3"
+    "tsx": "^4.22.4"
   }
 }
