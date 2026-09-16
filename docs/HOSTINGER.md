@@ -48,7 +48,7 @@ Durante la migración el sitio actual (WordPress) sigue online hasta la **Fase 5
 
 ---
 
-## Fase 2 — Mover las fotos a R2 (lo hace el desarrollador)
+## Fase 2 — Mover las fotos a R2 (hecho el 16/09/2026: las 54 fotos en uso están en R2)
 
 Pasarle al desarrollador los 4 datos de R2 (endpoint, access key, secret, URL pública). Él:
 1. Hace un respaldo de la base con la configuración actual.
@@ -90,10 +90,10 @@ Si el asistente obliga a elegir una subcarpeta: `apps/cms`, instalación `npm ci
 | `PREVIEW_URL` | `https://preview.babaloocoffeeclub.com` |
 | `PREVIEW_SECRET` | la clave de 1.2 |
 | `S3_BUCKET` | `babaloo-media` |
-| `S3_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
+| `S3_ENDPOINT` | `https://3652feac485027919b7623ab5d12a7f5.r2.cloudflarestorage.com` (sin `/babaloo-media` al final) |
 | `S3_REGION` | `auto` |
 | `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | los de 1.1 |
-| `S3_PUBLIC_URL` | `https://pub-xxxx.r2.dev` |
+| `S3_PUBLIC_URL` | `https://pub-b7138a4eb83846c38fb9a8271b27cc7a.r2.dev` |
 | `FORM_NOTIFY_EMAIL` | `info@babaloocoffeeclub.com` |
 
 **No** cargar todavía `DEPLOY_HOOK_*` ni `PREVIEW_DEPLOY_HOOK_*` (se agregan en la Fase 5, para que nada publique sobre el WordPress antes de tiempo). **No** cargar `NODE_ENV` ni las variables de Vercel Blob (`BLOB_*`, `BLOBB_*`).

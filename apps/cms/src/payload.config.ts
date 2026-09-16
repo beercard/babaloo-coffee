@@ -130,9 +130,9 @@ export default buildConfig({
       bucket: s3?.bucket ?? '',
       config: s3?.config ?? {},
       collections: {
-        media: s3?.publicUrl
-          ? { prefix: 'media', disablePayloadAccessControl: true, generateFileURL: ({ filename, prefix }) => `${s3.publicUrl}/${prefix ? `${prefix}/` : ''}${filename}` }
-          : { prefix: 'media' },
+        // Photos at the bucket root with their original names (same keys as in Vercel Blob, and no
+        // extra `prefix` column); served from the bucket's public URL.
+        media: s3?.publicUrl ? { disablePayloadAccessControl: true, generateFileURL: ({ filename }) => `${s3.publicUrl}/${filename}` } : true,
         resumes: { prefix: 'resumes' },
       },
     }),
