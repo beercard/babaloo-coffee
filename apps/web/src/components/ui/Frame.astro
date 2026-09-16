@@ -3,6 +3,9 @@
  * Ornate gold frame from the PDF with a photo behind it and an optional
  * hand-written label ("rea farms") drawn over the picture.
  *
+ * With several images the photo becomes a swipeable carousel (scroll-snap, so
+ * touch swipe works without JS; the script adds arrows, dots and autoplay).
+ *
  * The frame PNG measures 803×636 with its opening at
  * left 13.7% / top 14.8% / right 14.2% / bottom 17.5%; the photo is inset a
  * little less so it always tucks under the moulding.
@@ -14,24 +17,74 @@ import frameGold from '@/assets/brand/frame-gold.png';
 
 interface Props {
   image?: ImageRef;
+  /** Several photos = carousel. `image` is used when this is empty. */
+  images?: ImageRef[];
   label?: string;
   sizes?: string;
   loading?: 'lazy' | 'eager';
+  autoplay?: boolean;
   class?: string;
 }
 
-const { image, label, sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw', loading = 'lazy', class: className } = Astro.props;
+const { image, images = [], label, sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw', loading = 'lazy', autoplay = false, class: className } = Astro.props;
+const photos = images.length ? images : image ? [image] : [];
+const multi = photos.length > 1;
 ---
 
-<figure class:list={['frame', className]}>
-  <div class="frame__photo">
-    {image ? <Picture image={image} sizes={sizes} widths={[360, 560, 800]} loading={loading} quality={62} aspect={579 / 431} class="frame__img" /> : <div class="frame__empty" />}
-  </div>
-  <Image src={frameGold} alt="" widths={[360, 520, 803]} sizes={sizes} format="webp" quality={60} class="frame__gold" loading={loading} />
-  {label && <figcaption class="frame__label script">{label}</figcaption>}
-</figure>
+<div class:list={['frame-wrap', className]} data-frame-carousel={multi ? '' : undefined} data-autoplay={multi && autoplay ? '' : undefined}>
+  <figure class="frame">
+    <div class="frame__photo">
+      {
+        multi ? (
+          <div class="frame__track" data-track tabindex="0" role="region" aria-roledescription="carousel" aria-label={`${label ?? 'Photos'}: swipe to see ${photos.length} photos`}>
+            {photos.map((photo, i) => (
+              <div class="frame__slide" role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${photos.length}`}>
+                <Picture image={photo} sizes={sizes} widths={[360, 560, 800]} loading={i === 0 ? loading : 'lazy'} quality={62} aspect={579 / 431} class="frame__img" />
+              </div>
+            ))}
+          </div>
+        ) : photos[0] ? (
+          <Picture image={photos[0]} sizes={sizes} widths={[360, 560, 800]} loading={loading} quality={62} aspect={579 / 431} class="frame__img" />
+        ) : (
+          <div class="frame__empty" />
+        )
+      }
+    </div>
+    <Image src={frameGold} alt="" widths={[360, 520, 803]} sizes={sizes} format="webp" quality={60} class="frame__gold" loading={loading} />
+    {label && <figcaption class="frame__label script">{label}</figcaption>}
+    {
+      multi && (
+        <Fragment>
+          <button type="button" class="frame__arrow frame__arrow--prev" data-prev aria-label="Previous photo">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button type="button" class="frame__arrow frame__arrow--next" data-next aria-label="Next photo">
+            <span aria-hidden="true">›</span>
+          </button>
+        </Fragment>
+      )
+    }
+  </figure>
+  {
+    multi && (
+      <div class="frame__dots" data-dots>
+        {photos.map((_, i) => (
+          <button type="button" class="frame__dot" data-dot={i} aria-label={`Show photo ${i + 1}`} aria-current={i === 0 ? 'true' : undefined} />
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<script>
+  import { initFrameCarousels } from '@/scripts/frame-carousel';
+  document.addEventListener('astro:page-load', initFrameCarousels);
+</script>
 
 <style>
+  .frame-wrap {
+    width: 100%;
+  }
   .frame {
     position: relative;
     width: 100%;
@@ -49,6 +102,9 @@ const { image, label, sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw
   }
   .frame:hover :global(.frame__img) {
     transform: scale(1.05);
+  }
+  [data-frame-carousel] .frame:hover :global(.frame__img) {
+    transform: none;
   }
   .frame__label {
     animation: fade-up-in 1.1s var(--ease-out) 300ms both;
@@ -86,5 +142,95 @@ const { image, label, sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw
     pointer-events: none;
     padding: 0 6%;
     text-align: center;
+  }
+
+  /* ---------- carousel ---------- */
+  .frame__track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .frame__track::-webkit-scrollbar {
+    display: none;
+  }
+  .frame__track:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: -3px;
+  }
+  .frame__slide {
+    flex: 0 0 100%;
+    height: 100%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+  .frame__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: clamp(2rem, 3vw, 2.5rem);
+    height: clamp(2rem, 3vw, 2.5rem);
+    margin-top: -1.25rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(242, 238, 231, 0.88);
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transition: opacity var(--dur), transform var(--dur);
+  }
+  .frame__arrow span {
+    margin-top: -0.12em;
+  }
+  .frame__arrow--prev {
+    left: 15%;
+  }
+  .frame__arrow--next {
+    right: 15%;
+  }
+  .frame:hover .frame__arrow,
+  .frame__arrow:focus-visible {
+    opacity: 1;
+  }
+  .frame__arrow:hover {
+    transform: scale(1.08);
+  }
+  @media (hover: none) {
+    .frame__arrow {
+      display: none;
+    }
+  }
+  .frame__dots {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.4rem;
+  }
+  .frame__dot {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+  }
+  .frame__dot::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    transition: background-color var(--dur), transform var(--dur);
+  }
+  .frame__dot[aria-current='true']::before {
+    background: var(--ink);
+    transform: scale(1.15);
   }
 </style>

@@ -7,7 +7,7 @@
 interface Props {
   name: string;
   label: string;
-  type?: 'text' | 'email' | 'tel' | 'url' | 'textarea' | 'select';
+  type?: 'text' | 'email' | 'tel' | 'url' | 'textarea' | 'select' | 'number' | 'date';
   required?: boolean;
   autocomplete?: string;
   options?: string[];
@@ -44,7 +44,7 @@ const common = {
 };
 ---
 
-<div class:list={['field', type === 'textarea' && 'field--textarea', className]} data-field data-error-message={errorMessage}>
+<div class:list={['field', type === 'textarea' && 'field--textarea', type === 'date' && 'field--float', className]} data-field data-error-message={errorMessage}>
   {
     type === 'textarea' ? (
       <textarea {...common} rows={rows} minlength={minlength} maxlength={maxlength} class="field__control" />
@@ -56,7 +56,7 @@ const common = {
         ))}
       </select>
     ) : (
-      <input {...common} type={type} pattern={pattern} minlength={minlength} maxlength={maxlength} class="field__control" />
+      <input {...common} type={type} pattern={pattern} minlength={type === 'number' || type === 'date' ? undefined : minlength} maxlength={type === 'number' || type === 'date' ? undefined : maxlength} inputmode={type === 'number' ? 'decimal' : undefined} step={type === 'number' ? 'any' : undefined} class="field__control" />
     )
   }
   <label for={id} class="field__label script">
@@ -129,6 +129,7 @@ const common = {
   .field--textarea .field__label {
     top: calc(var(--frame-w) + 0.9em);
   }
+  .field--float .field__label,
   .field__control:focus ~ .field__label,
   .field__control:is(input, textarea):not(:placeholder-shown) ~ .field__label,
   .field__control--select:valid ~ .field__label,

@@ -13,10 +13,13 @@ import { Users } from './collections/Users';
 import { Media } from './collections/Media';
 import { MenuCategories } from './collections/MenuCategories';
 import { MenuItems } from './collections/MenuItems';
+import { MenuLabels } from './collections/MenuLabels';
+import { Pages } from './collections/Pages';
 import { FormSubmissions } from './collections/FormSubmissions';
 import { Resumes } from './collections/Resumes';
 import { globals } from './globals';
-import { formsSubmit, formsSubmitOptions } from './endpoints/formsSubmit';
+import { withRowLabels } from './fields/rowLabels';
+import { formsStatus, formsSubmit, formsSubmitOptions, formsTest } from './endpoints/formsSubmit';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -75,9 +78,9 @@ export default buildConfig({
     },
     // Sidebar order: groups are listed in the order collections/globals appear.
   },
-  // Sidebar: Pages (globals) · Menu · Media · Messages · Settings.
-  collections: [MenuItems, MenuCategories, Media, FormSubmissions, Resumes, Users],
-  globals,
+  // Sidebar: Pages (globals + new pages) · Menu · Media · Messages · Settings.
+  collections: withRowLabels([Pages, MenuItems, MenuCategories, MenuLabels, Media, FormSubmissions, Resumes, Users]),
+  globals: withRowLabels(globals),
   // Image library folders (one per page/section); the folder collection is created by Payload.
   folders: { slug: 'folders', browseByFolder: true, collectionSpecific: false },
   i18n: {
@@ -88,13 +91,15 @@ export default buildConfig({
       es: { general: { payloadSettings: 'Preferencias' } },
     },
   },
-  endpoints: [formsSubmit, formsSubmitOptions],
+  endpoints: [formsSubmit, formsSubmitOptions, formsStatus, formsTest],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: sqliteAdapter({
     client: { url: process.env.DATABASE_URL || 'file:./babaloo.db', authToken: process.env.DATABASE_AUTH_TOKEN || undefined },
     push: dbPush,
+    // Page sections are stored as one JSON column per page (far fewer tables and reads than one table per section type).
+    blocksAsJSON: true,
   }),
   plugins: [
     vercelBlobStorage({

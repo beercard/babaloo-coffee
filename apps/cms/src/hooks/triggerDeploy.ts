@@ -1,45 +1,62 @@
 /**
- * Calls the frontend build hook after content changes so the static site is
- * republished automatically. Debounced: many edits in a row trigger one build.
+ * Rebuilds the static sites after content changes. Debounced: many edits in a row trigger one build.
  *
- *   DEPLOY_HOOK_URL     – e.g. GitHub repository_dispatch URL, a Vercel/Netlify
- *                         build hook, or any webhook your CI understands.
- *   DEPLOY_HOOK_METHOD  – POST (default)
- *   DEPLOY_HOOK_TOKEN   – optional bearer token (GitHub: a fine-grained PAT
- *                         with "contents: write" on the repo).
- *   DEPLOY_HOOK_BODY    – optional JSON body (GitHub: {"event_type":"cms-publish"})
- *   DEPLOY_DEBOUNCE_MS  – default 60000
+ *   DEPLOY_HOOK_URL          – live site build hook (Vercel/Netlify/Cloudflare, or GitHub repository_dispatch).
+ *                              Called only when something is PUBLISHED (drafts never reach the live site).
+ *   PREVIEW_DEPLOY_HOOK_URL  – optional preview site build hook, called on every save (drafts included).
+ *   DEPLOY_HOOK_METHOD       – POST (default)
+ *   DEPLOY_HOOK_TOKEN        – optional bearer token (GitHub: fine-grained PAT with "contents: write").
+ *   DEPLOY_HOOK_BODY         – optional JSON body (GitHub: {"event_type":"cms-publish"})
+ *   DEPLOY_DEBOUNCE_MS       – default 60000 (preview: PREVIEW_DEBOUNCE_MS, default 20000)
  */
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload';
 
-let timer: NodeJS.Timeout | undefined;
+const timers = new Map<string, NodeJS.Timeout>();
 
-export function scheduleDeploy(reason: string): void {
-  const url = process.env.DEPLOY_HOOK_URL;
+function schedule(target: 'live' | 'preview', reason: string): void {
+  const url = target === 'live' ? process.env.DEPLOY_HOOK_URL : process.env.PREVIEW_DEPLOY_HOOK_URL;
   if (!url) return;
-  const wait = Number(process.env.DEPLOY_DEBOUNCE_MS ?? 60_000);
-  if (timer) clearTimeout(timer);
-  timer = setTimeout(async () => {
-    timer = undefined;
-    try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/vnd.github+json' };
-      if (process.env.DEPLOY_HOOK_TOKEN) headers.Authorization = `Bearer ${process.env.DEPLOY_HOOK_TOKEN}`;
-      const res = await fetch(url, {
-        method: process.env.DEPLOY_HOOK_METHOD ?? 'POST',
-        headers,
-        body: process.env.DEPLOY_HOOK_BODY ?? JSON.stringify({ event_type: 'cms-publish', client_payload: { reason } }),
-      });
-      console.info(`[deploy] hook called (${res.status}) — ${reason}`);
-    } catch (err) {
-      console.error('[deploy] hook failed', err);
-    }
-  }, wait);
+  const wait = Number((target === 'live' ? process.env.DEPLOY_DEBOUNCE_MS : process.env.PREVIEW_DEBOUNCE_MS) ?? (target === 'live' ? 60_000 : 20_000));
+  clearTimeout(timers.get(target));
+  timers.set(
+    target,
+    setTimeout(async () => {
+      timers.delete(target);
+      try {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/vnd.github+json' };
+        if (process.env.DEPLOY_HOOK_TOKEN && target === 'live') headers.Authorization = `Bearer ${process.env.DEPLOY_HOOK_TOKEN}`;
+        const res = await fetch(url, {
+          method: process.env.DEPLOY_HOOK_METHOD ?? 'POST',
+          headers,
+          body: (target === 'live' && process.env.DEPLOY_HOOK_BODY) || JSON.stringify({ event_type: 'cms-publish', client_payload: { reason, target } }),
+        });
+        console.info(`[deploy:${target}] hook called (${res.status}) — ${reason}`);
+      } catch (err) {
+        console.error(`[deploy:${target}] hook failed`, err);
+      }
+    }, wait),
+  );
 }
 
-export const triggerDeploy: CollectionAfterChangeHook & CollectionAfterDeleteHook = ({ collection }) => {
-  scheduleDeploy(`${collection.slug} changed`);
+/** `published` = the change is live content (drafts only rebuild the preview site). */
+export function scheduleDeploy(reason: string, published = true): void {
+  schedule('preview', reason);
+  if (published) schedule('live', reason);
+}
+
+const isDraft = (doc: unknown) => (doc as { _status?: string } | undefined)?._status === 'draft';
+
+export const triggerDeploy: CollectionAfterChangeHook = ({ collection, doc, previousDoc }) => {
+  // Drafts only rebuild the preview. When the previous state was published we also rebuild the live
+  // site (covers "Unpublish"; for a plain draft save it is a harmless no-op build).
+  const live = !isDraft(doc) || (previousDoc as { _status?: string } | undefined)?._status === 'published';
+  scheduleDeploy(`${collection.slug} changed`, live);
 };
 
-export const triggerDeployGlobal: GlobalAfterChangeHook = ({ global }) => {
-  scheduleDeploy(`${global.slug} changed`);
+export const triggerDeployDelete: CollectionAfterDeleteHook = ({ collection }) => {
+  scheduleDeploy(`${collection.slug} deleted`);
+};
+
+export const triggerDeployGlobal: GlobalAfterChangeHook = ({ global, doc }) => {
+  scheduleDeploy(`${global.slug} changed`, !isDraft(doc));
 };

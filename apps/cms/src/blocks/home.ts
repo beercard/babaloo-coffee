@@ -5,7 +5,7 @@
  * here, so the editor never has to look elsewhere.
  */
 import type { Block, Field } from 'payload';
-import { addressGroup, imageField, linkGroup } from '../fields';
+import { addressGroup, alignField, imageField, linkGroup } from '../fields';
 import { t } from '../fields/i18n';
 
 const enabled: Field = {
@@ -58,14 +58,47 @@ export const HeroBlock: Block = {
         },
       ],
     },
-    { name: 'interval', type: 'number', label: t('Seconds per photo', 'Segundos por foto'), defaultValue: 5, min: 3, max: 20 },
+    {
+      type: 'row',
+      fields: [
+        { name: 'interval', type: 'number', label: t('Seconds per photo', 'Segundos por foto'), defaultValue: 5, min: 3, max: 20, admin: { width: '50%' } },
+        {
+          name: 'height',
+          type: 'select',
+          label: t('Height', 'Altura'),
+          defaultValue: 'tall',
+          admin: { width: '50%', description: t('Phones always use a shorter version.', 'En el celular siempre se usa una versión más baja.') },
+          options: [
+            { label: t('Tall (900 px)', 'Alta (900 px)'), value: 'tall' },
+            { label: t('Medium (680 px)', 'Media (680 px)'), value: 'medium' },
+            { label: t('Short (460 px)', 'Baja (460 px)'), value: 'short' },
+          ],
+        },
+      ],
+    },
   ],
 };
 
 export const IconStripBlock: Block = {
   slug: 'iconStrip',
   labels: { singular: t('Sliding icons band', 'Franja de iconos'), plural: t('Sliding icons band', 'Franja de iconos') },
-  fields: [enabled, { name: 'speed', type: 'number', label: t('Seconds per loop (higher = slower)', 'Segundos por vuelta (más alto = más lento)'), defaultValue: 40, min: 10, max: 120 }],
+  fields: [
+    enabled,
+    { name: 'speed', type: 'number', label: t('Seconds per loop (higher = slower)', 'Segundos por vuelta (más alto = más lento)'), defaultValue: 40, min: 10, max: 120 },
+    {
+      name: 'icons',
+      type: 'array',
+      label: t('Custom icons (optional)', 'Iconos propios (opcional)'),
+      labels: { singular: t('Icon', 'Icono'), plural: t('Icons', 'Iconos') },
+      admin: {
+        description: t(
+          'Leave empty to use the nine hand-drawn icons. Upload light-coloured PNG or SVG files with a transparent background, about 300 x 200 px.',
+          'Déjalo vacío para usar los nueve iconos dibujados. Sube PNG o SVG claros con fondo transparente, de unos 300 x 200 px.',
+        ),
+      },
+      fields: [imageField('image', t('Icon', 'Icono'), true)],
+    },
+  ],
 };
 
 export const NavRowBlock: Block = {
@@ -81,6 +114,7 @@ export const IntroBlock: Block = {
     enabled,
     { name: 'title', type: 'text', label: t('Title (optional)', 'Título (opcional)') },
     { name: 'text', type: 'textarea', label: t('Text', 'Texto'), required: true, admin: { description: t('Each line break is kept, as in the design.', 'Cada salto de línea se respeta, como en el diseño.') } },
+    alignField('center'),
     linkGroup('cta', t('Button (optional)', 'Botón (opcional)')),
     anchor,
   ],
@@ -193,7 +227,7 @@ export const LocationsBlock: Block = {
 export const ClubStripBlock: Block = {
   slug: 'clubStrip',
   labels: { singular: t('Dogs band ("coffee & matcha club")', 'Franja de perros ("coffee & matcha club")'), plural: t('Dogs band', 'Franja de perros') },
-  fields: [enabled],
+  fields: [enabled, { name: 'speed', type: 'number', label: t('Seconds per loop (higher = slower)', 'Segundos por vuelta (más alto = más lento)'), defaultValue: 40, min: 10, max: 120 }],
 };
 
 export const FeaturedMenuBlock: Block = {
@@ -261,6 +295,7 @@ export const CtaBlock: Block = {
     enabled,
     { name: 'title', type: 'text', label: t('Title', 'Título'), required: true },
     { name: 'text', type: 'textarea', label: t('Text (optional)', 'Texto (opcional)') },
+    alignField('center'),
     linkGroup('cta', t('Button', 'Botón')),
     imageField('image', t('Image (optional)', 'Imagen (opcional)')),
     imageField('imageMobile', t('Phone image (optional)', 'Imagen móvil (opcional)')),
@@ -288,8 +323,104 @@ export const RichTextBlock: Block = {
         { label: t('Image right', 'Imagen a la derecha'), value: 'right' },
       ],
     },
+    alignField('left'),
     background(['cream', 'concrete', 'sage']),
     anchor,
+  ],
+};
+
+export const FramesBlock: Block = {
+  slug: 'frames',
+  labels: { singular: t('Gold frames (photos / carousels)', 'Marcos dorados (fotos / carruseles)'), plural: t('Gold frames', 'Marcos dorados') },
+  fields: [
+    enabled,
+    { name: 'title', type: 'text', label: t('Title (optional)', 'Título (opcional)') },
+    {
+      name: 'items',
+      type: 'array',
+      label: t('Frames (drag to reorder)', 'Marcos (arrastra para ordenar)'),
+      labels: { singular: t('Frame', 'Marco'), plural: t('Frames', 'Marcos') },
+      minRows: 1,
+      admin: { description: t('Rows of 3 on desktop, 2 on tablets and 1 on phones; an incomplete last row is centred.', 'Filas de 3 en escritorio, 2 en tablet y 1 en celular; la última fila incompleta se centra.') },
+      fields: [
+        imageField('image', t('Photo', 'Foto'), true),
+        {
+          name: 'more',
+          type: 'upload',
+          relationTo: 'media',
+          hasMany: true,
+          label: t('More photos (turns the frame into a swipeable carousel)', 'Más fotos (convierte el marco en un carrusel deslizable)'),
+        },
+        { name: 'label', type: 'text', label: t('Hand-written text over the photo (optional)', 'Texto manuscrito sobre la foto (opcional)') },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'columns',
+          type: 'select',
+          label: t('Frames per row on desktop', 'Marcos por fila en escritorio'),
+          defaultValue: '3',
+          admin: { width: '50%' },
+          options: ['2', '3', '4'].map((v) => ({ label: v, value: v })),
+        },
+        { name: 'autoplay', type: 'checkbox', label: t('Carousels move on their own', 'Los carruseles avanzan solos'), defaultValue: false, admin: { width: '50%' } },
+      ],
+    },
+    anchor,
+  ],
+};
+
+export const FormBlock: Block = {
+  slug: 'form',
+  labels: { singular: t('Form (Contact / Join our team)', 'Formulario (Contacto / Únete al equipo)'), plural: t('Forms', 'Formularios') },
+  fields: [
+    enabled,
+    {
+      name: 'form',
+      type: 'select',
+      required: true,
+      defaultValue: 'contact',
+      label: t('Which form', 'Qué formulario'),
+      admin: { description: t('Fields, recipients and messages are edited in Settings > Forms.', 'Campos, destinatarios y mensajes se editan en Ajustes > Formularios.') },
+      options: [
+        { label: t('Contact us', 'Contacto'), value: 'contact' },
+        { label: t('Join our team', 'Únete al equipo'), value: 'careers' },
+      ],
+    },
+    { name: 'title', type: 'text', label: t('Title (optional)', 'Título (opcional)') },
+    { name: 'text', type: 'textarea', label: t('Intro text (optional)', 'Texto de intro (opcional)') },
+    imageField('image', t('Photo next to the form (optional)', 'Foto junto al formulario (opcional)')),
+    background(['cream', 'concrete', 'sage']),
+    anchor,
+  ],
+};
+
+export const SpacerBlock: Block = {
+  slug: 'spacer',
+  labels: { singular: t('Space / divider', 'Espacio / separador'), plural: t('Spaces', 'Espacios') },
+  fields: [
+    enabled,
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'size',
+          type: 'select',
+          label: t('Height', 'Altura'),
+          defaultValue: 'm',
+          admin: { width: '50%' },
+          options: [
+            { label: 'S', value: 's' },
+            { label: 'M', value: 'm' },
+            { label: 'L', value: 'l' },
+          ],
+        },
+        { name: 'line', type: 'checkbox', label: t('Show a thin line', 'Mostrar una línea fina'), defaultValue: false, admin: { width: '50%' } },
+      ],
+    },
+    background(['cream', 'concrete', 'sage', 'bark']),
   ],
 };
 
@@ -305,4 +436,10 @@ export const homeBlocks: Block[] = [
   TestimonialsBlock,
   CtaBlock,
   RichTextBlock,
+  FramesBlock,
+  FormBlock,
+  SpacerBlock,
 ];
+
+/** Every section type works on any page (About / Contact / Menu extras and new pages). */
+export const pageBlocks: Block[] = homeBlocks;

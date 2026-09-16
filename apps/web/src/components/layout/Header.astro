@@ -13,6 +13,8 @@ import Icon from '@/components/ui/Icon.astro';
 import wood from '@/assets/textures/wood.jpg';
 import logoWhite from '@/assets/brand/babaloo-logo-white.png';
 import curtain from '@/assets/textures/curtain.png';
+import { getContent } from '@/lib/cms';
+import { imageOptions, resolveImage } from '@/lib/images';
 
 interface Props {
   settings: SiteSettings;
@@ -22,11 +24,23 @@ interface Props {
 }
 
 const { settings, isHome = false, currentPath } = Astro.props;
-const woodImg = await getImage({ src: wood, width: 464, format: 'webp', quality: 60 });
+const { design } = await getContent();
+const h = design.header;
+// Settings > Design can replace the wood, the logos and the curtain; otherwise the originals are used.
+const woodImg = h.wood
+  ? await getImage({ ...imageOptions(h.wood, Math.min(928, h.wood.width)), format: 'webp', quality: 60 })
+  : await getImage({ src: wood, width: 464, format: 'webp', quality: 60 });
+const woodSize = h.wood ? `${Math.round(Math.min(928, h.wood.width) / 2)}px` : '464px';
+const customLogo = h.logo ? await getImage({ ...imageOptions(h.logo, Math.min(800, h.logo.width)), format: h.logo.src.endsWith('.svg') ? 'svg' : 'webp', quality: 85 }) : undefined;
+const menuLogo = h.menuLogo ? resolveImage(h.menuLogo) : logoWhite;
+const curtainSrc = h.curtain ? resolveImage(h.curtain) : curtain;
+const curtainSize = h.curtain ? { width: h.curtain.width, height: h.curtain.height } : {};
+const menuLogoSize = h.menuLogo ? { width: h.menuLogo.width, height: h.menuLogo.height } : {};
 const social = settings.social;
+const logoAlt = `${settings.name} — home`;
 ---
 
-<header class="header" style={`--wood:url(${woodImg.src})`}>
+<header class:list={['header', !h.sticky && 'header--static']} style={`--wood:url(${woodImg.src});--wood-size:${woodSize}`}>
   <div class="header__band">
     <button
       class="nav-toggle"
@@ -42,14 +56,14 @@ const social = settings.social;
     {
       isHome ? (
         <h1 class="header__brand">
-          <a href="/" class="header__logo-link" aria-label={`${settings.name} — home`}>
-            <Logo class="header__logo" />
+          <a href="/" class="header__logo-link" aria-label={logoAlt}>
+            {customLogo ? <img src={customLogo.src} alt="" width={customLogo.attributes.width} height={customLogo.attributes.height} class="header__logo" decoding="async" /> : <Logo class="header__logo" />}
           </a>
         </h1>
       ) : (
         <p class="header__brand">
-          <a href="/" class="header__logo-link" aria-label={`${settings.name} — home`}>
-            <Logo class="header__logo" />
+          <a href="/" class="header__logo-link" aria-label={logoAlt}>
+            {customLogo ? <img src={customLogo.src} alt="" width={customLogo.attributes.width} height={customLogo.attributes.height} class="header__logo" decoding="async" /> : <Logo class="header__logo" />}
           </a>
         </p>
       )
@@ -84,7 +98,7 @@ const social = settings.social;
       </ul>
       <div class="site-nav__lockup">
         <Icon name="dog-poodle" class="site-nav__dog" />
-        <Image src={logoWhite} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720]} sizes="(min-width: 900px) 22rem, 44vw" format="webp" quality={82} class="site-nav__logo" loading="lazy" />
+        <Image src={menuLogo as never} {...(menuLogoSize as { width: number; height: number })} alt={`${settings.name} — ${settings.tagline ?? 'Coffee & Matcha Club'}`} widths={[320, 480, 720]} sizes="(min-width: 900px) 22rem, 44vw" format="webp" quality={82} class="site-nav__logo" loading="lazy" />
         <Icon name="dog-basenji" class="site-nav__dog site-nav__dog--right" />
       </div>
       <div class="site-nav__aside">
@@ -109,7 +123,7 @@ const social = settings.social;
     </div>
   </nav>
 
-  <Image src={curtain} alt="" widths={[640, 1280, 1920]} sizes="100vw" format="webp" quality={72} loading="eager" class="curtain" />
+  {h.showCurtain && <Image src={curtainSrc as never} {...(curtainSize as { width: number; height: number })} alt="" widths={[640, 1280, 1920]} sizes="100vw" format="webp" quality={72} loading="eager" class="curtain" />}
 </header>
 
 <script>
@@ -124,13 +138,16 @@ const social = settings.social;
     top: 0;
     z-index: 20;
   }
+  .header--static {
+    position: relative;
+  }
   .header__band {
     position: relative;
     z-index: 2; /* above the curtain, which starts underneath the wood */
     height: var(--header-h);
-    background-color: var(--wood);
+    background-color: var(--wood-bg, #58473a);
     background-image: var(--wood);
-    background-size: 464px auto;
+    background-size: var(--wood-size, 464px) auto;
     background-repeat: repeat;
     display: grid;
     place-items: center;
@@ -148,7 +165,9 @@ const social = settings.social;
   }
   .header__logo {
     /* PDF: 500px wide on a 1920 artboard, scaled down ~30% */
-    width: clamp(5.75rem, 11.5vw, 12.5rem);
+    width: calc(clamp(5.75rem, 11.5vw, 12.5rem) * var(--logo-scale, 1));
+    max-height: calc(var(--header-h) * 0.86);
+    object-fit: contain;
     height: auto;
     transition: transform var(--dur) var(--ease-out);
     animation: fade-up-in 900ms var(--ease-out) both;
@@ -205,9 +224,9 @@ const social = settings.social;
     /* Paint under the phone's status bar / home indicator too. */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
-    background-color: var(--wood);
+    background-color: var(--wood-bg, #58473a);
     background-image: var(--wood);
-    background-size: 464px auto;
+    background-size: var(--wood-size, 464px) auto;
     color: var(--cream-bright);
     overflow-y: auto;
     animation: nav-in 320ms var(--ease-out);

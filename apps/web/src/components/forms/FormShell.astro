@@ -11,12 +11,16 @@ interface Props {
   email?: string;
   submitLabel?: string;
   successMessage?: string;
+  /** Email subject (the CMS endpoint uses its own setting; the email relay uses this one). */
+  subject?: string;
+  /** The form has a file field. */
+  multipart?: boolean;
   class?: string;
   ariaLabelledby?: string;
 }
-const { form, email, submitLabel = 'send', successMessage, class: className, ariaLabelledby } = Astro.props;
+const { form, email, submitLabel = 'send', successMessage, subject: subjectProp, multipart = form === 'careers', class: className, ariaLabelledby } = Astro.props;
 const endpoint = getFormEndpoint(email);
-const subject = form === 'careers' ? 'Job application' : 'Website contact';
+const subject = subjectProp ?? (form === 'careers' ? 'Job application' : 'Website contact');
 ---
 
 {
@@ -28,7 +32,7 @@ const subject = form === 'careers' ? 'Job application' : 'Website contact';
       data-form={form}
       data-endpoint={endpoint}
       data-subject={`[Babaloo] ${subject}`}
-      enctype={form === 'careers' ? 'multipart/form-data' : undefined}
+      enctype={multipart ? 'multipart/form-data' : undefined}
       data-success-message={successMessage}
       aria-labelledby={ariaLabelledby}
       novalidate

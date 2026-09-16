@@ -14,6 +14,7 @@ function checkFile(input: HTMLInputElement): boolean {
   const file = input.files?.[0];
   const max = Number(input.dataset.maxBytes) || 5 * 1024 * 1024;
   let message = '';
+  if (!file && input.dataset.required !== undefined && input.dataset.touched) message = 'Please attach a file.';
   if (file && !RESUME_TYPES.includes(file.type)) message = 'Please attach a PDF or Word document.';
   else if (file && file.size > max) message = `The file is too large (${Math.round(max / 1024 / 1024)} MB max).`;
   if (name) {
@@ -98,6 +99,7 @@ export function initForms(): void {
       if (!endpoint) return; // let the mailto/native action happen
       event.preventDefault();
       if (!validate(form)) return;
+      if (fileInput) fileInput.dataset.touched = 'true';
       if (fileInput && !checkFile(fileInput)) return;
       const file = fileInput?.files?.[0];
 
@@ -151,7 +153,10 @@ export function initForms(): void {
           throw new Error(body.message || 'Something went wrong. Please try again or email us.');
         }
         form.reset();
-        if (fileInput) checkFile(fileInput);
+        if (fileInput) {
+          delete fileInput.dataset.touched;
+          checkFile(fileInput);
+        }
         setState(form, 'success', (relay ? form.dataset.successMessage : body.message) || form.dataset.successMessage || body.message || 'Thank you! We received your message.');
       } catch (err) {
         setState(form, 'error', (err as Error).message);

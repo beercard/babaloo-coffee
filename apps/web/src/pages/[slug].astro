@@ -1,0 +1,72 @@
+---
+/** Extra pages created in the CMS (Pages > New pages), published at /<slug>. */
+import type { GetStaticPaths } from 'astro';
+import Base from '@/layouts/Base.astro';
+import SectionRenderer from '@/components/sections/SectionRenderer.astro';
+import { getContent } from '@/lib/cms';
+import type { CustomPage } from '@/lib/cms/types';
+import { breadcrumbSchema } from '@/utils/schema';
+import { paragraphs } from '@/utils/format';
+
+export const getStaticPaths = (async () => {
+  // Paths owned by the built-in pages and the legacy redirects (never overridden by a CMS page).
+  const RESERVED = new Set(['menu', 'about', 'contact', 'contact-us', 'drinks', 'food', 'hours', 'gallery', 'join-our-team', '404', 'robots.txt']);
+  const { pages } = await getContent();
+  return pages.filter((p) => !RESERVED.has(p.slug)).map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: CustomPage };
+const content = await getContent();
+const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
+const schema = [
+  breadcrumbSchema([
+    { name: 'Home', url: siteUrl },
+    { name: page.title, url: `${siteUrl}${page.slug}` },
+  ]),
+];
+const concrete = page.background === 'concrete';
+---
+
+<Base seo={page.seo} title={page.title} schema={schema} bodyClass={`page-custom page-${page.slug}`} background={concrete ? 'concrete' : 'cream'}>
+  <header class:list={['page-head', concrete && 'page-head--concrete']}>
+    <div class="container container--narrow">
+      <h1 class:list={['page-head__title', 'eyebrow-link', !page.showTitle && 'visually-hidden']}>{page.title}</h1>
+      {
+        page.intro &&
+          paragraphs(page.intro).map((lines) => (
+            <p class="page-head__intro">
+              {lines.map((line, i) => (
+                <Fragment>
+                  {line}
+                  {i < lines.length - 1 && <br />}
+                </Fragment>
+              ))}
+            </p>
+          ))
+      }
+    </div>
+  </header>
+  <SectionRenderer sections={page.sections} content={content} />
+</Base>
+
+<style>
+  .page-head {
+    padding-top: calc(var(--curtain-h) + clamp(1.5rem, 2.5vw, 3rem));
+    padding-bottom: clamp(1rem, 2.5vw, 2.5rem);
+    background: var(--cream);
+    text-align: var(--title-align, center);
+  }
+  .page-head--concrete {
+    background: transparent;
+  }
+  .page-head__title {
+    display: block;
+  }
+  .page-head__intro {
+    margin-top: 1em;
+    font-style: italic;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    text-wrap: balance;
+  }
+</style>

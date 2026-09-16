@@ -1,0 +1,74 @@
+---
+/** "Form" section: the Contact or Join our team form anywhere, with an optional photo beside it. */
+import type { FormSection as FormSectionData, SiteContent } from '@/lib/cms/types';
+import Section from '@/components/ui/Section.astro';
+import Picture from '@/components/ui/Picture.astro';
+import SiteForm from '@/components/forms/SiteForm.astro';
+
+interface Props {
+  section: FormSectionData;
+  content: SiteContent;
+}
+const { section, content } = Astro.props;
+const id = section.anchor ?? section.id;
+const titleId = `${id}-title`;
+---
+
+<Section id={id} background={section.background} padded={section.image ? 'none' : 'y'} class:list={['form-section', section.image && 'form-section--image']} ariaLabelledby={section.title ? titleId : undefined}>
+  {
+    section.image && (
+      <div class="form-section__photo reveal reveal--left">
+        <Picture image={section.image} sizes="(min-width: 900px) 50vw, 100vw" widths={[480, 768, 1024, 1400]} class="form-section__img" />
+      </div>
+    )
+  }
+  <div class:list={['form-section__body', !section.image && 'container', 'reveal']}>
+    {section.title && <h2 id={titleId} class="form-section__title ui">{section.title}</h2>}
+    {section.text && <p class="form-section__text italic">{section.text}</p>}
+    <SiteForm form={section.form} config={content.forms[section.form]} email={content.settings.email} ariaLabelledby={section.title ? titleId : undefined} />
+  </div>
+</Section>
+
+<style>
+  .form-section__body {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 2rem);
+    max-width: 62rem;
+  }
+  /* Root classes sit on <Section>'s element, outside this component's style scope. */
+  :global(.form-section--image) {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    :global(.form-section--image) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  :global(.form-section--image) .form-section__body {
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 6rem) var(--gutter);
+    max-width: none;
+  }
+  .form-section__photo {
+    min-height: 18rem;
+  }
+  .form-section__photo :global(picture),
+  :global(.form-section__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .form-section__title {
+    font-weight: 700;
+    font-size: var(--text-title);
+    text-transform: uppercase;
+    text-align: var(--title-align, center);
+    letter-spacing: 0.01em;
+  }
+  .form-section__text {
+    text-align: var(--title-align, center);
+    font-size: var(--text-body-sm);
+  }
+</style>

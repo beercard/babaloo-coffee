@@ -107,8 +107,34 @@ Vercel no tiene disco persistente, así que la base de datos va a **Turso** (SQL
 
 Notas:
 - El plan Hobby de Vercel es solo para uso no comercial: sirve para la demo; para producción usa Pro o el VPS.
-- Para cambios de esquema en producción (campos nuevos), vuelve a correr el seed con `DB_PUSH=1` desde local o genera migraciones (`npm run payload migrate:create`).
-- El límite de intentos de login es en memoria por instancia; en Vercel sigue funcionando por función, pero no es global.
+- Cambios de esquema en producción (campos nuevos): ver *Actualizar el esquema* más abajo.
+
+#### Sitio de vista previa (borradores)
+
+Permite ver los borradores antes de publicarlos (botón **Preview** del panel).
+
+1. Vercel → **Add New Project** con el mismo repo, nombre `babaloo-preview`, *Root Directory* = `apps/web` (igual que el sitio).
+2. Variables del proyecto preview: `PAYLOAD_URL` y `PUBLIC_CMS_URL` = URL del CMS, `SITE_URL` = URL del preview, `PAYLOAD_DRAFTS=1`, `PAYLOAD_PREVIEW_SECRET=<cadena aleatoria>`.
+3. Settings → Git → **Deploy Hooks** del proyecto preview → crear uno (rama `main`).
+4. En el proyecto **CMS**: `PREVIEW_URL=https://babaloo-preview.vercel.app`, `PREVIEW_DEPLOY_HOOK_URL=<hook del paso 3>`, `PREVIEW_SECRET=<la misma cadena>`, y agrega la URL del preview a `SITE_URL`. Redeploy del CMS.
+5. Opcional: Settings → Deployment Protection del preview, para que solo lo vea quien tenga acceso.
+
+El sitio en vivo solo se reconstruye al **publicar**; el preview se reconstruye con cada guardado.
+
+#### Actualizar el esquema (campos nuevos) en Turso
+
+`push` interactivo de Payload no sirve en producción. Usa los scripts:
+
+```bash
+cd apps/cms
+export NODE_OPTIONS="--no-deprecation --import=tsx/esm" DB_PUSH=0 DEPLOY_HOOK_URL=
+# con DATABASE_URL / DATABASE_AUTH_TOKEN de Turso en el entorno:
+node src/scripts/export.ts backup.json               # respaldo completo en JSON
+node src/scripts/migrate-cms.ts backup.json --dry    # muestra qué tablas sobran
+node src/scripts/migrate-cms.ts backup.json          # aplica (una transacción) y convierte los datos
+```
+
+Orden recomendado: push del código, esperar a que el CMS nuevo esté *Ready*, correr la migración y publicar cualquier cambio (o redeploy del sitio) para reconstruir la web. Turso guarda además puntos de restauración (`turso db create --from-db … --timestamp …`).
 
 ### Railway / Render / Fly.io
 
@@ -134,7 +160,7 @@ Crea el admin, sube las fotos y carga el menú/locales/textos. Entra a `/admin`,
    DEPLOY_HOOK_TOKEN=github_pat_…
    DEPLOY_HOOK_BODY={"event_type":"cms-publish"}
    ```
-3. Al guardar cualquier contenido, Payload espera 60 s (agrupa ediciones) y dispara el workflow. En ~2 minutos el sitio está publicado.
+3. Al **publicar** contenido, Payload espera 60 s (agrupa ediciones) y dispara el workflow. En ~2 minutos el sitio está publicado. Guardar un borrador no dispara nada (salvo el hook de vista previa).
 
 Con Vercel/Netlify basta con poner su *Deploy Hook URL* en `DEPLOY_HOOK_URL` (sin token ni body).
 

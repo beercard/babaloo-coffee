@@ -1,97 +1,241 @@
-# Guía rápida para administrar la web de Babaloo
+# Guía del panel de Babaloo (CMS)
 
-Entra en **https://cms.babaloocoffeeclub.com/admin** con tu usuario y contraseña.
-Todo lo que guardes se publica solo en la web en un par de minutos (no hace falta avisar a nadie).
-
-Idioma del panel: **Mi cuenta e idioma** (abajo en la barra lateral) → English / Español. Ahí mismo está **Cerrar sesión**.
-
-## Cómo está organizado
-
-Cada **página** de la web es una entrada del panel y dentro están **sus secciones, en el mismo orden que en la web**:
-
-```
-PÁGINAS
- ├── Página de inicio      → Fotos del hero · Franja de iconos · Fila de enlaces · Texto de bienvenida · Locales y horarios · (secciones opcionales)
- ├── Página Menú           → texto de arriba del menú
- ├── Página About          → 1 Título y fotos enmarcadas · 2 Texto · 3 Únete al equipo (foto + formulario) · 4 Contacto
- └── Página Contacto       → título y texto
-MENÚ
- ├── Productos             → cada bebida o plato: nombre, descripción, precio, foto, etiquetas
- └── Categorías            → Coffee, Matcha & non-coffee, Bites… y sus secciones Hot / Iced
-FOTOS
- └── Imágenes              → biblioteca en carpetas: Home · Hero, Home · Locations, Menu · Products, About · Team, Gallery, Brand
-MENSAJES
- └── Mensajes              → lo que llega por los formularios
-AJUSTES (solo super admin)
- ├── Ajustes del sitio · SEO por defecto · Usuarios
-```
-
-Las cajas **SEO** de cada página y todo el grupo *Ajustes* solo las ve el super admin. Las URLs antiguas `/gallery` y `/join-our-team` redirigen a la portada y a About.
+Panel: **https://cms.babaloocoffeeclub.com/admin** (mientras tanto, https://babaloo-cms.vercel.app/admin).
+Idioma del panel: **My account / Mi cuenta** → Language → English o Español. Los nombres de botones van en inglés y, entre paréntesis, en español.
 
 ---
 
-## Las tareas más habituales
+## 1. Lógica general
 
-### Cambiar el precio del Latte
-1. **Menú → Productos** → busca "Latte" → ábrelo.
-2. Cambia el número en **Precio (USD)** (por ejemplo `6` → `6.5`).
-3. **Guardar**. La web mostrará `$6.50`.
+### Qué se edita desde el panel y qué sigue en código
 
-> Para un texto en lugar de número (por ejemplo `+$0.75` o `market price`) usa **Precio en texto**.
+| Desde el panel (sin código) | Queda en código (a propósito) |
+|---|---|
+| Textos, fotos, precios, productos, categorías, etiquetas y locales | Los dibujos a mano (perros, iconos originales, logo dibujado, marco dorado) |
+| Orden de las secciones, ocultarlas, duplicarlas y agregar nuevas | La maquetación de cada tipo de sección (cómo se acomoda en celular y escritorio) |
+| Páginas nuevas (eventos, catering…) con las mismas secciones de la portada | Las 4 páginas base (Home, Menu, About, Contact) no se pueden borrar ni renombrar su URL |
+| Colores, tipografías (de la lista), tamaños, espacios, alineación de títulos | Tipografías nuevas que no estén en la lista y cambios de diseño finos |
+| Header: altura, logo, madera, cortina, fijo al hacer scroll | Las redirecciones de las URLs viejas de WordPress |
+| Footer: fondo, logo, perros, links, dirección, email, redes, copyright, línea extra | SEO técnico, analítica y dominio (lo ve el desarrollador) |
+| Formularios: campos, obligatorios, desplegables, destinatarios y mensajes | La contraseña del correo que envía los formularios (SMTP) |
 
-### Cambiar la foto de un producto
-1. **Menú → Productos** → abre el producto.
-2. En **Foto del producto** pulsa *Elegir* (carpeta *Menu · Products*) o *Subir* una nueva.
-3. Escribe una **Descripción (ALT)** breve (obligatorio; ayuda a Google y a personas ciegas).
-4. **Guardar**. Al hacer clic en ese producto en la web aparecerá su foto.
+### Cómo se publica
+Cada página, producto o ajuste tiene dos botones arriba:
 
-### Añadir un producto nuevo
-**Menú → Productos → Crear**. Rellena nombre, categoría/sección (por ejemplo *Coffee → Iced*), precio, foto y guarda.
-- **Orden**: número para ordenar dentro de su sección (1 sale primero).
-- **Etiquetas**: *New*, *Popular*, *Seasonal*, *Signature*… se ven junto al nombre. Las etiquetas de local (*Rea Farms* verde oliva, *South End* terracota, *Lake Norman* azul) indican dónde está disponible el producto y se combinan con las otras (por ejemplo *Popular* + *Lake Norman*).
-- **Destacado**: lo muestra en la portada si esa sección está activa.
-- Desmarca **Disponible** para ocultarlo temporalmente sin borrarlo.
+- **Save Draft (Guardar borrador)**: guarda tus cambios sin publicarlos. La web no cambia.
+- **Publish changes (Publicar cambios)**: publica. La web se actualiza sola en **1 a 3 minutos** (se reconstruye entera, por eso es tan rápida para los visitantes).
 
-### Crear una categoría o una sección Hot / Iced
-**Menú → Categorías → Crear**. Si es una sección dentro de otra (por ejemplo *Hot* dentro de *Coffee*), elige la categoría madre en **Categoría madre**. En la web, Hot / Iced / Salty / Sweet se distinguen con icono y color.
+Arriba se ve el **Status (Estado)**: *Published* (publicado), *Draft* (borrador) o *Changed* (publicado, pero con cambios sin publicar).
 
-### Cambiar el horario o la dirección
-**Páginas → Página de inicio** → sección **Locales** → abre el local → **Horario (tal como se muestra en la web)**. Si cambia el horario, actualiza también *Horario para Google* dentro de "Horario para Google, mapa y coordenadas". Guardar.
+### Vista previa antes de publicar
+Si está activado el sitio de vista previa, aparece el botón **Preview (Vista previa)** al lado de *Publish*. Abre una copia privada de la web que **incluye los borradores** (tiene una etiqueta roja "Preview" abajo a la derecha y Google no la indexa).
 
-Para un local nuevo: en la misma sección, **Añadir local**, sube la foto que irá dentro del marco (carpeta *Home · Locations*) y marca **Próximamente** hasta que abra.
+1. Haz tus cambios y pulsa **Save Draft**.
+2. Espera 1 a 2 minutos y pulsa **Preview**.
+3. Si está bien, vuelve al panel y pulsa **Publish changes**.
 
-### Cambiar las fotos grandes de la portada (carrusel)
-**Páginas → Página de inicio** → sección **Fotos del hero** → cambia, añade o arrastra fotos (carpeta *Home · Hero*). Se alternan solas cada 5 segundos (ajustable) y el visitante puede pasar con las flechas, los puntos o deslizando.
+### Volver atrás si me equivoco
+Toda página, producto, categoría, etiqueta y ajuste guarda su historial.
 
-### Cambiar el texto de bienvenida / el texto de About
-- Portada: **Página de inicio** → sección **Texto de bienvenida**.
-- About: **Página About** → pestaña **2 · Texto**.
-Cada salto de línea se respeta tal cual.
+1. Abre el documento → pestaña **Versions (Versiones)**.
+2. Elige la versión anterior (se ve la fecha y quién la guardó). Puedes compararla con la actual.
+3. Pulsa **Restore (Restaurar)**. Si lo restauras como publicado, la web vuelve a esa versión en 1 a 3 minutos.
 
-### Fotos enmarcadas de About
-**Página About** → pestaña **1 · Título y fotos enmarcadas** → tres fotos (carpeta *Home · Locations* o *About · Team*).
+Además:
+- Para **ocultar** algo sin perderlo: desmarca *Available (Disponible)* en productos, *Visible on the website* en categorías o *Show this section (Mostrar esta sección)* en secciones.
+- Los borrados **no** tienen papelera: antes de borrar, mejor ocultar.
 
-### Galería de fotos (sección opcional de la portada)
-**Página de inicio** → sección **Galería de fotos**: marca *Mostrar esta sección*, añade fotos (carpeta *Gallery*), quita o arrastra para reordenar. Si la sección está oculta, la web no muestra galería.
+### Escritorio y celular
+Hay **una sola versión del contenido**. La web acomoda sola cada sección para escritorio, tablet y celular, así que **no se puede romper una versión editando la otra**. Lo único específico del celular son las fotos opcionales *Phone version (Versión móvil)* del hero y de algunos bloques, para usar un recorte vertical en el teléfono.
 
-### Leer los mensajes de los formularios
-**Mensajes**. Cada mensaje tiene un estado (New / Replied / Archived) y se puede borrar (también los currículums adjuntos). Las solicitudes de *Join our team* traen el currículum adjunto (campo **Currículum**, también en **Mensajes → Currículums**); además llegan por email al buzón configurado.
-
-### Ocultar o reordenar secciones de la portada
-**Página de inicio**: arrastra las secciones para cambiar su orden; desmarca **Mostrar esta sección** para ocultar una sin borrarla. Puedes añadir secciones nuevas (galería, productos destacados, testimonios, texto, llamada a la acción) con **Añadir sección**.
+El panel también funciona desde el celular.
 
 ---
 
-## Consejos sobre fotos
-- Sube JPG o PNG de buena calidad (1500–2500 px de ancho). La web las convierte sola a formatos ligeros.
-- Súbelas en la carpeta de su página para encontrarlas después.
-- Para productos funcionan mejor las fotos verticales con fondo limpio.
-- Rellena siempre la descripción (ALT).
+## 2. Ajustes generales del sitio
 
-## Usuarios
-- **Super admin**: todo, incluidos Ajustes, SEO y Usuarios.
-- **Editor**: páginas, menú, fotos y mensajes.
-Se crean en **Ajustes → Usuarios** (super admin).
+### Settings → Design (Ajustes → Diseño)
+Todo lo que cambia el aspecto de **todas** las páginas a la vez. Un campo vacío = diseño original, así que siempre se puede volver.
 
-## Si algo no se ve actualizado
-Espera 2–3 minutos y recarga con Ctrl+F5. Si sigue igual, avisa al desarrollador: puede que el "rebuild" no esté configurado (`DEPLOY_HOOK_URL`).
+- **Colours (Colores)**: texto y líneas, fondo de página, franja de iconos y botones oscuros, texto sobre fondos oscuros, paneles suaves, color bajo la textura de mármol, color del header (también pinta la barra del celular) y borde de foco. Botón **↺ default** para volver al original.
+- **Fonts & sizes (Tipografías y tamaños)**: tipografía del texto, de títulos/menú/botones y la manuscrita; tamaño en % del texto, títulos, manuscrita, lista del menú y enlaces (100 = original; conviene moverse de a 5 o 10).
+- **Layout & spacing (Diseño y espacios)**: espacio entre secciones %, márgenes laterales %, ancho máximo del texto, alineación de los títulos de página y animaciones al hacer scroll.
+- **Header**: ver sección 3.
+- **Footer & textures (Footer y texturas)**: ver sección 3. Aquí también se reemplaza la **textura de mármol** que usan el footer, Contacto y el panel de fotos del menú.
+
+> La alineación de textos de cada sección (izquierda, centro, derecha) se elige dentro de la sección.
+
+### Imágenes: tamaño, recorte, posición y formato
+- **Biblioteca**: *Images (Imágenes)*, en carpetas por página. Sube la foto en su carpeta y escribe la **descripción (ALT)**, que es obligatoria (ayuda a Google y a personas ciegas).
+- **Recorte y posición**: al abrir una imagen, *Edit image* permite **recortar** y marcar el **punto focal** (el punto que nunca se corta). La web respeta ese punto en todos los tamaños de pantalla.
+- **Tamaño en la web**: lo decide cada sección (por ejemplo, el marco dorado siempre tiene la misma proporción). No hace falta redimensionar a mano.
+- **Formato ideal para subir**:
+
+| Uso | Formato | Tamaño | Peso |
+|---|---|---|---|
+| Fotos (hero, marcos, productos, secciones) | JPG o WebP | 2000 a 2400 px del lado largo | menos de 1,5 MB |
+| Foto vertical para celular (hero) | JPG o WebP | 1200 × 1800 px aprox. | menos de 1 MB |
+| Logos, iconos, cortina | PNG o SVG con fondo transparente | logo 800 px, iconos 300 × 200 px, cortina 2400 px de ancho | menos de 500 KB |
+| Texturas (madera, mármol) | JPG | 720 a 1200 px, que se repita sin cortes | menos de 400 KB |
+| Imagen para compartir en redes | JPG | 1200 × 630 px | menos de 500 KB |
+
+La web convierte todo sola a AVIF/WebP en varios tamaños; subir fotos más grandes no mejora nada y hace más lenta la publicación.
+
+---
+
+## 3. Header, páginas y footer
+
+### Header (Settings → Design → Header)
+- **Header height (Altura)**: chico, mediano (original) o grande. Afecta también a la cortina.
+- **Logo size % (Tamaño del logo)**.
+- **Stays visible when scrolling (Queda fijo al hacer scroll)**.
+- **Logo**: opcional, reemplaza el logo dibujado (PNG/SVG claro con fondo transparente).
+- **Wood texture (Madera)**: foto continua de unos 1000 px de ancho.
+- **Show the curtain (Mostrar la cortina)** y **Curtain (Cortina)**: PNG ancho con el borde inferior transparente.
+- **Logo inside the open menu (Logo del menú abierto)**.
+
+### Links de navegación (Settings → Site settings → Navigation)
+- **Main menu (Menú principal)**: los links del menú desplegable y de la fila de links de la portada.
+- **Footer links (Links del footer)**.
+- Cada link tiene texto, URL y *New tab (Pestaña nueva)*. Arrastra para reordenar, **⋯ → Remove** para quitar, **Add Link** para agregar.
+- URLs válidas: una página (`/menu`, `/about`, `/catering`), una sección (`/#locations`) o una dirección completa (`https://…`).
+
+### Agregar, quitar o reordenar páginas
+1. **Pages → New pages (Páginas → Páginas nuevas) → Create new**.
+2. Escribe el título; la URL se completa sola (por ejemplo *Catering* → `/catering`).
+3. Elige si se muestra el título, el fondo (crema o mármol) y una intro opcional.
+4. Agrega secciones con **Add Section** (las mismas de la portada).
+5. **Publish changes**. La página queda en `babaloocoffeeclub.com/catering`.
+6. Para que aparezca en el menú, agrégala en *Navigation* (paso anterior). El orden del menú es el orden de esos links.
+
+Para quitar una página: sácala primero del menú y del footer, y después bórrala o pásala a borrador (**⋯ → Unpublish**).
+
+### Footer
+- **Settings → Site settings → Footer**: titular del copyright ("© año nombre"), mostrar u ocultar dirección y email, y una línea extra.
+- **Settings → Site settings → Contact**: la dirección, el teléfono y el email que se muestran.
+- **Settings → Site settings → Social media**: redes (iconos del footer, menú y Contacto).
+- **Settings → Design → Footer & textures**: fondo (textura de mármol o color liso), color del texto, logo del footer y mostrar los perros.
+
+---
+
+## 4. Home (Pages → Home page)
+
+La portada es una lista de **secciones** en el orden de la web. Cada fila muestra número, tipo y un resumen del contenido.
+
+- **Reordenar**: arrastra desde los puntitos de la izquierda.
+- **Ocultar**: abre la sección y desmarca *Show this section*.
+- **Duplicar**: menú **⋯** de la fila → **Duplicate**. Útil para copiar una sección con su diseño y cambiarle el contenido.
+- **Agregar**: **Add Section** al final → elegir el tipo → arrastrarla a su lugar.
+
+Tipos de sección disponibles (sirven en cualquier página):
+
+| Sección | Para qué |
+|---|---|
+| Hero photos | Carrusel de fotos grandes: fotos, versión móvil, segundos por foto y altura (alta, media, baja) |
+| Icons band | Franja de iconos en movimiento: velocidad e **iconos propios** (si se deja vacío, usa los dibujados) |
+| Links row | Fila de links (usa los links de Navigation) |
+| Welcome text | Texto centrado con saltos de línea, alineación y botón opcional |
+| Locations | Marcos dorados con los locales (ver sección 5) |
+| Dogs band | Franja "coffee & matcha club" con perros: velocidad |
+| Featured products | Productos marcados como destacados |
+| Photo gallery | Galería de fotos |
+| Testimonials | Frases de clientes |
+| Call to action | Título, texto, botón e imagen, con fondo y alineación |
+| Text block | Texto con formato simple e imagen a un lado |
+| Gold frames | Marcos dorados con fotos o **carruseles** (ver sección 7) |
+| Form | Formulario de Contacto o de Empleo, con foto opcional |
+| Space / divider | Espacio extra con línea opcional |
+
+**Cambiar el hero**: sección *Hero photos* → cambia, agrega o arrastra fotos (carpeta *Home · Hero*). Opcional: *Phone version* con recorte vertical.
+**Cambiar los textos**: sección *Welcome text*; cada salto de línea se respeta.
+**Franja de ilustraciones**: *Icons band* → *Custom icons* para subir tus propios dibujos, y *Seconds per loop* para la velocidad.
+
+---
+
+## 5. Locations (Pages → Home page → sección Locations)
+
+- **Agregar un local**: *Add Location* dentro de la sección.
+- **Datos**: nombre, nombre manuscrito sobre la foto, estado (*Open* abierto, *Coming soon* próximamente, *Hidden* oculto), foto del marco, dirección, teléfono, email.
+- **Horario**: *Opening hours* (tal como se lee en la web). Abre *Hours for Google, map & coordinates* para el horario de Google (formato 24 h), el link de Google Maps, las coordenadas y el link de pedidos.
+- **Orden**: arrastra los locales. El primero es el principal para Google.
+- **Acomodo automático**: 1 local por fila en celular, 2 en tablet y hasta 3 en escritorio. Con 4 locales se muestran 2 + 2; con 5, 3 + 2 centrados. No hay que tocar nada.
+- Si un local cambia de horario, actualiza también la página **Contact** si ahí se muestra.
+
+---
+
+## 6. Menu
+
+### Página del menú (Pages → Menu page)
+- **Intro**: título manuscrito (**Enter = salto de línea**), texto (línea en blanco = párrafo nuevo) y alineación.
+- **Menu options**: mostrar precios, mostrar el **selector de local** y el texto del botón "All locations".
+- **Extra sections**: secciones debajo del menú.
+
+### Categorías (Menu → Categories)
+- **Crear**: *Create new* → nombre. Para una subsección (Hot, Iced…), elige *Parent category (Categoría madre)*.
+- **Nombre con salto de línea**: *Name as shown on the menu*, Enter donde quieras cortar.
+- **Orden**: campo *Order (Orden)* en la columna derecha; los números más bajos salen primero.
+- **Agregar "Food"**: crea la categoría *Food* sin madre, dale un orden y agrégale productos. Una categoría sin productos no se muestra. La lista se vuelve a centrar sola.
+- **Ocultar**: desmarca *Visible on the website*.
+
+### Productos (Menu → Products)
+- **Agregar**: *Create new* → nombre, categoría, descripción, precio, foto.
+- **Precio**: *Price (USD)* con números (5.5 = $5.50). *Price text* reemplaza el número (por ejemplo "+$0.75"). *Sizes / variants* para varios tamaños o sabores con precio.
+- **Reordenar**: campo *Order* (o columna *Order* de la lista).
+- **Mover de categoría**: cambia *Category*. Para varios a la vez: márcalos en la lista → **Edit** → *Category* → guardar.
+- **Ocultar sin borrar**: desmarca *Available (Disponible)*.
+- **Etiquetas y locales**: *Labels & locations* en la columna derecha.
+
+### Etiquetas y locales (Menu → Labels)
+- **Crear una etiqueta**: *Create new* → texto, tipo, color del distintivo y del texto, orden.
+  - Tipo **Badge (Distintivo)**: Signature, New, Popular, Seasonal…
+  - Tipo **Location (Local)**: Rea Farms, South End, Lake Norman…
+- **Productos solo en un local**: agrégale al producto la etiqueta de ese local. Un producto **sin** etiqueta de local se vende en todos.
+- En la web, el selector de local (arriba del menú) muestra solo lo que se vende en el local elegido. Aparece cuando hay al menos dos locales en uso.
+- *Show as a badge*: desmárcalo si quieres usar la etiqueta solo para filtrar, sin mostrar el distintivo.
+
+---
+
+## 7. About (Pages → About page)
+
+- **1 · Title & framed photos**: título y **marcos dorados**. Agrega los marcos que quieras con *Add Frame* y arrástralos para ordenarlos. *Frames per row on desktop* (2, 3 o 4). Las filas incompletas se centran.
+- **Carrusel dentro de un marco**: en un marco, *More photos* → agrega más fotos. Ese marco pasa a ser un carrusel que se desliza con el dedo, con flechas en escritorio y puntitos debajo. *Carousels move on their own* lo hace avanzar solo.
+- **Texto sobre la foto**: *Hand-written text over the photo*.
+- **2 · Text**: texto, alineación y mostrar u ocultar la franja de perros.
+- **3 · Join our team**: mostrar u ocultar, foto del equipo, título e intro. Los campos del formulario están en *Settings → Forms*.
+- **4 · Extra sections**: más secciones (por ejemplo otra fila de marcos) antes del formulario de contacto.
+- **5 · Contact**: mostrar u ocultar el formulario de contacto al final.
+
+---
+
+## 8. Formularios (Settings → Forms)
+
+- **Send form messages to (Enviar a)**: el email que recibe los formularios. Varios: separados por coma. Cada formulario puede tener su propio destinatario en su pestaña.
+- Pestañas **Contact us** y **Join our team**:
+  - **Fields (Campos)**: cada fila es un campo. Arrastra para reordenar, **⋯ → Remove** para quitar, **Add Field** para agregar.
+  - En cada campo: *Label* (texto que se ve), *Type* (texto corto, email, teléfono, texto largo, desplegable, número, fecha, enlace, subir archivo), *Width* (mitad o completo) y *Required (Obligatorio)*.
+  - **Desplegables**: tipo *Dropdown* → *Dropdown options* para agregar, quitar o reordenar opciones (por ejemplo los puestos de trabajo).
+  - *Internal key* se completa sola. **No la cambies** en campos que ya recibieron mensajes.
+  - Un campo *File upload* se muestra como el botón manuscrito "upload résumé" (PDF o Word, hasta 5 MB).
+  - **Send button text**, **Email subject** y **Message after sending** (mensaje de confirmación).
+- Pestaña **Status & test (Estado y prueba)**: muestra si el envío de emails está configurado, a dónde llega cada formulario y los mensajes recientes. **Send a test email** manda un correo de prueba.
+
+**Verificar que funcionan**:
+1. *Publish changes* y espera 2 minutos.
+2. Envía el formulario desde la web con datos de prueba.
+3. Debe aparecer el mensaje de confirmación y el mensaje en **Messages (Mensajes)**.
+4. Si el envío de emails está configurado, también llega al correo (revisa spam la primera vez).
+5. Borra el mensaje de prueba.
+
+Los mensajes quedan en **Messages** con estado *New / Replied / Archived*; los currículums, en **Messages → Résumés**. Ambos se pueden borrar.
+
+---
+
+## 9. Usuarios
+- **Super admin**: todo, incluidos SEO y Usuarios.
+- **Editor**: páginas, menú, fotos, mensajes, Diseño, Ajustes del sitio y Formularios.
+Se crean en **Settings → Users** (super admin).
+
+## 10. Si algo no se ve actualizado
+1. ¿Pulsaste **Publish changes**? Un borrador no cambia la web.
+2. Espera 3 minutos y recarga con Ctrl+F5 (en el celular, cierra y abre la pestaña).
+3. Si sigue igual, avisa al desarrollador con la hora del cambio.

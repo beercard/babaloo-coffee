@@ -5,11 +5,13 @@
  */
 import '@fontsource/lato/latin-400.css';
 import '@fontsource/lato/latin-400-italic.css';
+import '@fontsource/lato/latin-700.css';
 import '@fontsource/lato/latin-700-italic.css';
 import '@fontsource/poppins/latin-300-italic.css';
 import '@fontsource/poppins/latin-400.css';
 import '@fontsource/poppins/latin-400-italic.css';
 import '@fontsource/poppins/latin-700.css';
+import '@fontsource/poppins/latin-700-italic.css';
 import '@fontsource/mrs-saint-delafield/latin-400.css';
 import '@/styles/global.css';
 
@@ -21,7 +23,8 @@ import type { SEOMeta, SiteContent } from '@/lib/cms/types';
 import { getContent } from '@/lib/cms';
 import { imageOptions, absoluteUrl } from '@/lib/images';
 import { getImage } from 'astro:assets';
-import concreteTexture from '@/assets/textures/concrete.jpg';
+import { concreteTextureUrl } from '@/lib/texture';
+import { designStyle } from '@/lib/design';
 import { organizationSchema, websiteSchema, cafeSchema, graph } from '@/utils/schema';
 import SEO from '@/components/seo/SEO.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
@@ -57,9 +60,13 @@ interface Props {
 }
 
 const { seo, title, isHome = false, schema = [], bodyClass, background = 'cream' } = Astro.props;
-const pageTexture = background === 'concrete' ? await getImage({ src: concreteTexture, width: 720, format: 'webp', quality: 55 }) : undefined;
+const pageTexture = background === 'concrete' ? { src: await concreteTextureUrl() } : undefined;
 const content: SiteContent = await getContent();
-const { settings, seoDefaults, locations } = content;
+const { settings, seoDefaults, locations, design } = content;
+const preview = import.meta.env.PAYLOAD_DRAFTS === '1';
+// The preview site (drafts) must never be indexed.
+const pageSeo: SEOMeta = preview ? { ...seo, robots: 'noindex, nofollow' } : seo;
+const woodColor = design.colors.wood ?? '#58473a';
 const siteUrl = Astro.site?.href ?? 'https://babaloocoffeeclub.com/';
 
 // Organisation logo for schema (uses the CMS logo when present, else the OG image).
@@ -76,13 +83,14 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
 ---
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="en" class:list={['no-js', !design.layout.animations && 'no-anim']}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <script is:inline>document.documentElement.classList.remove('no-js');</script>
-    <SEO meta={seo} defaults={seoDefaults} fallbackTitle={title} raw={isHome} siteName={settings.name} />
-    <meta name="theme-color" content="#58473a" data-theme-color />
+    <SEO meta={pageSeo} defaults={seoDefaults} fallbackTitle={title} raw={isHome} siteName={settings.name} />
+    <meta name="theme-color" content={woodColor} data-theme-color />
+    {designStyle(design) && <style is:inline set:html={designStyle(design)} />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -106,6 +114,7 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
   </head>
   <body class:list={[bodyClass, pageTexture && 'page--concrete']} style={pageTexture ? `--texture:url(${pageTexture.src})` : undefined}>
     <a href="#main" class="skip-link">Skip to content</a>
+    {preview && <p class="preview-ribbon" role="status">Preview · drafts included · not the live site</p>}
     {
       import.meta.env.PUBLIC_GTM_ID && (
         <noscript>
@@ -130,5 +139,20 @@ const ld = graph([organizationSchema(settings, siteUrl, logoUrl), websiteSchema(
 <style is:global>
   main:focus {
     outline: none;
+  }
+  .preview-ribbon {
+    position: fixed;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    z-index: 200;
+    margin: 0;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    background: #a3402f;
+    color: #fff;
+    font: 600 0.75rem/1.2 var(--font-ui);
+    letter-spacing: 0.04em;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
   }
 </style>

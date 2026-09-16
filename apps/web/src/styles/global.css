@@ -9,7 +9,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  background: #58473a;
+  background: var(--wood-bg, #58473a);
   /* Anchors land below the sticky header + curtain. */
   scroll-padding-top: calc(var(--header-h) + var(--curtain-h));
 }
@@ -17,7 +17,7 @@ body {
   margin: 0;
   /* Wood on <body>: iOS Safari tints its toolbars from the body colour (theme-color is not always
      honoured), so the browser chrome matches the header. Page surfaces are painted on <main>. */
-  background: #58473a;
+  background: var(--wood-bg, #58473a);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
@@ -190,7 +190,8 @@ body.page--concrete .band--concrete {
 .reveal-stagger > .reveal:nth-child(4) { --reveal-delay: 270ms; }
 .reveal-stagger > .reveal:nth-child(5) { --reveal-delay: 360ms; }
 .reveal-stagger > .reveal:nth-child(n + 6) { --reveal-delay: 450ms; }
-html.no-js .reveal {
+html.no-js .reveal,
+html.no-anim .reveal {
   opacity: 1;
   transform: none;
 }

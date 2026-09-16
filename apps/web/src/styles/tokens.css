@@ -23,31 +23,31 @@
   --font-script: 'Jimmy Script', 'Mrs Saint Delafield', 'Brush Script MT', cursive;
 
   /* PDF 46px @1920 = 2.4vw */
-  --text-body: clamp(1.0625rem, 0.85rem + 0.7vw, 1.45rem);
-  --text-body-sm: clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem);
+  --text-body: calc(clamp(1.0625rem, 0.85rem + 0.7vw, 1.45rem) * var(--text-scale, 1));
+  --text-body-sm: calc(clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem) * var(--text-scale, 1));
   /* PDF 26px @1920 */
-  --text-small: clamp(0.875rem, 0.8rem + 0.25vw, 1rem);
+  --text-small: calc(clamp(0.875rem, 0.8rem + 0.25vw, 1rem) * var(--text-scale, 1));
   /* PDF nav 46px */
-  --text-nav: clamp(1rem, 0.8rem + 0.6vw, 1.45rem);
+  --text-nav: calc(clamp(1rem, 0.8rem + 0.6vw, 1.45rem) * var(--nav-scale, 1));
   /* PDF menu titles 60px */
-  --text-menu-title: clamp(1.2rem, 0.95rem + 0.85vw, 1.85rem);
+  --text-menu-title: calc(clamp(1.2rem, 0.95rem + 0.85vw, 1.85rem) * var(--menu-scale, 1));
   /* PDF menu description 46px */
-  --text-menu-desc: clamp(0.95rem, 0.85rem + 0.35vw, 1.15rem);
+  --text-menu-desc: calc(clamp(0.95rem, 0.85rem + 0.35vw, 1.15rem) * var(--menu-scale, 1));
   /* PDF script 80–88px */
-  --text-script: clamp(2rem, 1.4rem + 2vw, 3.75rem);
-  --text-script-sm: clamp(1.5rem, 1.1rem + 1.3vw, 2.5rem);
+  --text-script: calc(clamp(2rem, 1.4rem + 2vw, 3.75rem) * var(--script-scale, 1));
+  --text-script-sm: calc(clamp(1.5rem, 1.1rem + 1.3vw, 2.5rem) * var(--script-scale, 1));
   /* PDF form titles 46px Poppins Bold */
-  --text-title: clamp(1.2rem, 1rem + 0.7vw, 1.75rem);
+  --text-title: calc(clamp(1.2rem, 1rem + 0.7vw, 1.75rem) * var(--title-scale, 1));
 
   --leading-tight: 1.15;
   --leading-body: 1.4;
 
   /* Spacing (PDF gutters: 87px @1920 ≈ 4.5vw) */
-  --gutter: clamp(1rem, 4.5vw, 5rem);
-  --section-y: clamp(3rem, 6vw, 6.5rem);
-  --section-y-sm: clamp(2rem, 3.5vw, 4rem);
+  --gutter: calc(clamp(1rem, 4.5vw, 5rem) * var(--side-scale, 1));
+  --section-y: calc(clamp(3rem, 6vw, 6.5rem) * var(--space-scale, 1));
+  --section-y-sm: calc(clamp(2rem, 3.5vw, 4rem) * var(--space-scale, 1));
   --max-w: 1920px;
-  --content-w: 1200px;
+  --content-w: var(--design-content-w, 1200px);
 
   /* Shape & motion */
   --radius-pill: 999px;
@@ -60,8 +60,8 @@
   --dur-slow: 1200ms;
 
   /* Header proportions (PDF: 300px header on 1920, reduced ~30% for screens) */
-  --header-h: clamp(3.75rem, 6.4vw, 7.25rem); /* sticky: kept low so it never crowds the page */
-  --curtain-h: clamp(1.25rem, 3.6vw, 4.25rem); /* half the curtain image height, scales with the viewport */
+  --header-h: calc(clamp(3.75rem, 6.4vw, 7.25rem) * var(--header-scale, 1)); /* sticky: kept low so it never crowds the page */
+  --curtain-h: calc(clamp(1.25rem, 3.6vw, 4.25rem) * var(--header-scale, 1)); /* half the curtain image height, scales with the viewport */
   --strip-h: clamp(3.5rem, 6.5vw, 7.5rem);
 
   color-scheme: light;

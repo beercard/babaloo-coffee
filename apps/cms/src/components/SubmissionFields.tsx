@@ -22,10 +22,13 @@ const ORDER = Object.keys(LABELS)
 
 export const SubmissionFields: React.FC<{ path: string }> = ({ path }) => {
   const { value } = useField<Record<string, string>>({ path })
+  const saved = useFormFields(([fields]) => fields.labels?.value as Record<string, string> | undefined)
   const resume = useFormFields(([fields]) => fields.resume?.value as number | string | { id?: number | string; url?: string; filename?: string } | undefined)
   const es = typeof navigator !== 'undefined' && document.cookie.includes('payload-lng=es')
   const data = value && typeof value === 'object' ? value : {}
-  const keys = [...ORDER.filter((k) => k in data), ...Object.keys(data).filter((k) => !ORDER.includes(k))].filter((k) => String(data[k] ?? '').trim() !== '')
+  const savedOrder = saved && typeof saved === 'object' ? Object.keys(saved) : []
+  const order = savedOrder.length ? savedOrder : ORDER
+  const keys = [...order.filter((k) => k in data), ...Object.keys(data).filter((k) => !order.includes(k))].filter((k) => String(data[k] ?? '').trim() !== '')
   const resumeId = resume && typeof resume === 'object' ? resume.id : resume
   const resumeUrl = resume && typeof resume === 'object' && resume.url ? resume.url : resumeId ? `/api/resumes/${resumeId}` : undefined
 
@@ -34,7 +37,7 @@ export const SubmissionFields: React.FC<{ path: string }> = ({ path }) => {
       {keys.length === 0 && <p className="bb-submission__empty">{es ? 'Sin datos' : 'No data'}</p>}
       {keys.map((k) => {
         const v = String(data[k])
-        const label = LABELS[k] ? (es ? LABELS[k][1] : LABELS[k][0]) : k
+        const label = saved?.[k] || (LABELS[k] ? (es ? LABELS[k][1] : LABELS[k][0]) : k.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase()))
         let body: React.ReactNode = v
         if (k === 'email') body = <a href={`mailto:${v}`}>{v}</a>
         else if (k === 'phone') body = <a href={`tel:${v.replace(/[^+\d]/g, '')}`}>{v}</a>

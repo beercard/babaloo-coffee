@@ -2,6 +2,7 @@
 /** Menu — PDF page 2. */
 import Base from '@/layouts/Base.astro';
 import MenuBoard from '@/components/menu/MenuBoard.astro';
+import SectionRenderer from '@/components/sections/SectionRenderer.astro';
 import { getContent, buildMenuTree } from '@/lib/cms';
 import { breadcrumbSchema, menuSchema } from '@/utils/schema';
 import { paragraphs } from '@/utils/format';
@@ -26,7 +27,7 @@ const schema = [
 
 <Base seo={menuPage.seo} title="Menu" schema={schema} bodyClass="page-menu">
   <section class="menu-intro" aria-labelledby="menu-title">
-    <div class="container container--narrow text-center reveal">
+    <div class:list={['container', 'container--narrow', 'reveal', `menu-intro--${menuPage.intro.align}`]}>
       <h1 id="menu-title" class="menu-intro__title script">{menuPage.intro.title}</h1>
       {
         menuPage.intro.text &&
@@ -43,7 +44,8 @@ const schema = [
       }
     </div>
   </section>
-  <MenuBoard menu={menu} showPrices={menuPage.showPrices} />
+  <MenuBoard menu={menu} showPrices={menuPage.showPrices} showLocationFilter={menuPage.showLocationFilter} allLocationsLabel={menuPage.allLocationsLabel} />
+  <SectionRenderer sections={menuPage.sections} content={content} />
 </Base>
 
 <style>
@@ -54,6 +56,22 @@ const schema = [
   }
   .menu-intro__title {
     font-size: var(--text-script);
+    white-space: pre-line;
+  }
+  .menu-intro--center {
+    text-align: center;
+  }
+  .menu-intro--left {
+    text-align: left;
+  }
+  .menu-intro--right {
+    text-align: right;
+  }
+  .menu-intro--left .menu-intro__text {
+    margin-inline: 0 auto;
+  }
+  .menu-intro--right .menu-intro__text {
+    margin-inline: auto 0;
   }
   .menu-intro__text {
     font-style: italic;

@@ -18,7 +18,7 @@ const slides = section.slides;
 
 {
   slides.length > 0 && (
-    <section class="hero" data-hero data-interval={section.interval * 1000} aria-roledescription="carousel" aria-label="Photos of Babaloo">
+    <section class:list={['hero', `hero--${section.height ?? 'tall'}`]} data-hero data-interval={section.interval * 1000} aria-roledescription="carousel" aria-label="Photos of Babaloo">
       <div class="hero__slides">
         {slides.map((slide, i) => (
           <div
@@ -68,6 +68,13 @@ const slides = section.slides;
     /* Fixed 900px band; on shorter screens (phones, small laptops) it never exceeds one viewport. */
     height: min(900px, 100svh);
     min-height: 20rem;
+  }
+  .hero--medium {
+    height: min(680px, 80svh);
+  }
+  .hero--short {
+    height: min(460px, 60svh);
+    min-height: 16rem;
     overflow: hidden;
     background: var(--wood);
   }

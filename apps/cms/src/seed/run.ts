@@ -15,6 +15,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { getPayload } from 'payload';
 import config from '../payload.config';
+import { DEFAULT_FIELDS } from '../endpoints/formsSubmit';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const WEB = path.resolve(dirname, '../../../web/src');
@@ -145,7 +146,7 @@ async function main() {
       created++;
       const doc = await payload.create({
         collection: 'menu-categories',
-        data: { name: c.name as string, slug: c.slug as string, description: c.description as string | undefined, order: c.order as number, active: (c.active as boolean) ?? true, image: await upload(c.image as ImageRef) },
+        data: { _status: 'published', name: c.name as string, slug: c.slug as string, description: c.description as string | undefined, order: c.order as number, active: (c.active as boolean) ?? true, image: await upload(c.image as ImageRef) },
       });
       catIds.set(c.id as string, doc.id as number);
     }
@@ -158,16 +159,36 @@ async function main() {
       created++;
       const doc = await payload.create({
         collection: 'menu-categories',
-        data: { name: c.name as string, slug: c.slug as string, parent: catIds.get(c.parent as string), order: c.order as number, active: (c.active as boolean) ?? true, image: await upload(c.image as ImageRef) },
+        data: { _status: 'published', name: c.name as string, slug: c.slug as string, parent: catIds.get(c.parent as string), order: c.order as number, active: (c.active as boolean) ?? true, image: await upload(c.image as ImageRef) },
       });
       catIds.set(c.id as string, doc.id as number);
     }
+    // Labels (badges + locations) from the seed's tag names.
+    const LOCATION_COLORS: Record<string, string> = { 'Rea Farms': '#5d6b3d', 'South End': '#8a4b2f', 'Lake Norman': '#3f6273' };
+    const labelIds = new Map<string, number>();
+    const labelId = async (name: string): Promise<number> => {
+      if (labelIds.has(name)) return labelIds.get(name)!;
+      const found = (await payload.find({ collection: 'menu-labels', where: { name: { equals: name } }, limit: 1, depth: 0 })).docs[0];
+      const id = (found?.id ??
+        (
+          await payload.create({
+            collection: 'menu-labels',
+            data: { _status: 'published', name, kind: LOCATION_COLORS[name] ? 'location' : 'badge', color: LOCATION_COLORS[name], showBadge: true, order: LOCATION_COLORS[name] ? 10 : 1 } as never,
+          })
+        ).id) as number;
+      labelIds.set(name, id);
+      return id;
+    };
     for (const i of menu.items) {
       if (await findBySlug('menu-items', i.slug as string)) continue;
+      const labels: number[] = [];
+      for (const tag of (i.tags as string[] | undefined) ?? []) labels.push(await labelId(tag));
       created++;
       await payload.create({
         collection: 'menu-items',
         data: {
+          _status: 'published',
+          labels,
           name: i.name as string,
           slug: i.slug as string,
           description: i.description as string | undefined,
@@ -175,7 +196,6 @@ async function main() {
           priceLabel: i.priceLabel as string | undefined,
           variants: (i.variants as { name: string; price: number }[] | undefined) ?? [],
           category: catIds.get(i.category as string)!,
-          tags: ((i.tags as string[] | undefined) ?? []) as never,
           featured: (i.featured as boolean) ?? false,
           available: (i.available as boolean) ?? true,
           order: i.order as number,
@@ -200,6 +220,7 @@ async function main() {
     await payload.updateGlobal({
       slug: 'site-settings',
       data: {
+        _status: 'published',
         ...(site as Json),
         logo: await upload(site.logo as ImageRef),
         nav: site.nav as Json[],
@@ -208,7 +229,7 @@ async function main() {
         secondaryCta: link(site.secondaryCta),
       } as never,
     });
-    await payload.updateGlobal({ slug: 'seo-defaults', data: { ...seo, ogImage: await upload(seo.ogImage as ImageRef) } as never });
+    await payload.updateGlobal({ slug: 'seo-defaults', data: { ...seo, _status: 'published', ogImage: await upload(seo.ogImage as ImageRef) } as never });
 
     const sections: Json[] = [];
     for (const s of home.sections) {
@@ -252,10 +273,10 @@ async function main() {
       }
       sections.push(block);
     }
-    await payload.updateGlobal({ slug: 'homepage', data: { sections, seo: await seoData(home.seo) } as never });
+    await payload.updateGlobal({ slug: 'homepage', data: { _status: 'published', sections, seo: await seoData(home.seo) } as never });
 
     const menuPage = pages.menuPage as Json;
-    await payload.updateGlobal({ slug: 'menu-page', data: { intro: menuPage.intro, showPrices: menuPage.showPrices ?? true, seo: await seoData(menuPage.seo as Json) } as never });
+    await payload.updateGlobal({ slug: 'menu-page', data: { _status: 'published', intro: menuPage.intro, showPrices: menuPage.showPrices ?? true, seo: await seoData(menuPage.seo as Json) } as never });
 
     const about = pages.aboutPage as Json;
     const frames: Json[] = [];
@@ -263,6 +284,7 @@ async function main() {
     await payload.updateGlobal({
       slug: 'about-page',
       data: {
+        _status: 'published',
         title: about.title,
         text: about.text,
         frames,
@@ -280,7 +302,21 @@ async function main() {
     });
 
     const contact = pages.contactPage as Json;
-    await payload.updateGlobal({ slug: 'contact-page', data: { title: contact.title, text: contact.text, details: contact.details, seo: await seoData(contact.seo as Json) } as never });
+    await payload.updateGlobal({ slug: 'contact-page', data: { _status: 'published', title: contact.title, text: contact.text, details: contact.details, seo: await seoData(contact.seo as Json) } as never });
+
+    // Forms: the original fields, with the careers dropdowns from the About page seed.
+    const join = about.join as { positions: string[]; experienceLevels: string[] };
+    const rows = (form: 'contact' | 'careers') =>
+      DEFAULT_FIELDS[form].map((f) => ({
+        label: f.label,
+        type: f.type,
+        name: f.name,
+        required: f.required,
+        width: f.type === 'textarea' ? 'full' : 'half',
+        options: (f.name === 'position' ? join.positions : f.name === 'experience' ? join.experienceLevels : f.options).map((label) => ({ label })),
+      }));
+    await payload.updateGlobal({ slug: 'forms', data: { _status: 'published', contact: { fields: rows('contact') }, careers: { fields: rows('careers') } } as never });
+    await payload.updateGlobal({ slug: 'design', data: { _status: 'published' } as never });
 
     payload.logger.info('[seed] pages done');
   }

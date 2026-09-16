@@ -138,3 +138,36 @@ export const activeField = (name = 'active', label: string | Record<string, stri
   defaultValue: true,
   admin: { position: 'sidebar' },
 });
+
+/** Hex colour picked with a swatch (see components/ColorField). Empty = the design default. */
+export const colorField = (name: string, label: string | Record<string, string>, placeholder?: string, description?: string | Record<string, string>): Field => ({
+  name,
+  type: 'text',
+  label,
+  validate: (value: unknown) => (!value || /^#[0-9a-f]{6}$/i.test(String(value)) ? true : 'Use a hex colour like #3c1a1e'),
+  admin: {
+    placeholder,
+    description,
+    components: { Field: '/components/ColorField#ColorField' },
+  },
+});
+
+/** Text alignment of a section's copy. */
+export const alignField = (defaultValue: 'left' | 'center' | 'right' = 'center', name = 'align', label: Record<string, string> = t('Text alignment', 'Alineación del texto')): Field => ({
+  name,
+  type: 'select',
+  label,
+  defaultValue,
+  options: [
+    { label: t('Left', 'Izquierda'), value: 'left' },
+    { label: t('Center', 'Centro'), value: 'center' },
+    { label: t('Right', 'Derecha'), value: 'right' },
+  ],
+});
+
+/**
+ * History + drafts: "Save draft" keeps changes private (visible only on the preview site),
+ * "Publish changes" puts them live; every save can be restored from the Versions tab.
+ */
+export const globalVersions = { max: 50, drafts: true } as const;
+export const collectionVersions = { maxPerDoc: 30, drafts: true } as const;

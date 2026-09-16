@@ -4,8 +4,7 @@
  * concrete texture (footer / contact / menu panel), sage (menu panel), bark
  * (icon strip). Textures are optimised through astro:assets.
  */
-import { getImage } from 'astro:assets';
-import concrete from '@/assets/textures/concrete.jpg';
+import { concreteTextureUrl } from '@/lib/texture';
 
 interface Props {
   id?: string;
@@ -21,7 +20,7 @@ interface Props {
 
 const { id, as: Tag = 'section', background = 'cream', padded = 'y', class: className, reveal = false, ariaLabelledby, offsetCurtain = false } = Astro.props as Props;
 
-const texture = background === 'concrete' ? await getImage({ src: concrete, width: 720, format: 'webp', quality: 55 }) : undefined;
+const texture = background === 'concrete' ? { src: await concreteTextureUrl() } : undefined;
 ---
 
 <Tag

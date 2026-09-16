@@ -3,6 +3,7 @@
 import Base from '@/layouts/Base.astro';
 import Section from '@/components/ui/Section.astro';
 import ContactForm from '@/components/forms/ContactForm.astro';
+import SectionRenderer from '@/components/sections/SectionRenderer.astro';
 import { getContent, sortedLocations } from '@/lib/cms';
 import { breadcrumbSchema } from '@/utils/schema';
 
@@ -40,7 +41,7 @@ const schema = [
       <div class="contact-page__form reveal reveal--left">
         <h1 id="contact-title" class="contact-page__title ui">{contactPage.title}</h1>
         {contactPage.text && <p class="contact-page__text italic">{contactPage.text}</p>}
-        <ContactForm email={email} ariaLabelledby="contact-title" />
+        <ContactForm email={email} config={content.forms.contact} ariaLabelledby="contact-title" />
       </div>
       <aside class="contact-page__aside reveal reveal--right" aria-label="Contact details">
         {email && (
@@ -101,6 +102,7 @@ const schema = [
       </aside>
     </div>
   </Section>
+  <SectionRenderer sections={contactPage.sections} content={content} />
 </Base>
 
 <style>

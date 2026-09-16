@@ -1,0 +1,66 @@
+---
+/**
+ * Any number of gold frames: rows of `columns` on desktop, 2 on tablets, 1 on phones, with an
+ * incomplete last row centred. Frames with several photos are swipeable carousels.
+ */
+import type { FrameItem } from '@/lib/cms/types';
+import Frame from '@/components/ui/Frame.astro';
+
+interface Props {
+  items: FrameItem[];
+  columns?: 2 | 3 | 4;
+  autoplay?: boolean;
+  title?: string;
+  id?: string;
+  /** Eager-load the first frame (first thing on the page). */
+  eager?: boolean;
+  class?: string;
+}
+const { items, columns = 3, autoplay = false, title, id, eager = false, class: className } = Astro.props;
+const sizes = columns === 4 ? '(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw' : columns === 2 ? '(min-width: 640px) 45vw, 90vw' : '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw';
+---
+
+<div class:list={['frames', className]} id={id} style={`--cols:${columns}`}>
+  {title && <h2 class="frames__title eyebrow-link">{title}</h2>}
+  <ul role="list" class="frames__grid reveal-stagger">
+    {
+      items.map((item, i) => (
+        <li class="frames__item reveal reveal--zoom" style={`--i:${i}`}>
+          <Frame images={item.images} label={item.label} sizes={sizes} loading={eager && i === 0 ? 'eager' : 'lazy'} autoplay={autoplay} />
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .frames__title {
+    display: block;
+    text-align: var(--title-align, center);
+    margin-bottom: clamp(1.5rem, 3.5vw, 3.5rem);
+  }
+  .frames__grid {
+    --gap: clamp(1.5rem, 4vw, 4.5rem);
+    --n: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--gap);
+  }
+  @media (min-width: 640px) {
+    .frames__grid {
+      --n: min(2, var(--cols));
+    }
+  }
+  @media (min-width: 1024px) {
+    .frames__grid {
+      --n: var(--cols);
+    }
+  }
+  .frames__item {
+    flex: 0 0 calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+    min-width: 0;
+    transition-delay: calc(var(--i) * 90ms);
+  }
+</style>

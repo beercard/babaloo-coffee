@@ -91,6 +91,49 @@ export interface SiteSettings {
   primaryCta?: Link;
   secondaryCta?: Link;
   copyright?: string;
+  footerShowAddress: boolean;
+  footerShowEmail: boolean;
+  footerNote?: string;
+}
+
+export type Align = 'left' | 'center' | 'right';
+
+/** Site-wide look from Settings > Design. Every value is optional: empty = original design. */
+export interface Design {
+  colors: Partial<Record<'ink' | 'cream' | 'bark' | 'creamBright' | 'sage' | 'concrete' | 'wood' | 'focus', string>>;
+  type: {
+    bodyFont: 'lato' | 'poppins';
+    uiFont: 'poppins' | 'lato';
+    scriptFont: 'jimmy' | 'delafield';
+    textScale: number;
+    titleScale: number;
+    scriptScale: number;
+    menuScale: number;
+    navScale: number;
+  };
+  layout: { sectionSpacing: number; sideMargin: number; contentWidth: number; titleAlign: Align; animations: boolean };
+  header: { size: 's' | 'm' | 'l'; logoScale: number; sticky: boolean; logo?: ImageRef; wood?: ImageRef; showCurtain: boolean; curtain?: ImageRef; menuLogo?: ImageRef };
+  footer: { background: 'texture' | 'color'; color?: string; textColor?: string; logo?: ImageRef; showDogs: boolean; texture?: ImageRef };
+}
+
+export type FormFieldType = 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'number' | 'date' | 'url' | 'file';
+export interface FormFieldConfig {
+  name: string;
+  label: string;
+  type: FormFieldType;
+  required: boolean;
+  width: 'half' | 'full';
+  options: string[];
+}
+export interface FormConfig {
+  fields: FormFieldConfig[];
+  submitLabel: string;
+  successMessage: string;
+  subject: string;
+}
+export interface FormsConfig {
+  contact: FormConfig;
+  careers: FormConfig;
 }
 
 export interface SEOMeta {
@@ -126,6 +169,8 @@ export interface HeroSlide {
 export interface MenuCategory {
   id: string;
   name: string;
+  /** Name as shown on the menu; may contain line breaks. */
+  displayName?: string;
   slug: string;
   description?: string;
   parent?: string;
@@ -151,10 +196,20 @@ export interface MenuItem {
   variants: MenuVariant[];
   image?: ImageRef;
   category: string;
-  tags: string[];
+  labels: MenuLabel[];
   featured: boolean;
   available: boolean;
   order: number;
+}
+
+export interface MenuLabel {
+  name: string;
+  slug: string;
+  kind: 'badge' | 'location';
+  color?: string;
+  textColor?: string;
+  showBadge: boolean;
+  order?: number;
 }
 
 export interface MenuData {
@@ -198,11 +253,14 @@ export interface HeroSection extends SectionBase {
   slides: HeroSlide[];
   /** Seconds between slides. */
   interval: number;
+  height: 'tall' | 'medium' | 'short';
 }
 export interface IconStripSection extends SectionBase {
   type: 'iconStrip';
   /** Seconds for one full loop. */
   speed: number;
+  /** Custom icons; empty = the built-in drawings. */
+  icons: ImageRef[];
 }
 export interface NavRowSection extends SectionBase {
   type: 'navRow';
@@ -212,6 +270,7 @@ export interface IntroSection extends SectionBase {
   title?: string;
   text: string;
   cta?: Link;
+  align: Align;
 }
 export interface LocationsSection extends SectionBase {
   type: 'locations';
@@ -247,6 +306,7 @@ export interface CtaSection extends SectionBase {
   image?: ImageRef;
   imageMobile?: ImageRef;
   background: 'cream' | 'concrete' | 'sage' | 'bark';
+  align: Align;
 }
 export interface RichTextSection extends SectionBase {
   type: 'richText';
@@ -256,9 +316,38 @@ export interface RichTextSection extends SectionBase {
   imageMobile?: ImageRef;
   imagePosition: 'left' | 'right';
   background: 'cream' | 'concrete' | 'sage';
+  align: Align;
 }
 export interface ClubStripSection extends SectionBase {
   type: 'clubStrip';
+  speed: number;
+}
+
+/** A gold frame; more than one image turns it into a swipeable carousel. */
+export interface FrameItem {
+  images: ImageRef[];
+  label?: string;
+}
+export interface FramesSection extends SectionBase {
+  type: 'frames';
+  title?: string;
+  items: FrameItem[];
+  columns: 2 | 3 | 4;
+  autoplay: boolean;
+}
+export interface FormSection extends SectionBase {
+  type: 'form';
+  form: 'contact' | 'careers';
+  title?: string;
+  text?: string;
+  image?: ImageRef;
+  background: 'cream' | 'concrete' | 'sage';
+}
+export interface SpacerSection extends SectionBase {
+  type: 'spacer';
+  size: 's' | 'm' | 'l';
+  line: boolean;
+  background: 'cream' | 'concrete' | 'sage' | 'bark';
 }
 
 export type HomeSection =
@@ -272,7 +361,10 @@ export type HomeSection =
   | TestimonialsSection
   | CtaSection
   | RichTextSection
-  | ClubStripSection;
+  | ClubStripSection
+  | FramesSection
+  | FormSection
+  | SpacerSection;
 
 export interface Homepage {
   sections: HomeSection[];
@@ -280,8 +372,11 @@ export interface Homepage {
 }
 
 export interface MenuPage {
-  intro: { title: string; text?: string };
+  intro: { title: string; text?: string; align: Align };
   showPrices: boolean;
+  showLocationFilter: boolean;
+  allLocationsLabel: string;
+  sections: HomeSection[];
   seo: SEOMeta;
 }
 
@@ -294,8 +389,13 @@ export interface JoinSection {
 
 export interface AboutPage {
   title: string;
-  frames: ImageRef[];
+  frames: FrameItem[];
+  frameColumns: 2 | 3 | 4;
+  framesAutoplay: boolean;
   text: string;
+  textAlign: Align;
+  showClubStrip: boolean;
+  sections: HomeSection[];
   showTeamSection: boolean;
   teamImage?: ImageRef;
   /** "Join our team" form texts (the section lives on the About page). */
@@ -321,6 +421,19 @@ export interface ContactPage {
   text?: string;
   /** Right column of /contact. Empty fields fall back to Site settings / the first location. */
   details: ContactDetails;
+  sections: HomeSection[];
+  seo: SEOMeta;
+}
+
+/** Extra page created in the CMS, published at /<slug>. */
+export interface CustomPage {
+  id: string;
+  title: string;
+  slug: string;
+  showTitle: boolean;
+  background: 'cream' | 'concrete';
+  intro?: string;
+  sections: HomeSection[];
   seo: SEOMeta;
 }
 
@@ -331,6 +444,9 @@ export interface SiteContent {
   menuPage: MenuPage;
   aboutPage: AboutPage;
   contactPage: ContactPage;
+  pages: CustomPage[];
+  design: Design;
+  forms: FormsConfig;
   menu: MenuData;
   /** Derived from the Home page "Locations" section (used by JSON-LD, contact page…). */
   locations: Location[];

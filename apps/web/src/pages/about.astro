@@ -1,7 +1,8 @@
 ---
 /** About — PDF page 3: ABOUT · frames · text · club strip · team + Join form · Contact form. */
 import Base from '@/layouts/Base.astro';
-import Frame from '@/components/ui/Frame.astro';
+import FramesGrid from '@/components/sections/FramesGrid.astro';
+import SectionRenderer from '@/components/sections/SectionRenderer.astro';
 import Intro from '@/components/sections/Intro.astro';
 import ClubStrip from '@/components/sections/ClubStrip.astro';
 import Picture from '@/components/ui/Picture.astro';
@@ -21,7 +22,9 @@ const frames =
     ? aboutPage.frames
     : sortedLocations(content.locations)
         .map((l) => l.image)
-        .filter((i): i is NonNullable<typeof i> => Boolean(i));
+        .filter((i): i is NonNullable<typeof i> => Boolean(i))
+        .slice(0, 3)
+        .map((image) => ({ images: [image] }));
 const teamImage = aboutPage.teamImage;
 
 const schema = [
@@ -36,22 +39,12 @@ const schema = [
   <section class="about" aria-labelledby="about-title">
     <div class="container">
       <h1 id="about-title" class="about__title eyebrow-link">{aboutPage.title}</h1>
-      {
-        frames.length > 0 && (
-          <ul role="list" class="about__frames reveal-stagger">
-            {frames.slice(0, 3).map((image, i) => (
-              <li class="reveal reveal--zoom" style={`--i:${i}`}>
-                <Frame image={image} loading={i === 0 ? 'eager' : 'lazy'} />
-              </li>
-            ))}
-          </ul>
-        )
-      }
+      {frames.length > 0 && <FramesGrid items={frames} columns={aboutPage.frameColumns} autoplay={aboutPage.framesAutoplay} eager />}
     </div>
-    <Intro text={aboutPage.text} size="lg" />
+    <Intro text={aboutPage.text} size="lg" align={aboutPage.textAlign} />
   </section>
 
-  <ClubStrip />
+  {aboutPage.showClubStrip && <ClubStrip />}
 
   {
     aboutPage.showTeamSection && (
@@ -64,11 +57,13 @@ const schema = [
         <div class="team__form reveal reveal--right">
           <h2 id="join-title" class="team__title ui">{joinPage.title}</h2>
           {joinPage.text && <p class="team__text italic">{joinPage.text}</p>}
-          <CareersForm email={settings.email} positions={joinPage.positions} experienceLevels={joinPage.experienceLevels} ariaLabelledby="join-title" />
+          <CareersForm email={settings.email} config={content.forms.careers} ariaLabelledby="join-title" />
         </div>
       </section>
     )
   }
+
+  <SectionRenderer sections={aboutPage.sections} content={content} />
 
   {
     aboutPage.showContactSection && (
@@ -77,7 +72,7 @@ const schema = [
           {contactPage.title}
         </h2>
         {contactPage.text && <p class="contact__text italic">{contactPage.text}</p>}
-        <ContactForm email={settings.email} ariaLabelledby="contact-title" />
+        <ContactForm email={settings.email} config={content.forms.contact} ariaLabelledby="contact-title" />
       </div>
     )
   }
@@ -90,21 +85,8 @@ const schema = [
   }
   .about__title {
     display: block;
-    text-align: center;
+    text-align: var(--title-align, center);
     margin-bottom: clamp(1.5rem, 3.5vw, 4rem);
-  }
-  .about__frames {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-    gap: clamp(1.5rem, 4vw, 4.5rem);
-  }
-  @media (min-width: 900px) {
-    .about__frames {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-  .about__frames li {
-    transition-delay: calc(var(--i) * 90ms);
   }
 
   .team {
@@ -146,11 +128,11 @@ const schema = [
     font-weight: 700;
     font-size: var(--text-title);
     text-transform: uppercase;
-    text-align: center;
+    text-align: var(--title-align, center);
     letter-spacing: 0.01em;
   }
   .team__text {
-    text-align: center;
+    text-align: var(--title-align, center);
     font-size: var(--text-body-sm);
   }
   /* Rendered inside the footer (same concrete, no seam); the footer lockup follows below. */
@@ -162,7 +144,7 @@ const schema = [
     margin-bottom: clamp(3rem, 7vw, 7rem);
   }
   .contact__text {
-    text-align: center;
+    text-align: var(--title-align, center);
     font-size: var(--text-body-sm);
   }
 </style>

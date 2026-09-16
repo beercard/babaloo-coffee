@@ -1,0 +1,39 @@
+---
+/** Empty band to add air between sections, optionally with a thin rule. */
+import type { SpacerSection } from '@/lib/cms/types';
+import Section from '@/components/ui/Section.astro';
+
+interface Props {
+  section: SpacerSection;
+}
+const { section } = Astro.props;
+---
+
+<Section as="div" background={section.background} padded="none" class:list={['spacer', `spacer--${section.size}`]}>
+  {section.line && <hr class="spacer__line container" />}
+</Section>
+
+<style>
+  /* The classes sit on <Section>'s element, outside this component's style scope. */
+  :global(.spacer) {
+    display: grid;
+    align-items: center;
+  }
+  :global(.spacer--s) {
+    min-height: calc(var(--section-y-sm) * 0.75);
+  }
+  :global(.spacer--m) {
+    min-height: var(--section-y);
+  }
+  :global(.spacer--l) {
+    min-height: calc(var(--section-y) * 2);
+  }
+  .spacer__line {
+    width: min(100% - 2 * var(--gutter), var(--content-w));
+    margin: 0 auto;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.45;
+  }
+</style>

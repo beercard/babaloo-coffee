@@ -80,25 +80,31 @@ GitHub ──push/webhook──▶ GitHub Actions (build Astro) ──FTP/SFTP�
 
 ## 4. Modelo de contenido (Payload)
 
+Todo el contenido editable tiene **historial** (pestaña Versions, con Restore) y **borradores**: *Save draft* no toca el sitio; *Publish changes* dispara el rebuild. Un segundo build del sitio (`PAYLOAD_DRAFTS=1`) sirve de vista previa con los borradores. Las secciones de página se guardan como JSON (`blocksAsJSON`), una columna por página.
+
 **Globals** (un solo documento cada uno)
-- `site-settings` — Business name, logo, tagline, phone, email, address, hours, social links, order-online URL, map URL, header/footer nav, primary CTAs.
-- `homepage` — `sections` (blocks ordenables y activables): `hero` (slides), `iconStrip`, `intro`, `locations`, `featuredMenu`, `gallery`, `cta`, `richText`; + `seo`.
-- `menu-page` — intro script, seo.
-- `about-page` — título, galería de marcos, texto, seo, toggles join/contact.
-- `contact-page`, `join-page`, `gallery-page` — textos + seo. (No hay página de locales: el diseño los muestra en la portada.)
-- `seo-defaults` — title template, default description/OG image, twitter handle, robots.
+- `homepage` — `sections` (blocks ordenables, activables y duplicables) + `seo`.
+- `menu-page` — intro (título con saltos de línea, texto, alineación), precios on/off, selector de local, secciones extra, seo.
+- `about-page` — título, marcos ilimitados (foto + `more` = carrusel, texto manuscrito, columnas, autoplay), texto + alineación, franja de perros on/off, Join our team, secciones extra, contacto on/off, seo.
+- `contact-page` — textos, columna de datos, secciones extra, seo.
+- `site-settings` — negocio, contacto, redes, navegación (menú y footer), textos del footer. Editable por editores.
+- `design` — colores, tipografías (de una lista), escalas de tamaño y espacio, ancho del texto, alineación de títulos, animaciones, header (altura, logo, madera, cortina, fijo) y footer (fondo, color, logo, perros, textura de mármol). Se traduce a variables CSS en `lib/design.ts`.
+- `forms` — destinatarios y, por formulario (contact / careers): campos (etiqueta, tipo, ancho, obligatorio, opciones), texto del botón, asunto y mensaje de confirmación. El endpoint `/api/forms/submit` valida contra esta configuración.
+- `seo-defaults` — title template, default description/OG image, twitter handle, robots (solo super admin).
+
+**Bloques de sección** (sirven en cualquier página): hero, iconStrip (con iconos propios), navRow, intro, locations, clubStrip, featuredMenu, gallery, testimonials, cta, richText, frames (marcos/carruseles), form, spacer.
 
 **Collections**
-- `media` — upload con `alt` obligatorio, `caption`; sizes generadas por sharp.
-- `menu-categories` — name, slug, description, image, parent (subcategorías Hot/Iced), order, active.
-- `menu-items` — name, slug, description, price (número) + `priceLabel` opcional ("+$0.75"), variants[] (name, price), image, category, tags[] (New, Popular, Seasonal…), featured, available, order.
-- `galleries` — name, slug, images[] (image, alt override, caption, order).
-- `locations` — name, scriptName ("rea farms"), address, geo, phone, hours[], mapUrl, image, status (open/coming-soon), order, seo.
-- `testimonials` — quote, author, rating, active, order.
-- `form-submissions` — form (contact/careers), payload JSON, meta (ip hash, ua), status.
+- `pages` — páginas nuevas en `/<slug>` con las mismas secciones (slugs reservados: menu, about, contact…).
+- `media` — upload con `alt` obligatorio, recorte y punto focal; carpetas por página.
+- `menu-categories` — name, displayName (saltos de línea), slug, description, image, parent (Hot/Iced), order, active.
+- `menu-items` — name, slug, description, price + `priceLabel`, variants[], image, category, labels[] (relación a `menu-labels`), featured, available, order. (`tags` queda oculto como respaldo del modelo anterior.)
+- `menu-labels` — name, kind (`badge` | `location`), colores, showBadge, order. Las de tipo `location` alimentan el selector de local del menú.
+- `form-submissions` — form, data JSON, labels (etiquetas al momento del envío), résumé, status.
+- `resumes` — archivos adjuntos (privados).
 - `users` — role: `admin` | `editor`.
 
-**Admin UX (grupos de navegación)**: Home · Menu · Media · Pages · Settings.
+**Acceso**: lectura pública solo de lo publicado; los borradores los leen usuarios logueados y el build de vista previa (`x-preview-secret`).
 
 ---
 

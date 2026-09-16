@@ -13,7 +13,7 @@ const id = section.anchor ?? section.id;
 ---
 
 <Section id={id} background={section.background} padded="y" reveal ariaLabelledby={`${id}-title`}>
-  <div class:list={['container', 'cta', section.image && 'cta--with-image']}>
+  <div class:list={['container', 'cta', `cta--${section.align ?? 'center'}`, section.image && 'cta--with-image']}>
     {section.image && <Picture image={section.image} mobile={section.imageMobile} sizes="(min-width: 900px) 40vw, 92vw" widths={[400, 700, 1000]} aspect={1} class="cta__img" />}
     <div class="cta__body">
       <h2 id={`${id}-title`} class="cta__title script">{section.title}</h2>
@@ -56,6 +56,20 @@ const id = section.anchor ?? section.id;
     .cta--with-image .cta__body {
       align-items: flex-start;
     }
+  }
+  .cta--left,
+  .cta--left.cta--with-image {
+    text-align: left;
+  }
+  .cta--left .cta__body {
+    align-items: flex-start;
+  }
+  .cta--right,
+  .cta--right.cta--with-image {
+    text-align: right;
+  }
+  .cta--right .cta__body {
+    align-items: flex-end;
   }
   .cta__title {
     font-size: var(--text-script);

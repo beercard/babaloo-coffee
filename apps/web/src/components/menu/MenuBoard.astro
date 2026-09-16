@@ -14,17 +14,29 @@
 import type { MenuData } from '@/lib/cms/types';
 import { buildMenuTree, type MenuTree } from '@/lib/cms';
 import { itemPrice } from '@/utils/format';
-import { getImage } from 'astro:assets';
 import Picture from '@/components/ui/Picture.astro';
-import concrete from '@/assets/textures/concrete.jpg';
+import { concreteTextureUrl } from '@/lib/texture';
 
 interface Props {
   menu: MenuData;
   showPrices?: boolean;
+  showLocationFilter?: boolean;
+  allLocationsLabel?: string;
 }
-const { menu, showPrices = true } = Astro.props;
+const { menu, showPrices = true, showLocationFilter = true, allLocationsLabel = 'All locations' } = Astro.props;
 const tree = buildMenuTree(menu.categories, menu.items);
-const texture = await getImage({ src: concrete, width: 720, format: 'webp', quality: 55 });
+
+/** Location labels in use (Menu > Labels, type "Location"), in the editor's order. */
+const locationMap = new Map<string, { name: string; order: number }>();
+for (const item of menu.items) {
+  for (const l of item.labels) if (l.kind === 'location' && !locationMap.has(l.slug)) locationMap.set(l.slug, { name: l.name, order: l.order ?? 0 });
+}
+const locations = [...locationMap.entries()].sort((a, b) => a[1].order - b[1].order || a[1].name.localeCompare(b[1].name));
+const showFilter = showLocationFilter && locations.length > 1;
+const locationsOf = (item: MenuData['items'][number]) => item.labels.filter((l) => l.kind === 'location').map((l) => l.slug).join(' ');
+const badgeStyle = (l: MenuData['items'][number]['labels'][number]) =>
+  [l.color && `--tag-bg:${l.color}`, l.textColor && `--tag-fg:${l.textColor}`].filter(Boolean).join(';') || undefined;
+const texture = { src: await concreteTextureUrl() };
 
 /** Every image that can appear in the panel, keyed by id (items + categories). */
 const visuals = new Map<string, { image: NonNullable<MenuData['items'][number]['image']>; label: string }>();
@@ -50,8 +62,6 @@ function subKind(slug: string): SubKind {
   return 'other';
 }
 
-/** Slug for a label, used to colour location badges (rea-farms · south-end · lake-norman). */
-const tagSlug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 /** Which id should the panel show for a given item (its own image or its category's). */
 function visualFor(itemId: string, image: unknown, categoryId: string, topId: string): string | undefined {
@@ -62,6 +72,20 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
 }
 ---
 
+{
+  showFilter && (
+    <div class="board-filter container" role="group" aria-label="Choose a location" data-board-filter>
+      <button type="button" class="board-filter__btn" data-location="" aria-pressed="true">
+        {allLocationsLabel}
+      </button>
+      {locations.map(([slug, l]) => (
+        <button type="button" class="board-filter__btn" data-location={slug} aria-pressed="false">
+          {l.name}
+        </button>
+      ))}
+    </div>
+  )
+}
 <div class="board" data-board>
   <div class="board__visual" data-board-visual data-tone="0" aria-live="polite">
     <div class="board__visual-inner">
@@ -82,7 +106,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
       tree.map((top, ti) => (
         <details class="board__cat" data-board-cat data-tone={ti % 2} data-visual={visuals.has(top.category.id) ? top.category.id : undefined} id={top.category.slug}>
           <summary class="board__row board__row--cat">
-            <h2 class="board__cat-name">{top.category.name}</h2>
+            <h2 class="board__cat-name">{top.category.displayName ?? top.category.name}</h2>
             <span class="board__toggle" aria-hidden="true" />
           </summary>
           <div class="board__panel" data-board-panel>
@@ -94,12 +118,12 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
                 const price = showPrices ? itemPrice(item, menu.currency) : undefined;
                 const visual = visualFor(item.id, item.image, top.category.id, top.category.id);
                 return (
-                  <li class="board__item" id={item.slug}>
+                  <li class="board__item" id={item.slug} data-locations={locationsOf(item)}>
                     <button type="button" class="board__item-btn" data-board-item data-visual={visual} aria-pressed="false">
                       <span class="board__item-name">
                         {item.name}
-                        {item.tags.map((t) => (
-                          <span class="board__tag" data-tag={tagSlug(t)}>{t}</span>
+                        {item.labels.filter((l) => l.showBadge).map((l) => (
+                          <span class="board__tag" data-tag={l.slug} style={badgeStyle(l)}>{l.name}</span>
                         ))}
                       </span>
                       {price && <span class="board__price">{price}</span>}
@@ -124,7 +148,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
             <details class="board__sub" data-board-sub data-kind={subKind(sub.category.slug)} data-visual={visuals.has(sub.category.id) ? sub.category.id : undefined} id={`${top.category.slug}-${sub.category.slug}`}>
               <summary class:list={['board__row', 'board__row--sub', `board__row--${subKind(sub.category.slug)}`]}>
                 <h3 class="board__sub-name">
-                  <span class="board__sub-label">{sub.category.name}</span>
+                  <span class="board__sub-label">{sub.category.displayName ?? sub.category.name}</span>
                 </h3>
                 <span class="board__toggle" aria-hidden="true" />
               </summary>
@@ -134,12 +158,12 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
                   const price = showPrices ? itemPrice(item, menu.currency) : undefined;
                   const visual = visualFor(item.id, item.image, sub.category.id, top.category.id);
                   return (
-                    <li class="board__item" id={item.slug}>
+                    <li class="board__item" id={item.slug} data-locations={locationsOf(item)}>
                       <button type="button" class="board__item-btn" data-board-item data-visual={visual} aria-pressed="false">
                         <span class="board__item-name">
                           {item.name}
-                          {item.tags.map((t) => (
-                            <span class="board__tag" data-tag={tagSlug(t)}>{t}</span>
+                          {item.labels.filter((l) => l.showBadge).map((l) => (
+                            <span class="board__tag" data-tag={l.slug} style={badgeStyle(l)}>{l.name}</span>
                           ))}
                         </span>
                         {price && <span class="board__price">{price}</span>}
@@ -165,6 +189,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
         </details>
       ))
     }
+    {showFilter && <p class="board__empty" data-board-empty hidden>Nothing listed for this location yet.</p>}
   </div>
 </div>
 
@@ -319,6 +344,7 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
   }
   .board__cat-name,
   .board__sub-name {
+    white-space: pre-line;
     font-family: var(--font-body);
     font-weight: 700;
     font-style: italic;
@@ -445,8 +471,8 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     margin-left: 0.5em;
     padding: 0.18em 0.6em 0.2em;
     border-radius: var(--radius-pill);
-    background: var(--bark);
-    color: var(--cream-bright);
+    background: var(--tag-bg, var(--bark));
+    color: var(--tag-fg, var(--cream-bright));
     /* Same small uppercase pill for every label (Signature, Popular, locations…). */
     font-family: var(--font-ui);
     font-weight: 700;
@@ -459,14 +485,71 @@ function visualFor(itemId: string, image: unknown, categoryId: string, topId: st
     transform: translateY(-0.15em);
   }
   /* Location badges: one colour per café so they read at a glance next to Signature / Popular. */
+  /* Default colours of the original location badges (a colour set in the CMS wins). */
   .board__tag[data-tag='rea-farms'] {
-    background: #5d6b3d; /* olive */
+    background: var(--tag-bg, #5d6b3d); /* olive */
   }
   .board__tag[data-tag='south-end'] {
-    background: #8a4b2f; /* terracotta */
+    background: var(--tag-bg, #8a4b2f); /* terracotta */
   }
   .board__tag[data-tag='lake-norman'] {
-    background: #3f6273; /* lake blue */
+    background: var(--tag-bg, #3f6273); /* lake blue */
+  }
+  .board__item[hidden],
+  .board__cat[hidden],
+  .board__sub[hidden] {
+    display: none;
+  }
+
+  /* ---------- location selector ---------- */
+  .board-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 0.75rem;
+    padding-bottom: clamp(1rem, 2.5vw, 2rem);
+    background: var(--cream);
+  }
+  /* Phones: one row that scrolls sideways instead of wrapping. */
+  @media (max-width: 600px) {
+    .board-filter {
+      flex-wrap: nowrap;
+      justify-content: safe center;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 0.4rem;
+    }
+    .board-filter::-webkit-scrollbar {
+      display: none;
+    }
+    .board-filter__btn {
+      flex: none;
+      font-size: 0.72rem;
+      padding: 0.5em 0.9em;
+    }
+  }
+  .board-filter__btn {
+    white-space: nowrap;
+    padding: 0.45em 1.1em 0.5em;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: var(--text-small);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background-color var(--dur), color var(--dur);
+  }
+  .board-filter__btn:hover {
+    background: rgba(60, 26, 30, 0.08);
+  }
+  .board-filter__btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .board__empty {
+    font-style: italic;
+    padding: 2rem 0;
   }
   .board__price {
     font-family: var(--font-body);

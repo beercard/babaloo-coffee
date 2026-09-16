@@ -14,13 +14,15 @@ interface Props {
   text?: string;
 }
 const { locations, id = 'locations', title = 'Locations', text } = Astro.props;
+// Desktop columns: up to 3 per row, but 4 locations read better as 2 + 2.
+const cols = locations.length === 4 ? 2 : Math.min(3, Math.max(1, locations.length));
 ---
 
 <section class="locations" id={id} aria-labelledby={`${id}-title`}>
   <div class="container">
     <h2 id={`${id}-title`} class="visually-hidden">{title}</h2>
     {text && <p class="locations__text">{text}</p>}
-    <ul role="list" class="locations__grid reveal-stagger">
+    <ul role="list" class="locations__grid reveal-stagger" style={`--cols:${cols}`}>
       {
         locations.map((loc, i) => (
           <li class="location reveal reveal--zoom" style={`--i:${i}`}>
@@ -94,20 +96,40 @@ const { locations, id = 'locations', title = 'Locations', text } = Astro.props;
     font-size: var(--text-body);
     margin-bottom: clamp(1.5rem, 3vw, 3rem);
   }
+  /* Any number of locations: 1 per row on phones, 2 on tablets, --cols on desktop (never wider
+     than a third of the page each); an incomplete last row is centred. */
   .locations__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-    column-gap: clamp(1.5rem, 4vw, 5rem);
+    --gap: clamp(1.5rem, 4vw, 5rem);
+    --n: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    column-gap: var(--gap);
     row-gap: clamp(2.5rem, 5vw, 4rem);
-    align-items: start;
+  }
+  @media (min-width: 640px) {
+    .locations__grid {
+      --n: 2;
+    }
   }
   @media (min-width: 1024px) {
+    /* Each frame keeps the width of a third of the page; the row narrows to --cols frames. */
     .locations__grid {
-      grid-template-columns: repeat(3, 1fr);
+      --n: var(--cols);
+      max-width: calc(var(--cols) / 3 * (100% - 2 * var(--gap)) + (var(--cols) - 1) * var(--gap));
+      margin-inline: auto;
     }
   }
   .location {
+    flex: 0 0 calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+    min-width: 0;
     transition-delay: calc(var(--i) * 90ms);
+  }
+  @media (max-width: 639px) {
+    .location {
+      flex-basis: min(100%, 30rem);
+    }
   }
   .location__body {
     /* PDF: 3350 → 3290 text starts ~90px under the frame */

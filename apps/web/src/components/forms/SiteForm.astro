@@ -1,0 +1,141 @@
+---
+/**
+ * A website form built from Settings > Forms: fields in the order, type, width and "required"
+ * state chosen by the editor. Half-width fields pair up on wider screens; a file field becomes
+ * the hand-written "upload" button above "send" (PDF design).
+ */
+import type { FormConfig, FormFieldConfig, FormFieldType } from '@/lib/cms/types';
+import FormShell from './FormShell.astro';
+import FormField from './FormField.astro';
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  form: 'contact' | 'careers';
+  config: FormConfig;
+  email?: string;
+  ariaLabelledby?: string;
+}
+const { form, config, email, ariaLabelledby } = Astro.props;
+const fields = config.fields.filter((f: FormFieldConfig) => f.type !== 'file');
+const file = config.fields.find((f: FormFieldConfig) => f.type === 'file');
+const uid = Math.random().toString(36).slice(2, 7);
+const fileId = `${form}-file-${uid}`;
+
+const AUTOCOMPLETE: Record<string, string> = { name: 'name', fullName: 'name', firstName: 'given-name', lastName: 'family-name', email: 'email', phone: 'tel', company: 'organization' };
+const limits = (f: FormFieldConfig) => {
+  switch (f.type) {
+    case 'textarea':
+      return { maxlength: 3000 };
+    case 'email':
+      return { maxlength: 200 };
+    case 'tel':
+      return { minlength: 7, maxlength: 30 };
+    case 'url':
+      return { maxlength: 300 };
+    case 'number':
+    case 'date':
+    case 'select':
+      return {};
+    default:
+      return { maxlength: 300, ...(f.required ? { minlength: 2 } : {}) };
+  }
+};
+---
+
+<FormShell form={form} email={email} submitLabel={config.submitLabel} successMessage={config.successMessage} subject={config.subject} multipart={Boolean(file)} ariaLabelledby={ariaLabelledby} class="site-form">
+  <div class="site-form__grid">
+    {
+      fields.map((f: FormFieldConfig) => (
+        <FormField
+          name={f.name}
+          label={f.label}
+          type={f.type as Exclude<FormFieldType, 'file'>}
+          required={f.required}
+          options={f.options}
+          autocomplete={AUTOCOMPLETE[f.name] ?? (f.type === 'email' ? 'email' : f.type === 'tel' ? 'tel' : undefined)}
+          rows={3}
+          class={f.width === 'full' || f.type === 'textarea' ? 'site-form__full' : undefined}
+          {...limits(f)}
+        />
+      ))
+    }
+  </div>
+
+  {
+    file && (
+      <div slot="actions" class="site-form__upload" data-field data-upload>
+        <Button for={fileId} variant="script" size="lg" class="site-form__upload-btn">
+          {file.label}
+          {file.required && <span class="site-form__req" aria-hidden="true">*</span>}
+        </Button>
+        <input
+          type="file"
+          id={fileId}
+          name="resume"
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          class="visually-hidden"
+          data-file
+          data-required={file.required ? '' : undefined}
+          data-max-bytes={5 * 1024 * 1024}
+        />
+        <p class="site-form__file" data-file-name aria-live="polite">
+          PDF or Word · up to 5 MB
+        </p>
+        <p class="site-form__error" data-error hidden />
+      </div>
+    )
+  }
+</FormShell>
+
+<style>
+  .site-form__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.9rem, 1.8vw, 1.5rem);
+  }
+  @media (min-width: 560px) {
+    .site-form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .site-form__grid > :global(.site-form__full) {
+      grid-column: 1 / -1;
+    }
+  }
+  .site-form__upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  /* The real input is visually hidden; show focus on the pill instead. */
+  .site-form__upload:focus-within :global(.btn) {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .site-form__req {
+    font-family: var(--font-ui);
+    font-size: 0.45em;
+    vertical-align: top;
+  }
+  .site-form__file {
+    font-family: var(--font-ui);
+    font-style: italic;
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--ink);
+    opacity: 0.8;
+  }
+  .site-form__file[data-has-file] {
+    opacity: 1;
+    font-style: normal;
+  }
+  .site-form__error {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: #9c2f2f;
+    text-align: center;
+  }
+  .site-form__error[hidden] {
+    display: none;
+  }
+</style>

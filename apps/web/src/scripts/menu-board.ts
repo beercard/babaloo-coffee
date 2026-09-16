@@ -109,6 +109,50 @@ export function initMenuBoard(): void {
     });
   });
 
+  // Location selector: products with location labels are only listed at those locations.
+  const filter = document.querySelector<HTMLElement>('[data-board-filter]');
+  if (filter) {
+    const buttons = Array.from(filter.querySelectorAll<HTMLButtonElement>('[data-location]'));
+    const items = Array.from(board.querySelectorAll<HTMLElement>('.board__item[data-locations]'));
+    const empty = board.querySelector<HTMLElement>('[data-board-empty]');
+    const apply = (slug: string) => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.location === slug)));
+      items.forEach((it) => {
+        const where = (it.dataset.locations ?? '').split(' ').filter(Boolean);
+        it.hidden = Boolean(slug) && where.length > 0 && !where.includes(slug);
+      });
+      // Hide sub-sections and categories left without products.
+      board.querySelectorAll<HTMLDetailsElement>('[data-board-sub]').forEach((d) => {
+        d.hidden = !d.querySelector('.board__item:not([hidden])');
+      });
+      cats.forEach((c) => {
+        c.hidden = !c.querySelector('.board__item:not([hidden])');
+        if (c.hidden) c.open = false;
+      });
+      if (empty) empty.hidden = cats.some((c) => !c.hidden);
+      try {
+        if (slug) sessionStorage.setItem('menu-location', slug);
+        else sessionStorage.removeItem('menu-location');
+      } catch {
+        /* storage unavailable */
+      }
+      const url = new URL(location.href);
+      if (slug) url.searchParams.set('location', slug);
+      else url.searchParams.delete('location');
+      history.replaceState(history.state, '', url);
+    };
+    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.location ?? '')));
+    let initial = new URL(location.href).searchParams.get('location') ?? '';
+    if (!initial) {
+      try {
+        initial = sessionStorage.getItem('menu-location') ?? '';
+      } catch {
+        initial = '';
+      }
+    }
+    if (initial && buttons.some((b) => b.dataset.location === initial)) apply(initial);
+  }
+
   // Deep link support.
   const openHash = () => {
     const id = decodeURIComponent(location.hash.slice(1));

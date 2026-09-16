@@ -47,6 +47,8 @@ export const FormSubmissions: CollectionConfig = {
       label: t('Message', 'Mensaje'),
       admin: { readOnly: true, components: { Field: '/components/SubmissionFields#SubmissionFields' } },
     },
+    // Field labels as they were when the message was sent (the form may change later).
+    { name: 'labels', type: 'json', admin: { hidden: true } },
     { name: 'resume', type: 'upload', relationTo: 'resumes', label: t('Résumé', 'Currículum'), admin: { readOnly: true } },
     {
       name: 'meta',

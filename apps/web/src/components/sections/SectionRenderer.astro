@@ -1,7 +1,7 @@
 ---
 /**
- * Renders the ordered, toggleable home sections configured in the CMS.
- * Adding a new block type = one entry here + one block in apps/cms.
+ * Renders the ordered, toggleable sections configured in the CMS (home page, the "extra sections"
+ * of the other pages and the new pages). Adding a block type = one entry here + one block in apps/cms.
  */
 import type { HomeSection, SiteContent } from '@/lib/cms/types';
 import { featuredItems } from '@/lib/cms';
@@ -16,6 +16,10 @@ import GalleryGrid from './GalleryGrid.astro';
 import Testimonials from './Testimonials.astro';
 import CtaBlock from './CtaBlock.astro';
 import RichText from './RichText.astro';
+import FramesGrid from './FramesGrid.astro';
+import FormSection from './FormSection.astro';
+import Spacer from './Spacer.astro';
+import Section from '@/components/ui/Section.astro';
 
 interface Props {
   sections: HomeSection[];
@@ -35,11 +39,11 @@ const enabled = sections.filter((s) => s.enabled);
       case 'navRow':
         return <NavRow links={content.settings.nav} />;
       case 'intro':
-        return <Intro text={section.text} title={section.title} cta={section.cta} id={section.anchor} />;
+        return <Intro text={section.text} title={section.title} cta={section.cta} id={section.anchor} align={section.align} />;
       case 'locations':
         return <Locations locations={section.items.filter((l) => l.status !== 'closed')} id={section.anchor ?? 'locations'} title={section.title} text={section.text} />;
       case 'clubStrip':
-        return <ClubStrip />;
+        return <ClubStrip speed={section.speed} />;
       case 'featuredMenu':
         return (
           <FeaturedMenu items={featuredItems(content.menu.items, section.limit)} title={section.title} text={section.text} cta={section.cta} currency={content.menu.currency} id={section.anchor ?? 'featured'} />
@@ -52,6 +56,16 @@ const enabled = sections.filter((s) => s.enabled);
         return <CtaBlock section={section} />;
       case 'richText':
         return <RichText section={section} />;
+      case 'frames':
+        return (
+          <Section id={section.anchor ?? section.id} padded="y">
+            <FramesGrid items={section.items} columns={section.columns} autoplay={section.autoplay} title={section.title} class="container" />
+          </Section>
+        );
+      case 'form':
+        return <FormSection section={section} content={content} />;
+      case 'spacer':
+        return <Spacer section={section} />;
       default:
         return null;
     }

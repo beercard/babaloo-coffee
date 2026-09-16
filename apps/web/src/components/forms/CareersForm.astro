@@ -1,100 +1,15 @@
 ---
-/** JOIN OUR TEAM (PDF about page): Name · Last · Email · Phone · Position · Experience · upload résumé · send. */
-import FormShell from './FormShell.astro';
-import FormField from './FormField.astro';
-import Button from '@/components/ui/Button.astro';
+/** JOIN OUR TEAM (PDF about page): fields, dropdowns and messages come from Settings > Forms. */
+import type { FormConfig } from '@/lib/cms/types';
+import { DEFAULT_FORMS } from '@/lib/cms/defaults';
+import SiteForm from './SiteForm.astro';
 
 interface Props {
   email?: string;
-  positions: string[];
-  experienceLevels: string[];
+  config?: FormConfig;
   ariaLabelledby?: string;
 }
-const { email, positions, experienceLevels, ariaLabelledby } = Astro.props;
-const fileId = `careers-resume-${Math.random().toString(36).slice(2, 7)}`;
+const { email, config = DEFAULT_FORMS.careers, ariaLabelledby } = Astro.props;
 ---
 
-<FormShell form="careers" email={email} submitLabel="send" successMessage="Thank you! We'll be in touch soon." ariaLabelledby={ariaLabelledby} class="careers-form">
-  <div class="careers-form__grid">
-    <FormField name="firstName" label="Name" required autocomplete="given-name" minlength={2} maxlength={80} />
-    <FormField name="lastName" label="Last" required autocomplete="family-name" minlength={2} maxlength={80} />
-    <FormField name="email" label="Email" type="email" required autocomplete="email" maxlength={200} />
-    <FormField name="phone" label="Phone" type="tel" required autocomplete="tel" minlength={7} maxlength={30} />
-    {
-      positions.length > 0 ? (
-        <FormField name="position" label="Position" type="select" required options={positions} />
-      ) : (
-        <FormField name="position" label="Position" required maxlength={120} />
-      )
-    }
-    {
-      experienceLevels.length > 0 ? (
-        <FormField name="experience" label="Experience" type="select" required options={experienceLevels} />
-      ) : (
-        <FormField name="experience" label="Experience" required maxlength={200} />
-      )
-    }
-  </div>
-
-  <div slot="actions" class="careers-form__upload" data-field data-upload>
-    <Button for={fileId} variant="script" size="lg" class="careers-form__upload-btn">
-      upload résumé
-    </Button>
-    <input
-      type="file"
-      id={fileId}
-      name="resume"
-      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      class="visually-hidden"
-      data-file
-      data-max-bytes={5 * 1024 * 1024}
-    />
-    <p class="careers-form__file" data-file-name aria-live="polite">PDF or Word · up to 5 MB</p>
-    <p class="careers-form__error" data-error hidden></p>
-  </div>
-</FormShell>
-
-<style>
-  .careers-form__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(0.9rem, 1.8vw, 1.5rem);
-  }
-  @media (min-width: 560px) {
-    .careers-form__grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  .careers-form__upload {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  /* The real input is visually hidden; show focus on the pill instead. */
-  .careers-form__upload:focus-within :global(.btn) {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
-  }
-  .careers-form__file {
-    font-family: var(--font-ui);
-    font-style: italic;
-    font-size: 0.85rem;
-    text-align: center;
-    color: var(--ink);
-    opacity: 0.8;
-  }
-  .careers-form__file[data-has-file] {
-    opacity: 1;
-    font-style: normal;
-  }
-  .careers-form__error {
-    font-family: var(--font-ui);
-    font-size: 0.85rem;
-    color: #9c2f2f;
-    text-align: center;
-  }
-  .careers-form__error[hidden] {
-    display: none;
-  }
-</style>
+<SiteForm form="careers" config={config} email={email} ariaLabelledby={ariaLabelledby} />

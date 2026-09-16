@@ -1,6 +1,6 @@
 ---
 /** Centred Lato Italic manifesto text (PDF home + about). Line breaks are kept. */
-import type { Link } from '@/lib/cms/types';
+import type { Align, Link } from '@/lib/cms/types';
 import { paragraphs } from '@/utils/format';
 import Button from '@/components/ui/Button.astro';
 
@@ -12,13 +12,14 @@ interface Props {
   headingLevel?: 'h1' | 'h2';
   size?: 'md' | 'lg';
   id?: string;
+  align?: Align;
 }
-const { text, title, cta, headingLevel = 'h2', size = 'md', id } = Astro.props;
+const { text, title, cta, headingLevel = 'h2', size = 'md', id, align = 'center' } = Astro.props;
 const Heading = headingLevel;
 const paras = paragraphs(text);
 ---
 
-<section class:list={['intro', `intro--${size}`, 'reveal']} id={id} aria-label={title ?? 'About Babaloo'}>
+<section class:list={['intro', `intro--${size}`, `intro--${align}`, 'reveal']} id={id} aria-label={title ?? 'About Babaloo'}>
   <div class="container container--narrow intro__inner">
     {title && <Heading class="intro__title eyebrow-link">{title}</Heading>}
     {
@@ -58,6 +59,14 @@ const paras = paragraphs(text);
   }
   .intro__title {
     text-decoration: underline;
+  }
+  .intro--left .intro__inner {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .intro--right .intro__inner {
+    align-items: flex-end;
+    text-align: right;
   }
   .intro__text {
     font-style: italic;

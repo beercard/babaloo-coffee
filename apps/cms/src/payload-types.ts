@@ -67,8 +67,10 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    pages: Page;
     'menu-items': MenuItem;
     'menu-categories': MenuCategory;
+    'menu-labels': MenuLabel;
     media: Media;
     'form-submissions': FormSubmission;
     resumes: Resume;
@@ -85,8 +87,10 @@ export interface Config {
     };
   };
   collectionsSelect: {
+    pages: PagesSelect<false> | PagesSelect<true>;
     'menu-items': MenuItemsSelect<false> | MenuItemsSelect<true>;
     'menu-categories': MenuCategoriesSelect<false> | MenuCategoriesSelect<true>;
+    'menu-labels': MenuLabelsSelect<false> | MenuLabelsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     resumes: ResumesSelect<false> | ResumesSelect<true>;
@@ -107,6 +111,8 @@ export interface Config {
     'about-page': AboutPage;
     'contact-page': ContactPage;
     'site-settings': SiteSetting;
+    design: Design;
+    forms: Form;
     'seo-defaults': SeoDefault;
   };
   globalsSelect: {
@@ -115,6 +121,8 @@ export interface Config {
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    design: DesignSelect<false> | DesignSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
     'seo-defaults': SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
   };
   locale: null;
@@ -146,90 +154,330 @@ export interface UserAuthOperations {
   };
 }
 /**
- * Every drink and dish. Change the price here and the website updates on the next publish.
+ * Create extra pages (events, catering, careers…) from the same sections as the home page. Each one is published at /its-url. Add it to the menu in Settings > Site settings > Navigation.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "menu-items".
+ * via the `definition` "pages".
  */
-export interface MenuItem {
+export interface Page {
   id: number;
-  name: string;
-  category: number | MenuCategory;
+  title: string;
   /**
-   * Ingredients or a short note, e.g. "cold foam served over iced espresso".
+   * Filled in from the title, e.g. "catering" = babaloocoffeeclub.com/catering.
    */
-  description?: string | null;
-  /**
-   * Numbers only, e.g. 5.5
-   */
-  price?: number | null;
-  /**
-   * Overrides the number, e.g. "+$0.75" or "market price".
-   */
-  priceLabel?: string | null;
-  /**
-   * e.g. Biscoff / Kinder Bueno / Nutella, or Small / Large with different prices.
-   */
-  variants?:
-    | {
-        name: string;
-        price: number;
-        id?: string | null;
-      }[]
-    | null;
-  image?: (number | null) | Media;
-  tags?:
+  slug: string;
+  showTitle?: boolean | null;
+  background?: ('cream' | 'concrete') | null;
+  intro?: string | null;
+  sections?:
     | (
-        | 'New'
-        | 'Popular'
-        | 'Seasonal'
-        | 'Vegan'
-        | 'Gluten free'
-        | 'Signature'
-        | 'Rea Farms'
-        | 'South End'
-        | 'Lake Norman'
+        | {
+            enabled?: boolean | null;
+            slides?:
+              | {
+                  image: number | Media;
+                  imageMobile?: (number | null) | Media;
+                  title?: string | null;
+                  subtitle?: string | null;
+                  text?: string | null;
+                  cta?: {
+                    label?: string | null;
+                    href?: string | null;
+                    external?: boolean | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            interval?: number | null;
+            /**
+             * Phones always use a shorter version.
+             */
+            height?: ('tall' | 'medium' | 'short') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            /**
+             * Leave empty to use the nine hand-drawn icons. Upload light-coloured PNG or SVG files with a transparent background, about 300 x 200 px.
+             */
+            icons?:
+              | {
+                  image: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'iconStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * The links themselves are managed by the super admin (Site settings → Navigation).
+             */
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'navRow';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Each line break is kept, as in the design.
+             */
+            text: string;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'intro';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            /**
+             * The first one is used for Google (address, hours). Set "Coming soon" for future locations.
+             */
+            items?:
+              | {
+                  name: string;
+                  scriptName?: string | null;
+                  status: 'open' | 'coming-soon' | 'closed';
+                  image?: (number | null) | Media;
+                  address?: {
+                    street?: string | null;
+                    suite?: string | null;
+                    city?: string | null;
+                    region?: string | null;
+                    postalCode?: string | null;
+                    country?: string | null;
+                  };
+                  phone?: string | null;
+                  email?: string | null;
+                  hoursDisplay?:
+                    | {
+                        days: string;
+                        hours: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  hoursSpec?:
+                    | {
+                        dayOfWeek: (
+                          'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+                        )[];
+                        opens: string;
+                        closes: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  mapUrl?: string | null;
+                  geo?: {
+                    lat?: number | null;
+                    lng?: number | null;
+                  };
+                  orderUrl?: string | null;
+                  /**
+                   * e.g. "Coming soon".
+                   */
+                  note?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'locations';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'clubStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            limit?: number | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredMenu';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            images?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            limit?: number | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            items?:
+              | {
+                  quote: string;
+                  author: string;
+                  role?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            enabled?: boolean | null;
+            title: string;
+            text?: string | null;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            html: string;
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            imagePosition?: ('left' | 'right') | null;
+            align?: ('left' | 'center' | 'right') | null;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Rows of 3 on desktop, 2 on tablets and 1 on phones; an incomplete last row is centred.
+             */
+            items?:
+              | {
+                  image: number | Media;
+                  more?: (number | Media)[] | null;
+                  label?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4') | null;
+            autoplay?: boolean | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'frames';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * Fields, recipients and messages are edited in Settings > Forms.
+             */
+            form: 'contact' | 'careers';
+            title?: string | null;
+            text?: string | null;
+            image?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'form';
+          }
+        | {
+            enabled?: boolean | null;
+            size?: ('s' | 'm' | 'l') | null;
+            line?: boolean | null;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
       )[]
     | null;
-  featured?: boolean | null;
-  available?: boolean | null;
   /**
-   * Lower numbers show first.
+   * Leave a field empty to use the site-wide default (Settings → SEO).
    */
-  order?: number | null;
-  /**
-   * Auto-generated from the name. Used for links like /menu#latte.
-   */
-  slug?: string | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Only if this page should point to another URL.
+     */
+    canonical?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    twitterCard?: ('summary_large_image' | 'summary') | null;
+    robots?: ('index, follow' | 'noindex, follow') | null;
+  };
   updatedAt: string;
   createdAt: string;
-}
-/**
- * Top-level categories (Coffee, Matcha & more, Food and sweets…) and their sub-sections (Hot, Iced, Salty, Sweets). Set "Parent" to make a sub-section.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "menu-categories".
- */
-export interface MenuCategory {
-  id: number;
-  name: string;
-  description?: string | null;
-  /**
-   * Leave empty for a top-level category. Pick "Coffee" to make this a section inside Coffee (e.g. Hot / Iced).
-   */
-  parent?: (number | null) | MenuCategory;
-  image?: (number | null) | Media;
-  /**
-   * Lower numbers show first.
-   */
-  order?: number | null;
-  active?: boolean | null;
-  /**
-   * Auto-generated from the name. Used for links like /menu#latte.
-   */
-  slug?: string | null;
-  updatedAt: string;
-  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product.
@@ -293,6 +541,124 @@ export interface FolderInterface {
   createdAt: string;
 }
 /**
+ * Every drink and dish. Tip: tick several products in the list and use "Edit" to move them to another category or change a field in one go.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-items".
+ */
+export interface MenuItem {
+  id: number;
+  name: string;
+  category: number | MenuCategory;
+  /**
+   * Ingredients or a short note, e.g. "cold foam served over iced espresso".
+   */
+  description?: string | null;
+  /**
+   * Numbers only, e.g. 5.5
+   */
+  price?: number | null;
+  /**
+   * Overrides the number, e.g. "+$0.75" or "market price".
+   */
+  priceLabel?: string | null;
+  /**
+   * e.g. Biscoff / Kinder Bueno / Nutella, or Small / Large with different prices.
+   */
+  variants?:
+    | {
+        name: string;
+        price: number;
+        id?: string | null;
+      }[]
+    | null;
+  image?: (number | null) | Media;
+  /**
+   * Badges (Signature, New…) and the locations that sell it. No location label = sold everywhere. Create new labels in Menu > Labels.
+   */
+  labels?: (number | MenuLabel)[] | null;
+  tags?:
+    | (
+        | 'New'
+        | 'Popular'
+        | 'Seasonal'
+        | 'Vegan'
+        | 'Gluten free'
+        | 'Signature'
+        | 'Rea Farms'
+        | 'South End'
+        | 'Lake Norman'
+      )[]
+    | null;
+  featured?: boolean | null;
+  available?: boolean | null;
+  /**
+   * Lower numbers show first.
+   */
+  order?: number | null;
+  /**
+   * Auto-generated from the name. Used for links like /menu#latte.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Top-level categories (Coffee, Matcha, Food…) and their sub-sections (Hot, Iced…). Set "Parent category" to make a sub-section; "Order" sets the position. The menu re-centres itself whatever the number of categories.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-categories".
+ */
+export interface MenuCategory {
+  id: number;
+  name: string;
+  displayName?: string | null;
+  description?: string | null;
+  /**
+   * Leave empty for a top-level category. Pick "Coffee" to make this a section inside Coffee (e.g. Hot / Iced).
+   */
+  parent?: (number | null) | MenuCategory;
+  image?: (number | null) | Media;
+  /**
+   * Lower numbers show first.
+   */
+  order?: number | null;
+  active?: boolean | null;
+  /**
+   * Auto-generated from the name. Used for links like /menu#latte.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Badges shown next to product names. "Location" labels also power the location selector of the menu: a product with location labels only appears at those locations.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-labels".
+ */
+export interface MenuLabel {
+  id: number;
+  name: string;
+  kind: 'badge' | 'location';
+  color?: string | null;
+  textColor?: string | null;
+  showBadge?: boolean | null;
+  /**
+   * Lower numbers show first.
+   */
+  order?: number | null;
+  /**
+   * Auto-generated from the name. Used for links like /menu#latte.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Messages sent from the Contact and Join our team forms.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -305,6 +671,15 @@ export interface FormSubmission {
   summary?: string | null;
   email?: string | null;
   data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  labels?:
     | {
         [k: string]: unknown;
       }
@@ -397,12 +772,20 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
         relationTo: 'menu-items';
         value: number | MenuItem;
       } | null)
     | ({
         relationTo: 'menu-categories';
         value: number | MenuCategory;
+      } | null)
+    | ({
+        relationTo: 'menu-labels';
+        value: number | MenuLabel;
       } | null)
     | ({
         relationTo: 'media';
@@ -468,6 +851,295 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  showTitle?: T;
+  background?: T;
+  intro?: T;
+  sections?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              enabled?: T;
+              slides?:
+                | T
+                | {
+                    image?: T;
+                    imageMobile?: T;
+                    title?: T;
+                    subtitle?: T;
+                    text?: T;
+                    cta?:
+                      | T
+                      | {
+                          label?: T;
+                          href?: T;
+                          external?: T;
+                        };
+                    id?: T;
+                  };
+              interval?: T;
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              icons?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        navRow?:
+          | T
+          | {
+              enabled?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        intro?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        locations?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              items?:
+                | T
+                | {
+                    name?: T;
+                    scriptName?: T;
+                    status?: T;
+                    image?: T;
+                    address?:
+                      | T
+                      | {
+                          street?: T;
+                          suite?: T;
+                          city?: T;
+                          region?: T;
+                          postalCode?: T;
+                          country?: T;
+                        };
+                    phone?: T;
+                    email?: T;
+                    hoursDisplay?:
+                      | T
+                      | {
+                          days?: T;
+                          hours?: T;
+                          id?: T;
+                        };
+                    hoursSpec?:
+                      | T
+                      | {
+                          dayOfWeek?: T;
+                          opens?: T;
+                          closes?: T;
+                          id?: T;
+                        };
+                    mapUrl?: T;
+                    geo?:
+                      | T
+                      | {
+                          lat?: T;
+                          lng?: T;
+                        };
+                    orderUrl?: T;
+                    note?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        clubStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featuredMenu?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              limit?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              limit?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              image?: T;
+              imageMobile?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              html?: T;
+              image?: T;
+              imageMobile?: T;
+              imagePosition?: T;
+              align?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        frames?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    more?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              autoplay?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        form?:
+          | T
+          | {
+              enabled?: T;
+              form?: T;
+              title?: T;
+              text?: T;
+              image?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              enabled?: T;
+              size?: T;
+              line?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterCard?: T;
+        robots?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "menu-items_select".
  */
 export interface MenuItemsSelect<T extends boolean = true> {
@@ -484,6 +1156,7 @@ export interface MenuItemsSelect<T extends boolean = true> {
         id?: T;
       };
   image?: T;
+  labels?: T;
   tags?: T;
   featured?: T;
   available?: T;
@@ -491,6 +1164,7 @@ export interface MenuItemsSelect<T extends boolean = true> {
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -498,6 +1172,7 @@ export interface MenuItemsSelect<T extends boolean = true> {
  */
 export interface MenuCategoriesSelect<T extends boolean = true> {
   name?: T;
+  displayName?: T;
   description?: T;
   parent?: T;
   image?: T;
@@ -506,6 +1181,23 @@ export interface MenuCategoriesSelect<T extends boolean = true> {
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-labels_select".
+ */
+export interface MenuLabelsSelect<T extends boolean = true> {
+  name?: T;
+  kind?: T;
+  color?: T;
+  textColor?: T;
+  showBadge?: T;
+  order?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -551,6 +1243,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   summary?: T;
   email?: T;
   data?: T;
+  labels?: T;
   resume?: T;
   meta?:
     | T
@@ -656,7 +1349,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Every section of the home page, in order. Drag to reorder; untick "Show this section" to hide one without deleting it.
+ * Every section of the home page, in order. Drag to reorder, use the row menu to duplicate, and untick "Show this section" to hide one without deleting it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
@@ -683,6 +1376,10 @@ export interface Homepage {
                 }[]
               | null;
             interval?: number | null;
+            /**
+             * Phones always use a shorter version.
+             */
+            height?: ('tall' | 'medium' | 'short') | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'hero';
@@ -690,6 +1387,15 @@ export interface Homepage {
         | {
             enabled?: boolean | null;
             speed?: number | null;
+            /**
+             * Leave empty to use the nine hand-drawn icons. Upload light-coloured PNG or SVG files with a transparent background, about 300 x 200 px.
+             */
+            icons?:
+              | {
+                  image: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'iconStrip';
@@ -711,6 +1417,7 @@ export interface Homepage {
              * Each line break is kept, as in the design.
              */
             text: string;
+            align?: ('left' | 'center' | 'right') | null;
             cta?: {
               label?: string | null;
               href?: string | null;
@@ -787,6 +1494,7 @@ export interface Homepage {
           }
         | {
             enabled?: boolean | null;
+            speed?: number | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'clubStrip';
@@ -851,6 +1559,7 @@ export interface Homepage {
             enabled?: boolean | null;
             title: string;
             text?: string | null;
+            align?: ('left' | 'center' | 'right') | null;
             cta?: {
               label?: string | null;
               href?: string | null;
@@ -874,6 +1583,7 @@ export interface Homepage {
             image?: (number | null) | Media;
             imageMobile?: (number | null) | Media;
             imagePosition?: ('left' | 'right') | null;
+            align?: ('left' | 'center' | 'right') | null;
             background?: ('cream' | 'concrete' | 'sage') | null;
             /**
              * Lets links jump to this section, e.g. "locations" → /#locations.
@@ -882,6 +1592,57 @@ export interface Homepage {
             id?: string | null;
             blockName?: string | null;
             blockType: 'richText';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Rows of 3 on desktop, 2 on tablets and 1 on phones; an incomplete last row is centred.
+             */
+            items?:
+              | {
+                  image: number | Media;
+                  more?: (number | Media)[] | null;
+                  label?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4') | null;
+            autoplay?: boolean | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'frames';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * Fields, recipients and messages are edited in Settings > Forms.
+             */
+            form: 'contact' | 'careers';
+            title?: string | null;
+            text?: string | null;
+            image?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'form';
+          }
+        | {
+            enabled?: boolean | null;
+            size?: ('s' | 'm' | 'l') | null;
+            line?: boolean | null;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
           }
       )[]
     | null;
@@ -901,11 +1662,12 @@ export interface Homepage {
     twitterCard?: ('summary_large_image' | 'summary') | null;
     robots?: ('index, follow' | 'noindex, follow') | null;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Intro text of the /menu page. The products and categories themselves are in the Menu group.
+ * Top of the /menu page and how the menu behaves. Products, categories and labels are in the Menu group.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "menu-page".
@@ -915,8 +1677,307 @@ export interface MenuPage {
   intro?: {
     title?: string | null;
     text?: string | null;
+    align?: ('left' | 'center' | 'right') | null;
   };
   showPrices?: boolean | null;
+  /**
+   * Appears when at least one product has a location label (Menu > Labels, type "Location"). Products without a location label are available everywhere.
+   */
+  showLocationFilter?: boolean | null;
+  allLocationsLabel?: string | null;
+  /**
+   * Shown below the menu.
+   */
+  sections?:
+    | (
+        | {
+            enabled?: boolean | null;
+            slides?:
+              | {
+                  image: number | Media;
+                  imageMobile?: (number | null) | Media;
+                  title?: string | null;
+                  subtitle?: string | null;
+                  text?: string | null;
+                  cta?: {
+                    label?: string | null;
+                    href?: string | null;
+                    external?: boolean | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            interval?: number | null;
+            /**
+             * Phones always use a shorter version.
+             */
+            height?: ('tall' | 'medium' | 'short') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            /**
+             * Leave empty to use the nine hand-drawn icons. Upload light-coloured PNG or SVG files with a transparent background, about 300 x 200 px.
+             */
+            icons?:
+              | {
+                  image: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'iconStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * The links themselves are managed by the super admin (Site settings → Navigation).
+             */
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'navRow';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Each line break is kept, as in the design.
+             */
+            text: string;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'intro';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            /**
+             * The first one is used for Google (address, hours). Set "Coming soon" for future locations.
+             */
+            items?:
+              | {
+                  name: string;
+                  scriptName?: string | null;
+                  status: 'open' | 'coming-soon' | 'closed';
+                  image?: (number | null) | Media;
+                  address?: {
+                    street?: string | null;
+                    suite?: string | null;
+                    city?: string | null;
+                    region?: string | null;
+                    postalCode?: string | null;
+                    country?: string | null;
+                  };
+                  phone?: string | null;
+                  email?: string | null;
+                  hoursDisplay?:
+                    | {
+                        days: string;
+                        hours: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  hoursSpec?:
+                    | {
+                        dayOfWeek: (
+                          'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+                        )[];
+                        opens: string;
+                        closes: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  mapUrl?: string | null;
+                  geo?: {
+                    lat?: number | null;
+                    lng?: number | null;
+                  };
+                  orderUrl?: string | null;
+                  /**
+                   * e.g. "Coming soon".
+                   */
+                  note?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'locations';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'clubStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            limit?: number | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredMenu';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            images?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            limit?: number | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            items?:
+              | {
+                  quote: string;
+                  author: string;
+                  role?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            enabled?: boolean | null;
+            title: string;
+            text?: string | null;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            html: string;
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            imagePosition?: ('left' | 'right') | null;
+            align?: ('left' | 'center' | 'right') | null;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Rows of 3 on desktop, 2 on tablets and 1 on phones; an incomplete last row is centred.
+             */
+            items?:
+              | {
+                  image: number | Media;
+                  more?: (number | Media)[] | null;
+                  label?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4') | null;
+            autoplay?: boolean | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'frames';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * Fields, recipients and messages are edited in Settings > Forms.
+             */
+            form: 'contact' | 'careers';
+            title?: string | null;
+            text?: string | null;
+            image?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'form';
+          }
+        | {
+            enabled?: boolean | null;
+            size?: ('s' | 'm' | 'l') | null;
+            line?: boolean | null;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+      )[]
+    | null;
   /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
    */
@@ -933,6 +1994,7 @@ export interface MenuPage {
     twitterCard?: ('summary_large_image' | 'summary') | null;
     robots?: ('index, follow' | 'noindex, follow') | null;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -945,34 +2007,339 @@ export interface MenuPage {
 export interface AboutPage {
   id: number;
   title?: string | null;
+  /**
+   * Add as many frames as you like: rows of 3 on desktop (or the number below), 2 on tablets, 1 on phones. Add "More photos" to turn a frame into a swipeable carousel.
+   */
   frames?:
     | {
         image: number | Media;
+        more?: (number | Media)[] | null;
+        label?: string | null;
         id?: string | null;
       }[]
     | null;
+  frameColumns?: ('2' | '3' | '4') | null;
+  framesAutoplay?: boolean | null;
   /**
    * Line breaks are kept.
    */
   text: string;
+  textAlign?: ('left' | 'center' | 'right') | null;
+  showClubStrip?: boolean | null;
   showTeamSection?: boolean | null;
   teamImage?: (number | null) | Media;
+  /**
+   * The form fields, dropdown options and messages are edited in Settings > Forms.
+   */
   join?: {
     title?: string | null;
     text?: string | null;
     positions?:
       | {
-          label: string;
+          label?: string | null;
           id?: string | null;
         }[]
       | null;
     experienceLevels?:
       | {
-          label: string;
+          label?: string | null;
           id?: string | null;
         }[]
       | null;
   };
+  /**
+   * Shown after "Join our team", before the contact form.
+   */
+  sections?:
+    | (
+        | {
+            enabled?: boolean | null;
+            slides?:
+              | {
+                  image: number | Media;
+                  imageMobile?: (number | null) | Media;
+                  title?: string | null;
+                  subtitle?: string | null;
+                  text?: string | null;
+                  cta?: {
+                    label?: string | null;
+                    href?: string | null;
+                    external?: boolean | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            interval?: number | null;
+            /**
+             * Phones always use a shorter version.
+             */
+            height?: ('tall' | 'medium' | 'short') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            /**
+             * Leave empty to use the nine hand-drawn icons. Upload light-coloured PNG or SVG files with a transparent background, about 300 x 200 px.
+             */
+            icons?:
+              | {
+                  image: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'iconStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * The links themselves are managed by the super admin (Site settings → Navigation).
+             */
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'navRow';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Each line break is kept, as in the design.
+             */
+            text: string;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'intro';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            /**
+             * The first one is used for Google (address, hours). Set "Coming soon" for future locations.
+             */
+            items?:
+              | {
+                  name: string;
+                  scriptName?: string | null;
+                  status: 'open' | 'coming-soon' | 'closed';
+                  image?: (number | null) | Media;
+                  address?: {
+                    street?: string | null;
+                    suite?: string | null;
+                    city?: string | null;
+                    region?: string | null;
+                    postalCode?: string | null;
+                    country?: string | null;
+                  };
+                  phone?: string | null;
+                  email?: string | null;
+                  hoursDisplay?:
+                    | {
+                        days: string;
+                        hours: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  hoursSpec?:
+                    | {
+                        dayOfWeek: (
+                          'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+                        )[];
+                        opens: string;
+                        closes: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  mapUrl?: string | null;
+                  geo?: {
+                    lat?: number | null;
+                    lng?: number | null;
+                  };
+                  orderUrl?: string | null;
+                  /**
+                   * e.g. "Coming soon".
+                   */
+                  note?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'locations';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'clubStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            limit?: number | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredMenu';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            images?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            limit?: number | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            items?:
+              | {
+                  quote: string;
+                  author: string;
+                  role?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            enabled?: boolean | null;
+            title: string;
+            text?: string | null;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            html: string;
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            imagePosition?: ('left' | 'right') | null;
+            align?: ('left' | 'center' | 'right') | null;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Rows of 3 on desktop, 2 on tablets and 1 on phones; an incomplete last row is centred.
+             */
+            items?:
+              | {
+                  image: number | Media;
+                  more?: (number | Media)[] | null;
+                  label?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4') | null;
+            autoplay?: boolean | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'frames';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * Fields, recipients and messages are edited in Settings > Forms.
+             */
+            form: 'contact' | 'careers';
+            title?: string | null;
+            text?: string | null;
+            image?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'form';
+          }
+        | {
+            enabled?: boolean | null;
+            size?: ('s' | 'm' | 'l') | null;
+            line?: boolean | null;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+      )[]
+    | null;
   showContactSection?: boolean | null;
   /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
@@ -990,6 +2357,7 @@ export interface AboutPage {
     twitterCard?: ('summary_large_image' | 'summary') | null;
     robots?: ('index, follow' | 'noindex, follow') | null;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1023,6 +2391,299 @@ export interface ContactPage {
     showSocial?: boolean | null;
   };
   /**
+   * Shown below the form.
+   */
+  sections?:
+    | (
+        | {
+            enabled?: boolean | null;
+            slides?:
+              | {
+                  image: number | Media;
+                  imageMobile?: (number | null) | Media;
+                  title?: string | null;
+                  subtitle?: string | null;
+                  text?: string | null;
+                  cta?: {
+                    label?: string | null;
+                    href?: string | null;
+                    external?: boolean | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            interval?: number | null;
+            /**
+             * Phones always use a shorter version.
+             */
+            height?: ('tall' | 'medium' | 'short') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            /**
+             * Leave empty to use the nine hand-drawn icons. Upload light-coloured PNG or SVG files with a transparent background, about 300 x 200 px.
+             */
+            icons?:
+              | {
+                  image: number | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'iconStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * The links themselves are managed by the super admin (Site settings → Navigation).
+             */
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'navRow';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Each line break is kept, as in the design.
+             */
+            text: string;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'intro';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            /**
+             * The first one is used for Google (address, hours). Set "Coming soon" for future locations.
+             */
+            items?:
+              | {
+                  name: string;
+                  scriptName?: string | null;
+                  status: 'open' | 'coming-soon' | 'closed';
+                  image?: (number | null) | Media;
+                  address?: {
+                    street?: string | null;
+                    suite?: string | null;
+                    city?: string | null;
+                    region?: string | null;
+                    postalCode?: string | null;
+                    country?: string | null;
+                  };
+                  phone?: string | null;
+                  email?: string | null;
+                  hoursDisplay?:
+                    | {
+                        days: string;
+                        hours: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  hoursSpec?:
+                    | {
+                        dayOfWeek: (
+                          'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+                        )[];
+                        opens: string;
+                        closes: string;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  mapUrl?: string | null;
+                  geo?: {
+                    lat?: number | null;
+                    lng?: number | null;
+                  };
+                  orderUrl?: string | null;
+                  /**
+                   * e.g. "Coming soon".
+                   */
+                  note?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'locations';
+          }
+        | {
+            enabled?: boolean | null;
+            speed?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'clubStrip';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            text?: string | null;
+            limit?: number | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredMenu';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            images?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            limit?: number | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            items?:
+              | {
+                  quote: string;
+                  author: string;
+                  role?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            enabled?: boolean | null;
+            title: string;
+            text?: string | null;
+            align?: ('left' | 'center' | 'right') | null;
+            cta?: {
+              label?: string | null;
+              href?: string | null;
+              external?: boolean | null;
+            };
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            html: string;
+            image?: (number | null) | Media;
+            imageMobile?: (number | null) | Media;
+            imagePosition?: ('left' | 'right') | null;
+            align?: ('left' | 'center' | 'right') | null;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            enabled?: boolean | null;
+            title?: string | null;
+            /**
+             * Rows of 3 on desktop, 2 on tablets and 1 on phones; an incomplete last row is centred.
+             */
+            items?:
+              | {
+                  image: number | Media;
+                  more?: (number | Media)[] | null;
+                  label?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4') | null;
+            autoplay?: boolean | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'frames';
+          }
+        | {
+            enabled?: boolean | null;
+            /**
+             * Fields, recipients and messages are edited in Settings > Forms.
+             */
+            form: 'contact' | 'careers';
+            title?: string | null;
+            text?: string | null;
+            image?: (number | null) | Media;
+            background?: ('cream' | 'concrete' | 'sage') | null;
+            /**
+             * Lets links jump to this section, e.g. "locations" → /#locations.
+             */
+            anchor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'form';
+          }
+        | {
+            enabled?: boolean | null;
+            size?: ('s' | 'm' | 'l') | null;
+            line?: boolean | null;
+            background?: ('cream' | 'concrete' | 'sage' | 'bark') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+      )[]
+    | null;
+  /**
    * Leave a field empty to use the site-wide default (Settings → SEO).
    */
   seo?: {
@@ -1038,11 +2699,12 @@ export interface ContactPage {
     twitterCard?: ('summary_large_image' | 'summary') | null;
     robots?: ('index, follow' | 'noindex, follow') | null;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Business name, contact details, social links and navigation. Used on every page and for Google.
+ * Business name, contact details, social links, navigation and footer texts. Used on every page and for Google.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
@@ -1054,7 +2716,6 @@ export interface SiteSetting {
   tagline?: string | null;
   logo?: (number | null) | Media;
   priceRange?: ('$' | '$$' | '$$$') | null;
-  copyright?: string | null;
   phone?: string | null;
   email?: string | null;
   address?: {
@@ -1075,9 +2736,6 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Use "/#locations" to scroll to the locations on the home page.
-   */
   nav?:
     | {
         label?: string | null;
@@ -1104,6 +2762,173 @@ export interface SiteSetting {
     href?: string | null;
     external?: boolean | null;
   };
+  /**
+   * Shown as "© year name".
+   */
+  copyright?: string | null;
+  footerShowAddress?: boolean | null;
+  footerShowEmail?: boolean | null;
+  footerNote?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Site-wide look: colours, fonts, sizes, spacing, header and footer. Empty fields use the original design, so you can always go back. Changes apply to desktop and mobile at once.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "design".
+ */
+export interface Design {
+  id: number;
+  colors?: {
+    ink?: string | null;
+    cream?: string | null;
+    bark?: string | null;
+    creamBright?: string | null;
+    sage?: string | null;
+    concrete?: string | null;
+    wood?: string | null;
+    focus?: string | null;
+  };
+  type?: {
+    bodyFont?: ('lato' | 'poppins') | null;
+    uiFont?: ('poppins' | 'lato') | null;
+    scriptFont?: ('jimmy' | 'delafield') | null;
+    /**
+     * 100 = design default.
+     */
+    textScale?: number | null;
+    /**
+     * 100 = design default.
+     */
+    titleScale?: number | null;
+    /**
+     * 100 = design default.
+     */
+    scriptScale?: number | null;
+    /**
+     * 100 = design default.
+     */
+    menuScale?: number | null;
+    /**
+     * 100 = design default.
+     */
+    navScale?: number | null;
+  };
+  layout?: {
+    /**
+     * 100 = design default.
+     */
+    sectionSpacing?: number | null;
+    /**
+     * 100 = design default.
+     */
+    sideMargin?: number | null;
+    contentWidth?: number | null;
+    titleAlign?: ('left' | 'center' | 'right') | null;
+    animations?: boolean | null;
+  };
+  header?: {
+    size?: ('s' | 'm' | 'l') | null;
+    /**
+     * 100 = design default.
+     */
+    logoScale?: number | null;
+    sticky?: boolean | null;
+    logo?: (number | null) | Media;
+    wood?: (number | null) | Media;
+    showCurtain?: boolean | null;
+    curtain?: (number | null) | Media;
+    menuLogo?: (number | null) | Media;
+  };
+  footer?: {
+    background?: ('texture' | 'color') | null;
+    color?: string | null;
+    textColor?: string | null;
+    logo?: (number | null) | Media;
+    showDogs?: boolean | null;
+    texture?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Fields, recipients and confirmation messages of the Contact and Join our team forms. Every message is also saved in Messages.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  /**
+   * Several addresses: separate with commas. Empty = the address configured on the server.
+   */
+  notifyEmail?: string | null;
+  contact?: {
+    /**
+     * Half-width fields sit side by side on desktop; on phones every field takes the full width. Open a row to edit it.
+     */
+    fields?:
+      | {
+          label: string;
+          type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'number' | 'date' | 'url' | 'file';
+          width?: ('half' | 'full') | null;
+          required?: boolean | null;
+          /**
+           * Filled in automatically from the label. Do not change it once messages exist.
+           */
+          name?: string | null;
+          options?:
+            | {
+                label: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    submitLabel?: string | null;
+    emailSubject?: string | null;
+    successMessage?: string | null;
+    /**
+     * Overrides the general address above for this form. Several addresses: separate with commas.
+     */
+    notifyEmail?: string | null;
+  };
+  careers?: {
+    /**
+     * Half-width fields sit side by side on desktop; on phones every field takes the full width. Open a row to edit it.
+     */
+    fields?:
+      | {
+          label: string;
+          type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'number' | 'date' | 'url' | 'file';
+          width?: ('half' | 'full') | null;
+          required?: boolean | null;
+          /**
+           * Filled in automatically from the label. Do not change it once messages exist.
+           */
+          name?: string | null;
+          options?:
+            | {
+                label: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    submitLabel?: string | null;
+    emailSubject?: string | null;
+    successMessage?: string | null;
+    /**
+     * Overrides the general address above for this form. Several addresses: separate with commas.
+     */
+    notifyEmail?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1125,6 +2950,7 @@ export interface SeoDefault {
   twitterHandle?: string | null;
   robots?: string | null;
   locale?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1158,6 +2984,7 @@ export interface HomepageSelect<T extends boolean = true> {
                     id?: T;
                   };
               interval?: T;
+              height?: T;
               id?: T;
               blockName?: T;
             };
@@ -1166,6 +2993,12 @@ export interface HomepageSelect<T extends boolean = true> {
           | {
               enabled?: T;
               speed?: T;
+              icons?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
               id?: T;
               blockName?: T;
             };
@@ -1183,6 +3016,7 @@ export interface HomepageSelect<T extends boolean = true> {
               enabled?: T;
               title?: T;
               text?: T;
+              align?: T;
               cta?:
                 | T
                 | {
@@ -1253,6 +3087,7 @@ export interface HomepageSelect<T extends boolean = true> {
           | T
           | {
               enabled?: T;
+              speed?: T;
               id?: T;
               blockName?: T;
             };
@@ -1314,6 +3149,7 @@ export interface HomepageSelect<T extends boolean = true> {
               enabled?: T;
               title?: T;
               text?: T;
+              align?: T;
               cta?:
                 | T
                 | {
@@ -1337,8 +3173,51 @@ export interface HomepageSelect<T extends boolean = true> {
               image?: T;
               imageMobile?: T;
               imagePosition?: T;
+              align?: T;
               background?: T;
               anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        frames?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    more?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              autoplay?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        form?:
+          | T
+          | {
+              enabled?: T;
+              form?: T;
+              title?: T;
+              text?: T;
+              image?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              enabled?: T;
+              size?: T;
+              line?: T;
+              background?: T;
               id?: T;
               blockName?: T;
             };
@@ -1355,6 +3234,7 @@ export interface HomepageSelect<T extends boolean = true> {
         twitterCard?: T;
         robots?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1369,8 +3249,274 @@ export interface MenuPageSelect<T extends boolean = true> {
     | {
         title?: T;
         text?: T;
+        align?: T;
       };
   showPrices?: T;
+  showLocationFilter?: T;
+  allLocationsLabel?: T;
+  sections?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              enabled?: T;
+              slides?:
+                | T
+                | {
+                    image?: T;
+                    imageMobile?: T;
+                    title?: T;
+                    subtitle?: T;
+                    text?: T;
+                    cta?:
+                      | T
+                      | {
+                          label?: T;
+                          href?: T;
+                          external?: T;
+                        };
+                    id?: T;
+                  };
+              interval?: T;
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              icons?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        navRow?:
+          | T
+          | {
+              enabled?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        intro?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        locations?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              items?:
+                | T
+                | {
+                    name?: T;
+                    scriptName?: T;
+                    status?: T;
+                    image?: T;
+                    address?:
+                      | T
+                      | {
+                          street?: T;
+                          suite?: T;
+                          city?: T;
+                          region?: T;
+                          postalCode?: T;
+                          country?: T;
+                        };
+                    phone?: T;
+                    email?: T;
+                    hoursDisplay?:
+                      | T
+                      | {
+                          days?: T;
+                          hours?: T;
+                          id?: T;
+                        };
+                    hoursSpec?:
+                      | T
+                      | {
+                          dayOfWeek?: T;
+                          opens?: T;
+                          closes?: T;
+                          id?: T;
+                        };
+                    mapUrl?: T;
+                    geo?:
+                      | T
+                      | {
+                          lat?: T;
+                          lng?: T;
+                        };
+                    orderUrl?: T;
+                    note?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        clubStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featuredMenu?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              limit?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              limit?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              image?: T;
+              imageMobile?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              html?: T;
+              image?: T;
+              imageMobile?: T;
+              imagePosition?: T;
+              align?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        frames?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    more?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              autoplay?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        form?:
+          | T
+          | {
+              enabled?: T;
+              form?: T;
+              title?: T;
+              text?: T;
+              image?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              enabled?: T;
+              size?: T;
+              line?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   seo?:
     | T
     | {
@@ -1383,6 +3529,7 @@ export interface MenuPageSelect<T extends boolean = true> {
         twitterCard?: T;
         robots?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1397,9 +3544,15 @@ export interface AboutPageSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
+        more?: T;
+        label?: T;
         id?: T;
       };
+  frameColumns?: T;
+  framesAutoplay?: T;
   text?: T;
+  textAlign?: T;
+  showClubStrip?: T;
   showTeamSection?: T;
   teamImage?: T;
   join?:
@@ -1420,6 +3573,269 @@ export interface AboutPageSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  sections?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              enabled?: T;
+              slides?:
+                | T
+                | {
+                    image?: T;
+                    imageMobile?: T;
+                    title?: T;
+                    subtitle?: T;
+                    text?: T;
+                    cta?:
+                      | T
+                      | {
+                          label?: T;
+                          href?: T;
+                          external?: T;
+                        };
+                    id?: T;
+                  };
+              interval?: T;
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              icons?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        navRow?:
+          | T
+          | {
+              enabled?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        intro?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        locations?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              items?:
+                | T
+                | {
+                    name?: T;
+                    scriptName?: T;
+                    status?: T;
+                    image?: T;
+                    address?:
+                      | T
+                      | {
+                          street?: T;
+                          suite?: T;
+                          city?: T;
+                          region?: T;
+                          postalCode?: T;
+                          country?: T;
+                        };
+                    phone?: T;
+                    email?: T;
+                    hoursDisplay?:
+                      | T
+                      | {
+                          days?: T;
+                          hours?: T;
+                          id?: T;
+                        };
+                    hoursSpec?:
+                      | T
+                      | {
+                          dayOfWeek?: T;
+                          opens?: T;
+                          closes?: T;
+                          id?: T;
+                        };
+                    mapUrl?: T;
+                    geo?:
+                      | T
+                      | {
+                          lat?: T;
+                          lng?: T;
+                        };
+                    orderUrl?: T;
+                    note?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        clubStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featuredMenu?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              limit?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              limit?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              image?: T;
+              imageMobile?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              html?: T;
+              image?: T;
+              imageMobile?: T;
+              imagePosition?: T;
+              align?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        frames?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    more?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              autoplay?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        form?:
+          | T
+          | {
+              enabled?: T;
+              form?: T;
+              title?: T;
+              text?: T;
+              image?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              enabled?: T;
+              size?: T;
+              line?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   showContactSection?: T;
   seo?:
     | T
@@ -1433,6 +3849,7 @@ export interface AboutPageSelect<T extends boolean = true> {
         twitterCard?: T;
         robots?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1462,6 +3879,269 @@ export interface ContactPageSelect<T extends boolean = true> {
         mapLabel?: T;
         showSocial?: T;
       };
+  sections?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              enabled?: T;
+              slides?:
+                | T
+                | {
+                    image?: T;
+                    imageMobile?: T;
+                    title?: T;
+                    subtitle?: T;
+                    text?: T;
+                    cta?:
+                      | T
+                      | {
+                          label?: T;
+                          href?: T;
+                          external?: T;
+                        };
+                    id?: T;
+                  };
+              interval?: T;
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              icons?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        navRow?:
+          | T
+          | {
+              enabled?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        intro?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        locations?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              items?:
+                | T
+                | {
+                    name?: T;
+                    scriptName?: T;
+                    status?: T;
+                    image?: T;
+                    address?:
+                      | T
+                      | {
+                          street?: T;
+                          suite?: T;
+                          city?: T;
+                          region?: T;
+                          postalCode?: T;
+                          country?: T;
+                        };
+                    phone?: T;
+                    email?: T;
+                    hoursDisplay?:
+                      | T
+                      | {
+                          days?: T;
+                          hours?: T;
+                          id?: T;
+                        };
+                    hoursSpec?:
+                      | T
+                      | {
+                          dayOfWeek?: T;
+                          opens?: T;
+                          closes?: T;
+                          id?: T;
+                        };
+                    mapUrl?: T;
+                    geo?:
+                      | T
+                      | {
+                          lat?: T;
+                          lng?: T;
+                        };
+                    orderUrl?: T;
+                    note?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        clubStrip?:
+          | T
+          | {
+              enabled?: T;
+              speed?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featuredMenu?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              limit?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              limit?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    id?: T;
+                  };
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              text?: T;
+              align?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    external?: T;
+                  };
+              image?: T;
+              imageMobile?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              html?: T;
+              image?: T;
+              imageMobile?: T;
+              imagePosition?: T;
+              align?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        frames?:
+          | T
+          | {
+              enabled?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    more?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              autoplay?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        form?:
+          | T
+          | {
+              enabled?: T;
+              form?: T;
+              title?: T;
+              text?: T;
+              image?: T;
+              background?: T;
+              anchor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              enabled?: T;
+              size?: T;
+              line?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   seo?:
     | T
     | {
@@ -1474,6 +4154,7 @@ export interface ContactPageSelect<T extends boolean = true> {
         twitterCard?: T;
         robots?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1488,7 +4169,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   tagline?: T;
   logo?: T;
   priceRange?: T;
-  copyright?: T;
   phone?: T;
   email?: T;
   address?:
@@ -1541,6 +4221,135 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         href?: T;
         external?: T;
       };
+  copyright?: T;
+  footerShowAddress?: T;
+  footerShowEmail?: T;
+  footerNote?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "design_select".
+ */
+export interface DesignSelect<T extends boolean = true> {
+  colors?:
+    | T
+    | {
+        ink?: T;
+        cream?: T;
+        bark?: T;
+        creamBright?: T;
+        sage?: T;
+        concrete?: T;
+        wood?: T;
+        focus?: T;
+      };
+  type?:
+    | T
+    | {
+        bodyFont?: T;
+        uiFont?: T;
+        scriptFont?: T;
+        textScale?: T;
+        titleScale?: T;
+        scriptScale?: T;
+        menuScale?: T;
+        navScale?: T;
+      };
+  layout?:
+    | T
+    | {
+        sectionSpacing?: T;
+        sideMargin?: T;
+        contentWidth?: T;
+        titleAlign?: T;
+        animations?: T;
+      };
+  header?:
+    | T
+    | {
+        size?: T;
+        logoScale?: T;
+        sticky?: T;
+        logo?: T;
+        wood?: T;
+        showCurtain?: T;
+        curtain?: T;
+        menuLogo?: T;
+      };
+  footer?:
+    | T
+    | {
+        background?: T;
+        color?: T;
+        textColor?: T;
+        logo?: T;
+        showDogs?: T;
+        texture?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  notifyEmail?: T;
+  contact?:
+    | T
+    | {
+        fields?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              width?: T;
+              required?: T;
+              name?: T;
+              options?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        submitLabel?: T;
+        emailSubject?: T;
+        successMessage?: T;
+        notifyEmail?: T;
+      };
+  careers?:
+    | T
+    | {
+        fields?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              width?: T;
+              required?: T;
+              name?: T;
+              options?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        submitLabel?: T;
+        emailSubject?: T;
+        successMessage?: T;
+        notifyEmail?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1557,6 +4366,7 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
   twitterHandle?: T;
   robots?: T;
   locale?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
