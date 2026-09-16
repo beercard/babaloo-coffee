@@ -9,7 +9,7 @@
  */
 import { NextResponse, type NextRequest } from 'next/server';
 
-const LOGIN_LIMIT = Number(process.env.LOGIN_RATE_LIMIT ?? 10); // attempts
+const LOGIN_LIMIT = Number(process.env.LOGIN_RATE_LIMIT ?? 30); // attempts per IP (a whole café may share one)
 const LOGIN_WINDOW_MS = Number(process.env.LOGIN_RATE_WINDOW_MS ?? 15 * 60 * 1000); // per 15 min
 const hits = new Map<string, number[]>();
 

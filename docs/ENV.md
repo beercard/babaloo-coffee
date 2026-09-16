@@ -39,7 +39,7 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | no | Remitente de los avisos. |
 | `FORM_WEBHOOK_URL` | no | Webhook para CRM / WhatsApp / newsletter con cada envío. |
 | `FORM_RATE_LIMIT` | no | Envíos por IP cada 10 min. Default 5. |
-| `LOGIN_RATE_LIMIT` / `LOGIN_RATE_WINDOW_MS` | no | Intentos de login por IP y ventana (default 10 / 15 min). Payload además bloquea la cuenta 15 min tras 5 fallos. |
+| `LOGIN_RATE_LIMIT` / `LOGIN_RATE_WINDOW_MS` | no | Intentos de login por IP y ventana (default 30 / 15 min). Payload además bloquea la cuenta 15 min tras 5 fallos. |
 | `ADMIN_ALLOWED_IPS` | no | Lista de IPs (coma) que pueden abrir `/admin`; vacío = todas. |
 | `RESUMES_DIR` | no | Carpeta de los currículums (default `media/resumes`, dentro del volumen de media). |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | sólo seed | Primer usuario admin. |
