@@ -1,12 +1,17 @@
 import { withPayload } from '@payloadcms/next/withPayload'
-import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
-const nextConfig: NextConfig = {
+/**
+ * Plain JavaScript on purpose: Hostinger's servers (glibc 2.28) cannot load Next's native SWC
+ * binary, and the WebAssembly fallback cannot compile a TypeScript config nor run Turbopack.
+ * The build therefore uses webpack (`next build --webpack`).
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
   images: {
     localPatterns: [
       {
@@ -14,7 +19,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (webpackConfig) => {
+  webpack: (/** @type {import('webpack').Configuration} */ webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
