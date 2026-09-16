@@ -43,6 +43,15 @@ export function proxy(req: NextRequest) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 
+  // No session cookie → straight to the login page. (Payload also redirects, but it does so while
+  // streaming the dashboard, which some hosts deliver as a blank page instead of following it.)
+  const publicAdmin = /^\/admin\/(login|logout|forgot-password|reset-password|create-first-user|verify|unlock)(\/|$)/;
+  if (pathname.startsWith('/admin') && !publicAdmin.test(pathname) && !req.cookies.get('payload-token')) {
+    const login = new URL('/admin/login', req.url);
+    if (pathname !== '/admin') login.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(login);
+  }
+
   // Throttle credential endpoints.
   const isAuthAttempt =
     req.method === 'POST' &&

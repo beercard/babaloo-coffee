@@ -99,7 +99,8 @@ export default buildConfig({
     vercelBlobStorage({
       enabled: Boolean(blobToken),
       token: blobToken,
-      collections: { media: true },
+      // Public photos are served straight from the Blob CDN (no token needed to read them).
+      collections: { media: { disablePayloadAccessControl: true } },
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 365,
     }),
