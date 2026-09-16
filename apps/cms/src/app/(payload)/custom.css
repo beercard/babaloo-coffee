@@ -318,3 +318,32 @@ select,
   border-radius: var(--style-radius-l);
   padding: 2rem;
 }
+
+/* ---------- Message view (form submissions) ---------- */
+.bb-submission {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--theme-elevation-150, #e2ddd4);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--theme-elevation-0, #fff);
+}
+.bb-submission__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) 1fr;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--theme-elevation-100, #eee8df);
+}
+.bb-submission__row:first-child { border-top: 0; }
+.bb-submission__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--theme-elevation-600, #6b6058);
+  padding-top: 0.15rem;
+}
+.bb-submission__value { font-size: 0.95rem; line-height: 1.45; word-break: break-word; }
+.bb-submission__value a { color: var(--bb-ink); text-decoration: underline; text-underline-offset: 2px; }
+.bb-submission__message { white-space: pre-wrap; }
+.bb-submission__empty { padding: 1rem; color: var(--theme-elevation-500); }

@@ -1,5 +1,6 @@
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { SubmissionFields as SubmissionFields_6220cb454b90ba75f94742ee9d2448a6 } from '../../../components/SubmissionFields'
 import { Icon as Icon_a02a4abfb5c9da17149cbadc8057c129 } from '../../../components/Icon'
 import { Logo as Logo_919492c8e60179286a0f183c0a5b652e } from '../../../components/Logo'
 import { HeaderActions as HeaderActions_baad58540feb60629bcd8b504efb51d5 } from '../../../components/HeaderActions'
@@ -12,6 +13,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 export const importMap = {
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "/components/SubmissionFields#SubmissionFields": SubmissionFields_6220cb454b90ba75f94742ee9d2448a6,
   "/components/Icon#Icon": Icon_a02a4abfb5c9da17149cbadc8057c129,
   "/components/Logo#Logo": Logo_919492c8e60179286a0f183c0a5b652e,
   "/components/HeaderActions#HeaderActions": HeaderActions_baad58540feb60629bcd8b504efb51d5,

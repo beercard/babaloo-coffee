@@ -39,14 +39,19 @@ export const FormSubmissions: CollectionConfig = {
       ],
       admin: { position: 'sidebar' },
     },
-    { name: 'summary', type: 'text', label: 'From', admin: { readOnly: true } },
-    { name: 'email', type: 'email', admin: { readOnly: true } },
-    { name: 'data', type: 'json', label: 'Submitted fields', admin: { readOnly: true } },
+    { name: 'summary', type: 'text', label: t('From', 'De'), admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'email', type: 'email', admin: { readOnly: true, position: 'sidebar' } },
+    {
+      name: 'data',
+      type: 'json',
+      label: t('Message', 'Mensaje'),
+      admin: { readOnly: true, components: { Field: '/components/SubmissionFields#SubmissionFields' } },
+    },
     { name: 'resume', type: 'upload', relationTo: 'resumes', label: t('Résumé', 'Currículum'), admin: { readOnly: true } },
     {
       name: 'meta',
       type: 'group',
-      admin: { readOnly: true },
+      admin: { readOnly: true, hidden: true }, // technical details, kept for abuse tracing only
       fields: [
         { name: 'page', type: 'text' },
         { name: 'userAgent', type: 'text' },
