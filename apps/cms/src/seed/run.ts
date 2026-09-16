@@ -104,7 +104,7 @@ async function main() {
       const id = existing.docs[0].id as number;
       // With Vercel Blob there is no local file to check; only re-upload when forced.
       const onDisk = path.join(process.env.MEDIA_DIR ?? path.resolve(process.cwd(), 'media'), existing.docs[0].filename ?? '');
-      const fileMissing = process.env.BLOB_READ_WRITE_TOKEN ? false : !fs.existsSync(onDisk);
+      const fileMissing = process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOBB_READ_WRITE_TOKEN ? false : !fs.existsSync(onDisk);
       if (fileMissing || force) {
         // Re-upload the file (keeps the same id, so every reference stays valid).
         await payload.update({ collection: 'media', id, data: { alt: ref.alt, caption: ref.caption, folder: folderId } as never, filePath: file, overwriteExistingFiles: true });

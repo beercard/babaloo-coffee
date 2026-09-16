@@ -13,7 +13,7 @@ export async function GET() {
     nodeEnv: process.env.NODE_ENV,
     payloadSecret: Boolean(process.env.PAYLOAD_SECRET),
     database: { scheme, hasAuthToken: Boolean(process.env.DATABASE_AUTH_TOKEN), hasWhitespace: url !== url.trim() },
-    blobToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+    blobToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOBB_READ_WRITE_TOKEN),
     smtp: Boolean(process.env.SMTP_HOST),
     serverUrl: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? null,
     siteUrl: process.env.SITE_URL ?? null,

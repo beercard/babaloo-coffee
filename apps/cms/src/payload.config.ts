@@ -32,7 +32,8 @@ const siteUrls = (process.env.SITE_URL ?? 'http://localhost:4321')
  * Schema sync: `push` runs in dev (and when DB_PUSH=1), so seeding from a dev machine against Turso
  * creates the tables; in production the schema is expected to exist already.
  */
-const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+// `BLOBB_…` is accepted too (the Vercel project keeps the store under that name).
+const blobToken = (process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOBB_READ_WRITE_TOKEN || '').trim().replace(/^"|"$/g, '') || undefined;
 
 /** Outgoing email (form notifications) over SMTP, e.g. Hostinger: smtp.hostinger.com:465 with the info@ mailbox. */
 const smtp = process.env.SMTP_HOST
