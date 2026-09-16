@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import path from 'path';
-import { isAdmin, isEditorOrAdmin } from '../access/roles';
+import { isEditorOrAdmin } from '../access/roles';
 import { t } from '../fields/i18n';
 
 /** Résumés uploaded from the "Join our team" form. Private: only logged-in users can open them. */
@@ -26,7 +26,7 @@ export const Resumes: CollectionConfig = {
     read: isEditorOrAdmin,
     create: () => false, // only the /api/forms/submit endpoint uploads (via local API)
     update: () => false,
-    delete: isAdmin,
+    delete: isEditorOrAdmin,
   },
   upload: {
     staticDir: resumesDir,

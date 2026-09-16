@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isEditorOrAdmin } from '../access/roles';
+import { isEditorOrAdmin } from '../access/roles';
 import { t } from '../fields/i18n';
 
 export const FormSubmissions: CollectionConfig = {
@@ -15,7 +15,7 @@ export const FormSubmissions: CollectionConfig = {
     read: isEditorOrAdmin,
     create: () => false, // only the /api/forms/submit endpoint creates documents (via local API)
     update: isEditorOrAdmin,
-    delete: isAdmin,
+    delete: isEditorOrAdmin, // editors clean their own inbox
   },
   fields: [
     {
