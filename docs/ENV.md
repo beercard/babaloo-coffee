@@ -38,7 +38,7 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` | con notificaciones | SMTP para enviar los avisos (Hostinger: `smtp.hostinger.com`, 465, usuario y clave del buzón). Sin `SMTP_HOST` no se envía email; el mensaje queda solo en el CMS. |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | no | Remitente de los avisos. |
 | `FORM_WEBHOOK_URL` | no | Webhook para CRM / WhatsApp / newsletter con cada envío. |
-| `FORM_RATE_LIMIT` | no | Envíos por IP cada 10 min. Default 5. |
+| `FORM_RATE_LIMIT` | no | Envíos aceptados por IP cada 10 min (los errores de validación no cuentan). Default 10. |
 | `ADMIN_ALLOWED_IPS` | no | Lista de IPs (coma) que pueden abrir `/admin`; vacío = todas. |
 | `RESUMES_DIR` | no | Carpeta de los currículums (default `media/resumes`, dentro del volumen de media). |
 | `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | sólo seed | Primer usuario admin. |
