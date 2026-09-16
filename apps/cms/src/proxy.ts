@@ -53,9 +53,9 @@ export function proxy(req: NextRequest) {
   }
 
   // Throttle credential endpoints.
-  const isAuthAttempt =
-    req.method === 'POST' &&
-    (/^\/api\/users\/(login|forgot-password|reset-password|unlock)$/.test(pathname) || pathname === '/admin/login');
+  // Only the REST credential endpoints count. (The admin login *page* also receives POSTs for
+  // React server functions on every field validation, which must not count as attempts.)
+  const isAuthAttempt = req.method === 'POST' && /^\/api\/users\/(login|forgot-password|reset-password|unlock)$/.test(pathname);
   if (isAuthAttempt && limited(`${client}:${pathname}`)) {
     return NextResponse.json({ errors: [{ message: 'Too many attempts. Please wait a few minutes and try again.' }] }, { status: 429, headers: { 'Retry-After': '900' } });
   }
