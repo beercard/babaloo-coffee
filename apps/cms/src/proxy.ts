@@ -42,6 +42,17 @@ export function proxy(req: NextRequest) {
   // Brute force is handled per account by Payload (5 failed logins → 15 min lock, see
   // collections/Users.ts). A per-IP counter was removed: cafés and offices share one IP and
   // legitimate staff kept locking each other out.
+  // Admin language: English unless the person picked another language in their account
+  // (Payload stores that choice in the `payload-lng` cookie). Without this, Payload follows the
+  // browser's Accept-Language and Spanish browsers got a Spanish login page.
+  if (pathname.startsWith('/admin') && !req.cookies.get('payload-lng')) {
+    const headers = new Headers(req.headers);
+    headers.set('cookie', [req.headers.get('cookie'), 'payload-lng=en'].filter(Boolean).join('; '));
+    const res = NextResponse.next({ request: { headers } });
+    res.cookies.set('payload-lng', 'en', { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' });
+    return res;
+  }
+
   return NextResponse.next();
 }
 
