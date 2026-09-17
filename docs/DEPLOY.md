@@ -173,7 +173,7 @@ Con Vercel/Netlify basta con poner su *Deploy Hook URL* en `DEPLOY_HOOK_URL` (si
 | Antigua | Nueva |
 |---|---|
 | `/drinks/` | `/menu` |
-| `/food/` | `/menu#food-and-sweets` |
+| `/food/` | `/menu#bites-and-sweets` |
 | `/hours/` | `/#locations` |
 | `/contact-us/` | `/contact` |
 | `/gallery/` | `/` |

@@ -12,12 +12,14 @@ RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,NE]
 
 # Old WordPress URLs → new pages
 RewriteRule ^drinks/?$        /menu                    [R=301,L,NC]
-RewriteRule ^food/?$          /menu#food-and-sweets    [R=301,L,NC,NE]
+RewriteRule ^food/?$          /menu#bites-and-sweets   [R=301,L,NC,NE]
 RewriteRule ^hours/?$         /#locations              [R=301,L,NC,NE]
 RewriteRule ^contact-us/?$    /contact                 [R=301,L,NC]
 RewriteRule ^gallery/?$       /                        [R=301,L,NC]
 RewriteRule ^join-our-team/?$ /about#join-our-team     [R=301,L,NC,NE]
-RewriteRule ^(wp-admin|wp-login\.php|wp-content|wp-includes|xmlrpc\.php|feed)(/.*)?$ / [R=301,L,NC]
+RewriteRule ^(wp-admin|wp-login\.php|wp-content|wp-includes|xmlrpc\.php|feed|comments/feed|category|author|tag)(/.*)?$ / [R=301,L,NC]
+# Old Yoast / WordPress sitemaps → the new sitemap
+RewriteRule ^(sitemap_index|page-sitemap|post-sitemap|category-sitemap|author-sitemap|wp-sitemap|sitemap)\.xml$ /sitemap-index.xml [R=301,L,NC]
 
 # Strip trailing slashes (Astro is built with trailingSlash: 'never')
 RewriteCond %{REQUEST_FILENAME} !-d

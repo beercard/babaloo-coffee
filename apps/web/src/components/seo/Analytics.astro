@@ -5,12 +5,15 @@
  * build ships zero third-party JavaScript until the client opts in.
  *
  *   PUBLIC_GTM_ID          → Google Tag Manager (recommended: manage the rest from GTM)
- *   PUBLIC_GA4_ID          → Google Analytics 4 (gtag)
+ *   PUBLIC_GA4_ID          → Google Analytics 4 (gtag). Defaults to Babaloo's property on the live
+ *                            site; the preview site (PAYLOAD_DRAFTS=1) and local dev send nothing.
+ *                            Events are tracked by scripts/analytics.ts.
  *   PUBLIC_GADS_ID         → Google Ads conversion tag (gtag)
  *   PUBLIC_META_PIXEL_ID   → Meta Pixel
  */
 const gtm = import.meta.env.PUBLIC_GTM_ID;
-const ga4 = import.meta.env.PUBLIC_GA4_ID;
+const isLive = import.meta.env.PROD && import.meta.env.PAYLOAD_DRAFTS !== '1';
+const ga4 = import.meta.env.PUBLIC_GA4_ID || (isLive ? 'G-Q88BBY2LQ8' : undefined);
 const gads = import.meta.env.PUBLIC_GADS_ID;
 const pixel = import.meta.env.PUBLIC_META_PIXEL_ID;
 const gtagIds = [ga4, gads].filter(Boolean) as string[];
@@ -43,8 +46,12 @@ const gtagIds = [ga4, gads].filter(Boolean) as string[];
         }
         gtag('js', new Date());
         gtagIds.forEach(function (id) {
-          gtag('config', id, { anonymize_ip: true });
+          gtag('config', id);
         });
+      </script>
+      <script>
+        import { initAnalytics } from '@/scripts/analytics';
+        document.addEventListener('astro:page-load', initAnalytics);
       </script>
     </Fragment>
   )

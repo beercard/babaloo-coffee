@@ -42,7 +42,7 @@ export default defineConfig({
   // public/_redirects (Netlify/Cloudflare) and vercel.json so real 301s are served.
   redirects: {
     '/drinks': '/menu',
-    '/food': '/menu#food-and-sweets',
+    '/food': '/menu#bites-and-sweets',
     '/hours': '/#locations',
     '/contact-us': '/contact',
     '/gallery': '/',

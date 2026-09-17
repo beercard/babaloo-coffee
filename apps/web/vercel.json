@@ -13,7 +13,7 @@
     },
     {
       "source": "/food",
-      "destination": "/menu#food-and-sweets",
+      "destination": "/menu#bites-and-sweets",
       "permanent": true
     },
     {

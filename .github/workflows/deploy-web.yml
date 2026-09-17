@@ -4,7 +4,7 @@
 # Preview site (drafts, noindex) — push to main, "cms-draft" (sent by the CMS on every save), manual run
 #
 # Repository secrets (Settings → Secrets and variables → Actions → Secrets):
-#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   hPanel → Files → FTP accounts
+#   HOSTINGER_API_TOKEN                      hPanel → Account → API (publishes through the API)
 #   PAYLOAD_URL                              https://cms.babaloocoffeeclub.com
 #   PAYLOAD_PREVIEW_SECRET                   same value as PREVIEW_SECRET on the CMS (preview only)
 # Repository variables (… → Variables):
@@ -13,8 +13,8 @@
 #   FTP_SERVER_DIR    /public_html/                     (default)
 #   FTP_PROTOCOL      ftps                              (default; use ftp if FTPS is not available)
 #   PREVIEW_SITE_URL  https://preview.babaloocoffeeclub.com
-#   FTP_PREVIEW_DIR   folder of the preview subdomain as seen by the FTP account
-#                     (empty = the preview site is not built)
+#   PREVIEW_ENABLED   true — also build the preview site (drafts)
+#   (FTP fallback only: FTP_SERVER / FTP_USERNAME / FTP_PASSWORD secrets, FTP_PREVIEW_DIR variable)
 #   PUBLIC_GTM_ID, PUBLIC_GA4_ID, PUBLIC_GADS_ID, PUBLIC_META_PIXEL_ID, PUBLIC_FORM_ENDPOINT (optional)
 name: Build & deploy website
 
@@ -51,7 +51,7 @@ jobs:
 
   preview:
     if: >-
-      vars.FTP_PREVIEW_DIR != '' && (
+      (vars.PREVIEW_ENABLED == 'true' || vars.FTP_PREVIEW_DIR != '') && (
       github.event_name == 'push' ||
       (github.event_name == 'repository_dispatch' && github.event.action == 'cms-draft') ||
       (github.event_name == 'workflow_dispatch' && inputs.target != 'live'))

@@ -1,4 +1,5 @@
-# Reusable: builds the Astro site (live or preview) and uploads it to Hostinger over FTP.
+# Reusable: builds the Astro site (live or preview) and publishes it to Hostinger through the
+# Hostinger API (scripts/hostinger-deploy.mjs). FTP is kept as a fallback when no API token is set.
 # Called by deploy-web.yml; see that file for the secrets and variables it needs.
 name: Build site
 
@@ -19,7 +20,9 @@ jobs:
       cancel-in-progress: true
     env:
       LIVE: ${{ inputs.site == 'live' }}
+      HAS_API: ${{ secrets.HOSTINGER_API_TOKEN != '' }}
       HAS_FTP: ${{ secrets.FTP_SERVER != '' }}
+      DOMAIN: ${{ inputs.site == 'live' && (vars.HOSTINGER_DOMAIN || 'babaloocoffeeclub.com') || (vars.HOSTINGER_PREVIEW_DOMAIN || 'preview.babaloocoffeeclub.com') }}
       SERVER_DIR: ${{ inputs.site == 'live' && (vars.FTP_SERVER_DIR || '/public_html/') || vars.FTP_PREVIEW_DIR }}
     steps:
       - uses: actions/checkout@v4
@@ -64,8 +67,19 @@ jobs:
           path: apps/web/dist
           retention-days: 3
 
-      - name: Deploy to Hostinger (FTP)
-        if: env.HAS_FTP == 'true' && env.SERVER_DIR != ''
+      - name: Deploy to Hostinger (API)
+        if: env.HAS_API == 'true'
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          HOSTINGER_USERNAME: ${{ vars.HOSTINGER_USERNAME || 'u731809005' }}
+        run: |
+          cd apps/web/dist
+          zip -qr "$RUNNER_TEMP/site-${{ inputs.site }}.zip" . -x '*.git*'
+          cd "$GITHUB_WORKSPACE"
+          node scripts/hostinger-deploy.mjs "$RUNNER_TEMP/site-${{ inputs.site }}.zip" "$DOMAIN"
+
+      - name: Deploy to Hostinger (FTP fallback)
+        if: env.HAS_API != 'true' && env.HAS_FTP == 'true' && env.SERVER_DIR != ''
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}

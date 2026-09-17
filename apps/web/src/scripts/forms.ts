@@ -157,8 +157,10 @@ export function initForms(): void {
           delete fileInput.dataset.touched;
           checkFile(fileInput);
         }
+        document.dispatchEvent(new CustomEvent('babaloo:form', { detail: { form: form.dataset.form ?? 'contact', status: 'success' } }));
         setState(form, 'success', (relay ? form.dataset.successMessage : body.message) || form.dataset.successMessage || body.message || 'Thank you! We received your message.');
       } catch (err) {
+        document.dispatchEvent(new CustomEvent('babaloo:form', { detail: { form: form.dataset.form ?? 'contact', status: 'error', message: (err as Error).message } }));
         setState(form, 'error', (err as Error).message);
       }
     });

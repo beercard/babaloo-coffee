@@ -1,8 +1,8 @@
 # Netlify / Cloudflare Pages redirects (WordPress → new site)
 /drinks         /menu                   301
 /drinks/        /menu                   301
-/food           /menu#food-and-sweets   301
-/food/          /menu#food-and-sweets   301
+/food           /menu#bites-and-sweets   301
+/food/          /menu#bites-and-sweets   301
 /hours          /#locations             301
 /hours/         /#locations             301
 /contact-us     /contact                301
