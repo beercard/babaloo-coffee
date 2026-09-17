@@ -480,7 +480,7 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product.
+ * Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product. Replacing the file of an existing photo changes it on EVERY page that uses it: to change a photo in one place only, upload a new photo and pick it there.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -574,22 +574,9 @@ export interface MenuItem {
     | null;
   image?: (number | null) | Media;
   /**
-   * Badges (Signature, New…) and the locations that sell it. No location label = sold everywhere. Create new labels in Menu > Labels.
+   * Pick any labels: badges (Signature, New…) and the locations that sell it. No location label = sold everywhere. To add a label that does not exist yet, use the + button here or Menu > Labels.
    */
   labels?: (number | MenuLabel)[] | null;
-  tags?:
-    | (
-        | 'New'
-        | 'Popular'
-        | 'Seasonal'
-        | 'Vegan'
-        | 'Gluten free'
-        | 'Signature'
-        | 'Rea Farms'
-        | 'South End'
-        | 'Lake Norman'
-      )[]
-    | null;
   featured?: boolean | null;
   available?: boolean | null;
   /**
@@ -706,6 +693,7 @@ export interface FormSubmission {
 export interface Resume {
   id: number;
   applicant?: string | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1157,7 +1145,6 @@ export interface MenuItemsSelect<T extends boolean = true> {
       };
   image?: T;
   labels?: T;
-  tags?: T;
   featured?: T;
   available?: T;
   order?: T;
@@ -1261,6 +1248,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
  */
 export interface ResumesSelect<T extends boolean = true> {
   applicant?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -2008,7 +1996,7 @@ export interface AboutPage {
   id: number;
   title?: string | null;
   /**
-   * Add as many frames as you like: rows of 3 on desktop (or the number below), 2 on tablets, 1 on phones. Add "More photos" to turn a frame into a swipeable carousel.
+   * Add as many frames as you like: rows of 3 on desktop (or the number below), 2 on tablets, 1 on phones. Add "More photos" to turn a frame into a swipeable carousel. These photos are only used here (folder "About · Frames"): to change one, upload a new photo instead of replacing a photo used on the Home page.
    */
   frames?:
     | {

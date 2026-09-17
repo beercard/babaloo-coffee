@@ -132,8 +132,8 @@ export const AboutPage: GlobalConfig = {
               labels: { singular: t('Frame', 'Marco'), plural: t('Frames', 'Marcos') },
               admin: {
                 description: t(
-                  'Add as many frames as you like: rows of 3 on desktop (or the number below), 2 on tablets, 1 on phones. Add "More photos" to turn a frame into a swipeable carousel.',
-                  'Agrega los marcos que quieras: filas de 3 en escritorio (o el número de abajo), 2 en tablet, 1 en celular. Agrega "Más fotos" para convertir un marco en un carrusel deslizable.',
+                  'Add as many frames as you like: rows of 3 on desktop (or the number below), 2 on tablets, 1 on phones. Add "More photos" to turn a frame into a swipeable carousel. These photos are only used here (folder "About · Frames"): to change one, upload a new photo instead of replacing a photo used on the Home page.',
+                  'Agrega los marcos que quieras: filas de 3 en escritorio (o el número de abajo), 2 en tablet, 1 en celular. Agrega "Más fotos" para convertir un marco en un carrusel deslizable. Estas fotos se usan solo aquí (carpeta "About · Frames"): para cambiar una, sube una foto nueva en vez de reemplazar una foto que usa la Home.',
                 ),
               },
               fields: [

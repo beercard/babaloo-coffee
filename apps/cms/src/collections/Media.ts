@@ -12,8 +12,8 @@ export const Media: CollectionConfig = {
   admin: {
     group: t('Media', 'Fotos'),
     description: t(
-      'Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product.',
-      'Biblioteca de fotos, organizada en carpetas por página (Home · Menu · About · Gallery…). Sube en la carpeta correcta, añade una descripción y luego elige la foto desde la página o el producto.',
+      'Photo library, organised in folders by page (Home · Menu · About · Gallery…). Upload into the right folder, add a short description, then pick the photo from the page or product. Replacing the file of an existing photo changes it on EVERY page that uses it: to change a photo in one place only, upload a new photo and pick it there.',
+      'Biblioteca de fotos, organizada en carpetas por página (Home · Menu · About · Gallery…). Sube en la carpeta correcta, añade una descripción y luego elige la foto desde la página o el producto. Reemplazar el archivo de una foto existente la cambia en TODAS las páginas que la usan: para cambiar una foto en un solo lugar, sube una foto nueva y elígela ahí.',
     ),
     defaultColumns: ['filename', 'alt', 'folder', 'updatedAt'],
   },

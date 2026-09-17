@@ -432,32 +432,23 @@ function page(doc: Json): CustomPage | undefined {
 }
 
 const slugOf = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-const LEGACY_LOCATIONS = ['rea farms', 'south end', 'lake norman'];
 
 function labels(item: Json): MenuLabel[] {
-  if (Array.isArray(item.labels) && item.labels.length) {
-    return (item.labels as unknown[])
-      .filter((l): l is Json => Boolean(l) && typeof l === 'object')
-      .filter((l) => DRAFTS || l._status !== 'draft')
-      .map((l) => ({
-        name: str(l.name) ?? '',
-        slug: str(l.slug) ?? slugOf(str(l.name) ?? ''),
-        kind: (l.kind === 'location' ? 'location' : 'badge') as MenuLabel['kind'],
-        color: color(l.color),
-        textColor: color(l.textColor),
-        showBadge: bool(l.showBadge, true),
-        order: num(l.order) ?? 0,
-      }))
-      .filter((l) => l.name)
-      .sort((a, b) => a.order - b.order);
-  }
-  // Before labels existed: fixed tags.
-  return (Array.isArray(item.tags) ? (item.tags as string[]) : []).map((t) => ({
-    name: t,
-    slug: slugOf(t),
-    kind: LEGACY_LOCATIONS.includes(t.toLowerCase()) ? 'location' : 'badge',
-    showBadge: true,
-  }));
+  if (!Array.isArray(item.labels)) return [];
+  return (item.labels as unknown[])
+    .filter((l): l is Json => Boolean(l) && typeof l === 'object')
+    .filter((l) => DRAFTS || l._status !== 'draft')
+    .map((l) => ({
+      name: str(l.name) ?? '',
+      slug: str(l.slug) ?? slugOf(str(l.name) ?? ''),
+      kind: (l.kind === 'location' ? 'location' : 'badge') as MenuLabel['kind'],
+      color: color(l.color),
+      textColor: color(l.textColor),
+      showBadge: bool(l.showBadge, true),
+      order: num(l.order) ?? 0,
+    }))
+    .filter((l) => l.name)
+    .sort((a, b) => a.order - b.order);
 }
 
 function location(doc: Json): Location {

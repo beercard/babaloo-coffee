@@ -79,19 +79,12 @@ export const MenuItems: CollectionConfig = {
       label: t('Labels & locations', 'Etiquetas y locales'),
       admin: {
         position: 'sidebar',
+        allowCreate: true,
         description: t(
-          'Badges (Signature, New…) and the locations that sell it. No location label = sold everywhere. Create new labels in Menu > Labels.',
-          'Distintivos (Signature, New…) y los locales que lo venden. Sin etiqueta de local = se vende en todos. Crea etiquetas nuevas en Menú > Etiquetas.',
+          'Pick any labels: badges (Signature, New…) and the locations that sell it. No location label = sold everywhere. To add a label that does not exist yet, use the + button here or Menu > Labels.',
+          'Elige las etiquetas que quieras: distintivos (Signature, New…) y los locales que lo venden. Sin etiqueta de local = se vende en todos. Para una etiqueta que todavía no existe, usa el botón + de aquí o Menú > Etiquetas.',
         ),
       },
-    },
-    // Legacy fixed list, replaced by `labels` (kept hidden so older data is not lost).
-    {
-      name: 'tags',
-      type: 'select',
-      hasMany: true,
-      admin: { hidden: true },
-      options: ['New', 'Popular', 'Seasonal', 'Vegan', 'Gluten free', 'Signature', 'Rea Farms', 'South End', 'Lake Norman'].map((v) => ({ label: v, value: v })),
     },
     { name: 'featured', type: 'checkbox', label: t('Featured (home page)', 'Destacado (portada)'), defaultValue: false, admin: { position: 'sidebar' } },
     activeField('available', t('Available (shown on the menu)', 'Disponible (visible en el menú)')),
