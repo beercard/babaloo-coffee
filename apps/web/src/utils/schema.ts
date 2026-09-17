@@ -25,10 +25,10 @@ export function cafeSchema(location: Location, settings: SiteSettings, siteUrl: 
   const a = location.address;
   return {
     '@type': 'CafeOrCoffeeShop',
-    '@id': `${siteUrl}locations#${location.slug}`,
+    '@id': `${siteUrl}#location-${location.slug}`,
     name: location.name === settings.name ? settings.name : `${settings.name} – ${location.name}`,
     parentOrganization: { '@id': `${siteUrl}#organization` },
-    url: `${siteUrl}locations`,
+    url: `${siteUrl}#locations`,
     ...(imageUrl ? { image: imageUrl } : {}),
     ...(location.phone || settings.phone ? { telephone: location.phone ?? settings.phone } : {}),
     ...(location.email || settings.email ? { email: location.email ?? settings.email } : {}),
