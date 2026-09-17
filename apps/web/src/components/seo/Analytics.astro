@@ -44,6 +44,8 @@ const gtagIds = [ga4, gads].filter(Boolean) as string[];
         function gtag() {
           dataLayer.push(arguments);
         }
+        // define:vars wraps this script in a function: expose gtag for the event tracker.
+        window.gtag = gtag;
         gtag('js', new Date());
         gtagIds.forEach(function (id) {
           gtag('config', id);
