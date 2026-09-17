@@ -45,17 +45,23 @@ export const DRAFTS = import.meta.env.PAYLOAD_DRAFTS === '1';
 
 async function get<T = Json>(path: string): Promise<T> {
   const url = `${BASE}/api/${path}${DRAFTS ? `${path.includes('?') ? '&' : '?'}draft=true` : ''}`;
-  const res = await fetch(url, {
+  const init = {
     headers: {
       Accept: 'application/json',
+      'User-Agent': 'Mozilla/5.0 (compatible; BabalooSiteBuild/1.0)',
       ...(API_KEY ? { Authorization: `users API-Key ${API_KEY}` } : {}),
       ...(DRAFTS && PREVIEW_SECRET ? { 'x-preview-secret': PREVIEW_SECRET } : {}),
     },
-  });
-  if (!res.ok) {
-    throw new Error(`[cms] ${res.status} ${res.statusText} for ${url}`);
+  };
+  // The CMS can briefly answer 403/5xx while Hostinger restarts it: retry before failing the build.
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(url, init).catch((err: Error) => err);
+    if (res instanceof Response && res.ok) return (await res.json()) as T;
+    const reason = res instanceof Response ? `${res.status} ${res.statusText}` : res.message;
+    const retryable = !(res instanceof Response) || res.status === 403 || res.status === 429 || res.status >= 500;
+    if (!retryable || attempt >= 5) throw new Error(`[cms] ${reason} for ${url}`);
+    await new Promise((r) => setTimeout(r, attempt * 15_000));
   }
-  return (await res.json()) as T;
 }
 
 /**
