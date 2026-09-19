@@ -1,0 +1,77 @@
+# Weekly check that the publish chain still works end to end:
+#   CMS publish → repository_dispatch → this repo builds → Hostinger API deploys the site.
+# A broken link fails silently for the editor (she publishes and nothing changes), so the job
+# FAILS on purpose and GitHub emails the repository owner.
+#
+# Runs every Monday at 12:00 UTC, or on demand (Actions → Health check → Run workflow).
+name: Health check
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE: ${{ vars.SITE_URL || 'https://babaloocoffeeclub.com' }}
+      PREVIEW: ${{ vars.PREVIEW_SITE_URL || 'https://preview.babaloocoffeeclub.com' }}
+      CMS: https://cms.babaloocoffeeclub.com
+      HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+      HOSTINGER_USERNAME: ${{ vars.HOSTINGER_USERNAME || 'u731809005' }}
+      GH_TOKEN: ${{ github.token }}
+      # Days without a successful live deploy before this is treated as a broken chain.
+      MAX_DAYS: 30
+    steps:
+      - name: Check
+        run: |
+          fail=0
+          note() { echo "::error::$1"; fail=1; }
+          ok() { echo "OK   $1"; }
+
+          # 1. the sites answer
+          for url in "$SITE" "$SITE/menu" "$SITE/about" "$SITE/contact" "$PREVIEW"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -A 'BabalooHealthCheck/1.0' "$url")
+            [ "$code" = 200 ] && ok "$url" || note "$url answered $code"
+          done
+
+          # 2. the CMS answers (the site cannot be rebuilt without it)
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$CMS/health")
+          [ "$code" = 200 ] && ok "CMS up" || note "CMS /health answered $code"
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$CMS/api/globals/site-settings?depth=0")
+          [ "$code" = 200 ] && ok "CMS API" || note "CMS API answered $code"
+
+          # 3. the deploy workflow still succeeds (a publish that never reaches the site shows up here)
+          last=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-web.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].updated_at')
+          if [ -z "$last" ] || [ "$last" = null ]; then
+            note "no successful website deploy found"
+          else
+            days=$(( ( $(date -u +%s) - $(date -u -d "$last" +%s) ) / 86400 ))
+            [ "$days" -le "$MAX_DAYS" ] && ok "last site deploy $days day(s) ago" || note "last successful site deploy was $days days ago ($last)"
+          fi
+          bad=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-web.yml/runs?status=failure&per_page=1" --jq '.workflow_runs[0].updated_at // empty')
+          if [ -n "$bad" ] && [ "$bad" \> "$last" ]; then note "the most recent website deploy failed ($bad)"; fi
+
+          # 4. the Hostinger token still works (it is what uploads the built site)
+          if [ -z "$HOSTINGER_API_TOKEN" ]; then
+            note "HOSTINGER_API_TOKEN secret is missing"
+          else
+            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $HOSTINGER_API_TOKEN" -H 'Accept: application/json' \
+              "https://developers.hostinger.com/api/hosting/v1/websites?per_page=1")
+            [ "$code" = 200 ] && ok "Hostinger token" || note "Hostinger API answered $code (token expired or revoked?)"
+          fi
+
+          # 5. certificates
+          for host in babaloocoffeeclub.com cms.babaloocoffeeclub.com preview.babaloocoffeeclub.com; do
+            end=$(echo | openssl s_client -servername "$host" -connect "$host:443" 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
+            days=$(( ( $(date -u -d "$end" +%s) - $(date -u +%s) ) / 86400 ))
+            [ "$days" -gt 10 ] && ok "SSL $host ($days days)" || note "SSL $host expires in $days days"
+          done
+
+          exit $fail
