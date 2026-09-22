@@ -76,7 +76,16 @@ async function archiveSource() {
   return { source_type: 'archive', source_options: { archive_path: file } };
 }
 
-const started = await api('POST', `${base}/nodejs/builds`, useGit ? await gitSource() : await archiveSource());
+// The build takes the settings in the request, so reuse the ones stored for the website
+// (framework, Node version, root/output directory, build script, package manager).
+const stored = await api('GET', `${base}/nodejs/builds/settings`);
+const settings = stored.data ?? stored;
+const keep = ['node_version', 'app_type', 'root_directory', 'output_directory', 'build_script', 'entry_file', 'package_manager'];
+const buildSettings = Object.fromEntries(keep.filter((k) => settings[k] !== undefined && settings[k] !== null).map((k) => [k, settings[k]]));
+if (!buildSettings.node_version) buildSettings.node_version = 22;
+console.log('[cms] settings', JSON.stringify(buildSettings));
+
+const started = await api('POST', `${base}/nodejs/builds`, { ...buildSettings, ...(useGit ? await gitSource() : await archiveSource()) });
 const uuid = started.uuid ?? started.data?.uuid;
 console.log(`[cms] build ${uuid ?? '(no id returned)'} started`);
 
