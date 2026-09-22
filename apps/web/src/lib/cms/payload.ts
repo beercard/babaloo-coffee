@@ -43,25 +43,42 @@ const PREVIEW_SECRET = import.meta.env.PAYLOAD_PREVIEW_SECRET;
 /** Preview build: latest drafts instead of the published content. */
 export const DRAFTS = import.meta.env.PAYLOAD_DRAFTS === '1';
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/**
+ * Hostinger's CDN answers 403 to bursts of requests from a data centre (the CI runner), so the
+ * build asks for one document at a time, looking like a browser, and waits out a block.
+ */
+let queue: Promise<unknown> = Promise.resolve();
+
 async function get<T = Json>(path: string): Promise<T> {
   const url = `${BASE}/api/${path}${DRAFTS ? `${path.includes('?') ? '&' : '?'}draft=true` : ''}`;
   const init = {
     headers: {
       Accept: 'application/json',
-      'User-Agent': 'Mozilla/5.0 (compatible; BabalooSiteBuild/1.0)',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
       ...(API_KEY ? { Authorization: `users API-Key ${API_KEY}` } : {}),
       ...(DRAFTS && PREVIEW_SECRET ? { 'x-preview-secret': PREVIEW_SECRET } : {}),
     },
   };
-  // The CMS can briefly answer 403/5xx while Hostinger restarts it: retry before failing the build.
-  for (let attempt = 1; ; attempt++) {
-    const res = await fetch(url, init).catch((err: Error) => err);
-    if (res instanceof Response && res.ok) return (await res.json()) as T;
-    const reason = res instanceof Response ? `${res.status} ${res.statusText}` : res.message;
-    const retryable = !(res instanceof Response) || res.status === 403 || res.status === 429 || res.status >= 500;
-    if (!retryable || attempt >= 5) throw new Error(`[cms] ${reason} for ${url}`);
-    await new Promise((r) => setTimeout(r, attempt * 15_000));
-  }
+  const run = async (): Promise<T> => {
+    for (let attempt = 1; ; attempt++) {
+      const res = await fetch(url, init).catch((err: Error) => err);
+      if (res instanceof Response && res.ok) {
+        await sleep(200); // keep the pace below the CDN's bot threshold
+        return (await res.json()) as T;
+      }
+      const reason = res instanceof Response ? `${res.status} ${res.statusText}` : res.message;
+      const retryable = !(res instanceof Response) || res.status === 403 || res.status === 429 || res.status >= 500;
+      if (!retryable || attempt >= 8) throw new Error(`[cms] ${reason} for ${url} (after ${attempt} tries)`);
+      console.warn(`[cms] ${reason} for ${url} — retry ${attempt}`);
+      await sleep(Math.min(attempt * 20_000, 60_000));
+    }
+  };
+  const result = queue.then(run, run);
+  queue = result.catch(() => undefined);
+  return result;
 }
 
 /**
