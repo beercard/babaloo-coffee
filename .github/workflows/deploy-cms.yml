@@ -1,0 +1,46 @@
+# Deploys the CMS (Hostinger Node.js app) through the Hostinger API, so updating it does not depend
+# on the hPanel "Redeploy" button or on Hostinger's Git webhook, which has already missed pushes.
+#
+# Needs the HOSTINGER_API_TOKEN secret and, on the Hostinger account, the GitHub app connected once
+# (Websites → the CMS → Git). Runs on pushes that touch the CMS, or on demand.
+name: Deploy CMS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/cms/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/hostinger-cms-build.mjs'
+      - '.github/workflows/deploy-cms.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cms
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Start the Hostinger build
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          HOSTINGER_USERNAME: ${{ vars.HOSTINGER_USERNAME || 'u731809005' }}
+          CMS_DOMAIN: ${{ vars.CMS_DOMAIN || 'cms.babaloocoffeeclub.com' }}
+        run: node scripts/hostinger-cms-build.mjs
+      - name: Check the CMS answers
+        run: |
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://cms.babaloocoffeeclub.com/health)
+            [ "$code" = 200 ] && { echo "CMS up"; exit 0; }
+            sleep 15
+          done
+          echo "::error::the CMS did not answer after the build"
+          exit 1
