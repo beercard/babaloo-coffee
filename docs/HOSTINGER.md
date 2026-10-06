@@ -170,19 +170,48 @@ Prueba:
 4. Cambiar la contraseña del super admin del CMS.
 5. Unas semanas después, borrar la carpeta `wordpress-old`.
 
-## Fase 7 — Email de los formularios (cuando haya acceso a Microsoft 365)
-Hoy los mensajes se guardan en **Messages**; falta que además lleguen por correo.
-1. Microsoft 365 admin center → **Users → info@ → Mail → Manage email apps** → activar **Authenticated SMTP**.
-2. En la app Node.js del CMS agregar:
+## Fase 7 — Email de los formularios (con Resend)
+Los mensajes se guardan siempre en **Messages**; esto hace que además lleguen a `info@babaloocoffeeclub.com`.
 
-   | Variable | Valor |
-   |---|---|
-   | `SMTP_HOST` | `smtp.office365.com` |
-   | `SMTP_PORT` | `587` |
-   | `SMTP_SECURE` | `false` |
-   | `SMTP_USER` / `SMTP_PASS` | `info@babaloocoffeeclub.com` y su contraseña |
-   | `EMAIL_FROM` / `EMAIL_FROM_NAME` | `info@babaloocoffeeclub.com` / `Babaloo Coffee Club` |
+Microsoft 365 solo acepta OAuth2 (`smtp-mail.outlook.com:587`, Modern Auth): el usuario y contraseña por SMTP está desactivado, y habilitar OAuth2 exige registrar una aplicación en Entra ID siendo administrador del tenant. Por eso el envío sale por **Resend**, que no toca la casilla ni el correo entrante.
 
-3. Redeployar y usar **Settings → Forms → Status & test → Send a test email**.
+### 7.1 Resend
+1. Crear cuenta en resend.com (plan gratuito: 3.000 correos por mes, 100 por día).
+2. **Domains → Add domain** → `send.babaloocoffeeclub.com` (**subdominio**, para no tocar el SPF del dominio principal, que es el del correo de Microsoft).
+3. Resend muestra 3 registros DNS. Cargarlos en Hostinger → **Dominios → DNS**, tal cual, con el nombre **sin** `.babaloocoffeeclub.com` al final:
 
-Si la organización tiene MFA obligatorio o "security defaults", Microsoft puede bloquear el SMTP con contraseña. En ese caso la alternativa es un servicio de envío (Brevo o Resend, con registros DNS en Hostinger) o una casilla de Hostinger solo para enviar.
+   | Tipo | Nombre | Valor |
+   |---|---|---|
+   | TXT | `send` | `v=spf1 include:amazonses.com ~all` |
+   | TXT | `resend._domainkey.send` | la clave DKIM que muestra Resend |
+   | MX | `send` | `feedback-smtp.us-east-1.amazonses.com` (prioridad 10) |
+
+4. Volver a Resend y pulsar **Verify DNS records** (tarda entre minutos y una hora).
+5. **API Keys → Create API Key**, permiso *Sending access*. Se muestra una sola vez.
+
+### 7.2 CMS
+En la app Node.js del CMS (hPanel → la app → Variables de entorno) agregar:
+
+| Variable | Valor |
+|---|---|
+| `SMTP_HOST` | `smtp.resend.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_SECURE` | `false` |
+| `SMTP_USER` | `resend` |
+| `SMTP_PASS` | la API key de Resend |
+| `EMAIL_FROM` | `web@send.babaloocoffeeclub.com` |
+| `EMAIL_FROM_NAME` | `Babaloo Coffee Club` |
+| `FORM_NOTIFY_EMAIL` | `info@babaloocoffeeclub.com` |
+
+Redeployar (**Actions → Deploy CMS → Run workflow**) y probar en **Settings → Forms → Status & test → Send a test email**. Como `replyTo` lleva el correo de quien escribió, responder desde Outlook le contesta directo.
+
+El destinatario también se puede cambiar sin tocar nada de esto, en **Settings → Forms**, por formulario.
+
+### 7.3 SPF del dominio principal (pendiente, no depende de Resend)
+Hoy el TXT del dominio es `v=spf1 include:secureserver.net -all`: autoriza a GoDaddy y **no** a Microsoft 365, que es donde está el correo. Los mensajes que envía `info@` pueden caer en spam o ser rechazados. Corregir en Hostinger → DNS, registro TXT de `@`:
+
+```
+v=spf1 include:spf.protection.outlook.com -all
+```
+
+Si algo todavía envía desde GoDaddy, dejar los dos: `v=spf1 include:spf.protection.outlook.com include:secureserver.net -all`.

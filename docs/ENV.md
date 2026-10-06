@@ -41,7 +41,7 @@ Las variables `PUBLIC_*` se incrustan en el HTML; nunca pongas secretos en ellas
 | `PREVIEW_DEBOUNCE_MS` | no | Espera del rebuild de vista previa. Default 20000. |
 | `PREVIEW_SECRET` | con vista previa | Cadena aleatoria; el build de vista previa la envía para leer borradores. Sin ella, los borradores solo los ven usuarios logueados. |
 | `FORM_NOTIFY_EMAIL` | recomendado | Buzón por defecto de los formularios (`info@babaloocoffeeclub.com`). Los editores pueden cambiarlo en *Settings → Forms*, que tiene prioridad. |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` | con notificaciones | SMTP para enviar los avisos (Hostinger: `smtp.hostinger.com`, 465, usuario y clave del buzón). Sin `SMTP_HOST` no se envía email; el mensaje queda solo en el CMS. |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` | con notificaciones | SMTP para enviar los avisos. En producción: Resend (`smtp.resend.com`, 587, `SMTP_SECURE=false`, usuario `resend`, clave = API key). Sin `SMTP_HOST` no se envía email; el mensaje queda solo en el CMS. Ver docs/HOSTINGER.md fase 7. |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | no | Remitente de los avisos. |
 | `FORM_WEBHOOK_URL` | no | Webhook para CRM / WhatsApp / newsletter con cada envío. |
 | `FORM_RATE_LIMIT` | no | Envíos aceptados por IP cada 10 min (los errores de validación no cuentan). Default 10. |
