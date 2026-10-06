@@ -61,10 +61,16 @@ const s3 = process.env.S3_BUCKET
     }
   : undefined;
 
-/** Outgoing email (form notifications) over SMTP, e.g. Hostinger: smtp.hostinger.com:465 with the info@ mailbox. */
+/**
+ * Outgoing email (form notifications) over SMTP. Production uses Resend:
+ * smtp.resend.com:587, SMTP_SECURE=false, user "resend", password = the API key.
+ * The sender must be an address of a domain verified there, so SMTP_USER ("resend") cannot be it.
+ */
+const emailAddress = (value?: string) => (value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ? value.trim() : undefined);
 const smtp = process.env.SMTP_HOST
   ? nodemailerAdapter({
-      defaultFromAddress: process.env.EMAIL_FROM ?? process.env.SMTP_USER ?? 'no-reply@babaloocoffeeclub.com',
+      defaultFromAddress:
+        emailAddress(process.env.EMAIL_FROM) ?? emailAddress(process.env.SMTP_USER) ?? 'no-reply@babaloocoffeeclub.com',
       defaultFromName: process.env.EMAIL_FROM_NAME ?? 'Babaloo Coffee Club',
       // Don't verify the SMTP login at boot: a wrong password must not take the whole CMS down,
       // it just fails (and is logged) when a notification is sent.
